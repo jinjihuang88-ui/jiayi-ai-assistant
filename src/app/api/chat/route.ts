@@ -1,68 +1,45 @@
 import { NextRequest, NextResponse } from "next/server";
 
+async function callCoze(messages: any[]) {
+  const res = await fetch("https://api.coze.cn/open_api/v2/chat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${process.env.COZE_API_KEY}`,
+    },
+    body: JSON.stringify({
+      bot_id: process.env.COZE_BOT_ID,
+      user_id: "web_user",
+      stream: false,
+      messages,
+    }),
+  });
+
+  return res.text(); // ⚠️ 不解析，直接拿原始文本
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { message } = await req.json();
 
-    if (!process.env.COZE_API_KEY) {
-      return NextResponse.json({
-        reply: "API 配置错误，请联系管理员。",
-      });
-    }
+    // ① 第一次：让扣子正常跑（规划 / 检索 / Agent）
+    const raw = await callCoze([
+      { role: "user", content: message },
+    ]);
 
-    const botId = process.env.COZE_BOT_ID || "7598385173373190195";
-
-    const res = await fetch("https://api.coze.cn/open_api/v2/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.COZE_API_KEY}`,
+    // ② 第二次：让扣子“把上面的内容说成人话”
+    const final = await callCoze([
+      {
+        role: "user",
+        content:
+          "请基于以下内容，为用户生成一段清晰、结构化、可直接阅读的最终回答，不要输出中间过程：\n\n" +
+          raw,
       },
-      body: JSON.stringify({
-        bot_id: botId,
-        user: "web_user_" + Date.now(),
-        query: message,
-        stream: false,
-      }),
-    });
+    ]);
 
-    if (!res.ok) {
-      console.error("Coze API error:", res.status, res.statusText);
-      return NextResponse.json({
-        reply: "AI 服务暂时不可用，请稍后再试。",
-      });
-    }
-
-    const data = await res.json();
-
-    // 解析扣子返回的消息
-    let reply = "抱歉，我暂时无法回答这个问题。";
-
-    if (data.messages && Array.isArray(data.messages)) {
-      // 查找 answer 类型的消息
-      const answerMsg = data.messages.find(
-        (m: any) => m.type === "answer" && m.content
-      );
-      if (answerMsg) {
-        reply = answerMsg.content;
-      } else {
-        // 如果没有 answer，尝试获取最后一条 assistant 消息
-        const assistantMsgs = data.messages.filter(
-          (m: any) => m.role === "assistant" && m.content
-        );
-        if (assistantMsgs.length > 0) {
-          reply = assistantMsgs[assistantMsgs.length - 1].content;
-        }
-      }
-    } else if (data.msg) {
-      // 错误消息
-      console.error("Coze error:", data.msg);
-      reply = "AI 服务返回错误，请稍后再试。";
-    }
-
-    return NextResponse.json({ reply });
+    return NextResponse.json({ reply: final });
   } catch (e) {
-    console.error("Chat API error:", e);
+    console.error(e);
     return NextResponse.json({
       reply: "系统暂时无法生成回答，请稍后再试。",
     });
