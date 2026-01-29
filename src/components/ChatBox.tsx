@@ -7,20 +7,33 @@ interface Message {
   content: string;
 }
 
+// 清理内容，移除系统消息
+function cleanContent(content: string): string {
+  if (!content) return "";
+  return content
+    .replace(/\{"msg_type"[^}]*\}/g, "")
+    .replace(/\{"finish_reason"[^}]*\}/g, "")
+    .replace(/\{"event"[^}]*\}/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 export default function ChatBox() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [streamingContent, setStreamingContent] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, streamingContent]);
+  }, [messages]);
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -29,7 +42,6 @@ export default function ChatBox() {
     setInput("");
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setIsLoading(true);
-    setStreamingContent("");
 
     try {
       const res = await fetch("/api/chat", {
@@ -38,56 +50,16 @@ export default function ChatBox() {
         body: JSON.stringify({ message: userMessage }),
       });
 
-      // 检查是否是流式响应
-      const contentType = res.headers.get("content-type");
+      const data = await res.json();
+      let replyContent = data.reply || "抱歉，暂时无法回复。";
       
-      if (contentType?.includes("text/event-stream")) {
-        // 流式处理
-        const reader = res.body?.getReader();
-        const decoder = new TextDecoder();
-        let fullContent = "";
+      // 清理内容
+      replyContent = cleanContent(replyContent);
 
-        while (reader) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n");
-
-          for (const line of lines) {
-            if (line.startsWith("data: ")) {
-              const data = line.slice(6);
-              if (data === "[DONE]") continue;
-              try {
-                const parsed = JSON.parse(data);
-                if (parsed.content) {
-                  fullContent += parsed.content;
-                  setStreamingContent(fullContent);
-                }
-              } catch {
-                // 非 JSON 数据，直接追加
-                fullContent += data;
-                setStreamingContent(fullContent);
-              }
-            }
-          }
-        }
-
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: fullContent || "抱歉，暂时无法回复。" },
-        ]);
-        setStreamingContent("");
-      } else {
-        // 非流式响应
-        const data = await res.json();
-        let replyContent = data.reply || "抱歉，暂时无法回复。";
-
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: replyContent },
-        ]);
-      }
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: replyContent },
+      ]);
     } catch (error) {
       setMessages((prev) => [
         ...prev,
@@ -95,7 +67,6 @@ export default function ChatBox() {
       ]);
     } finally {
       setIsLoading(false);
-      setStreamingContent("");
     }
   };
 
@@ -116,7 +87,7 @@ export default function ChatBox() {
   return (
     <div className="flex flex-col h-[700px] bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-red-600 to-orange-500 text-white">
+      <div className="flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-red-600 to-orange-500 text-white flex-shrink-0">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -136,8 +107,11 @@ export default function ChatBox() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50">
-        {messages.length === 0 && !streamingContent ? (
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50"
+      >
+        {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center px-4">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-3xl mb-4 shadow-lg">
               🍁
@@ -155,9 +129,7 @@ export default function ChatBox() {
               {suggestedQuestions.map((q, i) => (
                 <button
                   key={i}
-                  onClick={() => {
-                    setInput(q);
-                  }}
+                  onClick={() => setInput(q)}
                   className="w-full text-left px-4 py-3 rounded-xl bg-white border border-slate-200 text-sm text-slate-700 hover:border-red-300 hover:bg-red-50 transition-all duration-200"
                 >
                   {q}
@@ -184,27 +156,15 @@ export default function ChatBox() {
               </div>
             ))}
             
-            {/* Streaming content */}
-            {streamingContent && (
-              <div className="flex justify-start">
-                <div className="max-w-[85%] bg-white border border-slate-200 px-4 py-3 rounded-2xl rounded-bl-md shadow-sm">
-                  <p className="text-sm whitespace-pre-wrap leading-relaxed text-slate-800">
-                    {streamingContent}
-                    <span className="inline-block w-2 h-4 bg-red-500 ml-1 animate-pulse"></span>
-                  </p>
-                </div>
-              </div>
-            )}
-            
             {/* Loading indicator */}
-            {isLoading && !streamingContent && (
+            {isLoading && (
               <div className="flex justify-start">
                 <div className="bg-white border border-slate-200 px-4 py-3 rounded-2xl rounded-bl-md shadow-sm">
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1">
-                      <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                      <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                      <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                      <span className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                      <span className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                      <span className="w-2 h-2 bg-red-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
                     </div>
                     <span className="text-xs text-slate-500">AI 正在思考...</span>
                   </div>
@@ -217,7 +177,7 @@ export default function ChatBox() {
       </div>
 
       {/* Input */}
-      <div className="p-4 bg-white border-t border-slate-200">
+      <div className="p-4 bg-white border-t border-slate-200 flex-shrink-0">
         <div className="flex items-end gap-3">
           <div className="flex-1 relative">
             <textarea
