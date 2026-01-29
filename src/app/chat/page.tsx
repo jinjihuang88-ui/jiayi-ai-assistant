@@ -17,10 +17,10 @@ export default function ChatPage() {
       <ChatHeader />
 
       <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-900">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            {/* Left: Info Section */}
-            <div className={`transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="grid lg:grid-cols-5 gap-8 items-stretch">
+            {/* Left: Info Section - 2 columns */}
+            <div className={`lg:col-span-2 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-medium mb-6">
                 <span className="relative flex h-2 w-2">
@@ -36,18 +36,18 @@ export default function ChatPage() {
                   AI 加拿大移民咨询
                 </span>
               </h1>
-              <p className="text-lg text-slate-500 mb-8">
+              <p className="text-lg text-slate-500 mb-6">
                 AI-Powered Canadian Immigration Consultation
               </p>
 
               {/* Description */}
-              <p className="text-slate-600 leading-relaxed mb-8">
+              <p className="text-slate-600 leading-relaxed mb-6">
                 基于加拿大移民局（IRCC）官方公开数据的智能咨询服务，
                 帮助您理解可行路径、关键条件以及下一步方向。
               </p>
 
               {/* Features */}
-              <div className="space-y-4 mb-8">
+              <div className="space-y-3 mb-6">
                 {[
                   { icon: "🏛️", title: "官方数据驱动", desc: "基于 IRCC 官方公开信息" },
                   { icon: "💬", title: "即时对话", desc: "实时 AI 智能回复" },
@@ -64,7 +64,7 @@ export default function ChatPage() {
               </div>
 
               {/* Secondary CTA */}
-              <div className="p-6 rounded-xl bg-slate-100">
+              <div className="p-5 rounded-xl bg-slate-100">
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-2xl">📊</span>
                   <span className="font-medium text-slate-800">想先了解整体可能性？</span>
@@ -81,8 +81,8 @@ export default function ChatPage() {
               </div>
             </div>
 
-            {/* Right: Chat Box */}
-            <div className={`transition-all duration-700 delay-200 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            {/* Right: Chat Box - 3 columns */}
+            <div className={`lg:col-span-3 transition-all duration-700 delay-200 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
               <ChatBox />
             </div>
           </div>
