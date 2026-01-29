@@ -11,6 +11,7 @@ export default function ChatBox() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [streamingContent, setStreamingContent] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -19,7 +20,7 @@ export default function ChatBox() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, streamingContent]);
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -28,6 +29,7 @@ export default function ChatBox() {
     setInput("");
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setIsLoading(true);
+    setStreamingContent("");
 
     try {
       const res = await fetch("/api/chat", {
@@ -36,28 +38,56 @@ export default function ChatBox() {
         body: JSON.stringify({ message: userMessage }),
       });
 
-      const data = await res.json();
+      // 检查是否是流式响应
+      const contentType = res.headers.get("content-type");
       
-      // 解析回复内容
-      let replyContent = data.reply || "抱歉，暂时无法回复。";
-      
-      // 如果返回的是 JSON 字符串，尝试解析
-      if (typeof replyContent === "string" && replyContent.startsWith("{")) {
-        try {
-          const parsed = JSON.parse(replyContent);
-          if (parsed.messages && Array.isArray(parsed.messages)) {
-            const answerMsg = parsed.messages.find((m: any) => m.type === "answer");
-            replyContent = answerMsg?.content || replyContent;
-          }
-        } catch {
-          // 保持原样
-        }
-      }
+      if (contentType?.includes("text/event-stream")) {
+        // 流式处理
+        const reader = res.body?.getReader();
+        const decoder = new TextDecoder();
+        let fullContent = "";
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: replyContent },
-      ]);
+        while (reader) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split("\n");
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const data = line.slice(6);
+              if (data === "[DONE]") continue;
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.content) {
+                  fullContent += parsed.content;
+                  setStreamingContent(fullContent);
+                }
+              } catch {
+                // 非 JSON 数据，直接追加
+                fullContent += data;
+                setStreamingContent(fullContent);
+              }
+            }
+          }
+        }
+
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: fullContent || "抱歉，暂时无法回复。" },
+        ]);
+        setStreamingContent("");
+      } else {
+        // 非流式响应
+        const data = await res.json();
+        let replyContent = data.reply || "抱歉，暂时无法回复。";
+
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: replyContent },
+        ]);
+      }
     } catch (error) {
       setMessages((prev) => [
         ...prev,
@@ -65,6 +95,7 @@ export default function ChatBox() {
       ]);
     } finally {
       setIsLoading(false);
+      setStreamingContent("");
     }
   };
 
@@ -83,7 +114,7 @@ export default function ChatBox() {
   ];
 
   return (
-    <div className="flex flex-col h-[600px] max-h-[80vh] bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+    <div className="flex flex-col h-[700px] bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-red-600 to-orange-500 text-white">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
@@ -105,8 +136,8 @@ export default function ChatBox() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
-        {messages.length === 0 ? (
+      <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50">
+        {messages.length === 0 && !streamingContent ? (
           <div className="h-full flex flex-col items-center justify-center text-center px-4">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-3xl mb-4 shadow-lg">
               🍁
@@ -119,7 +150,7 @@ export default function ChatBox() {
             </p>
             
             {/* Suggested Questions */}
-            <div className="w-full max-w-md space-y-2">
+            <div className="w-full space-y-2">
               <p className="text-xs text-slate-400 mb-2">您可以这样问：</p>
               {suggestedQuestions.map((q, i) => (
                 <button
@@ -142,7 +173,7 @@ export default function ChatBox() {
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[80%] px-4 py-3 rounded-2xl ${
+                  className={`max-w-[85%] px-4 py-3 rounded-2xl ${
                     msg.role === "user"
                       ? "bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-br-md"
                       : "bg-white border border-slate-200 text-slate-800 rounded-bl-md shadow-sm"
@@ -153,7 +184,20 @@ export default function ChatBox() {
               </div>
             ))}
             
-            {isLoading && (
+            {/* Streaming content */}
+            {streamingContent && (
+              <div className="flex justify-start">
+                <div className="max-w-[85%] bg-white border border-slate-200 px-4 py-3 rounded-2xl rounded-bl-md shadow-sm">
+                  <p className="text-sm whitespace-pre-wrap leading-relaxed text-slate-800">
+                    {streamingContent}
+                    <span className="inline-block w-2 h-4 bg-red-500 ml-1 animate-pulse"></span>
+                  </p>
+                </div>
+              </div>
+            )}
+            
+            {/* Loading indicator */}
+            {isLoading && !streamingContent && (
               <div className="flex justify-start">
                 <div className="bg-white border border-slate-200 px-4 py-3 rounded-2xl rounded-bl-md shadow-sm">
                   <div className="flex items-center gap-2">
