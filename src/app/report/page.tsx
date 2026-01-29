@@ -1,9 +1,9 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 
-export default function ReportPage() {
+function ReportContent() {
   const searchParams = useSearchParams();
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -52,7 +52,7 @@ export default function ReportPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <>
       {/* PDF Cover Page */}
       <div className="hidden print:block min-h-screen flex items-center justify-center">
         <div className="text-center px-10">
@@ -276,91 +276,80 @@ export default function ReportPage() {
             <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
               <span className="text-xl">✅</span>
             </div>
-            <h2 className="text-xl font-bold text-slate-900">建议的下一步</h2>
+            <h2 className="text-xl font-bold text-slate-900">建议下一步</h2>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-            {[
-              { step: 1, title: "规划语言考试", desc: "IELTS / CELPIP / TEF", icon: "🗣️" },
-              { step: 2, title: "学历认证（ECA）", desc: "确认是否需要进行学历认证", icon: "📜" },
-              { step: 3, title: "关注政策动态", desc: "持续关注官方政策与职业需求变化", icon: "📰" },
-            ].map((item, i) => (
-              <div 
-                key={i} 
-                className={`flex items-center gap-4 p-5 ${i !== 2 ? 'border-b border-slate-100' : ''} hover:bg-slate-50 transition-colors duration-200`}
-              >
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-orange-500 text-white font-bold flex items-center justify-center flex-shrink-0">
-                  {item.step}
-                </div>
-                <div className="flex-1">
-                  <div className="font-semibold text-slate-900">{item.title}</div>
-                  <div className="text-sm text-slate-500">{item.desc}</div>
-                </div>
-                <span className="text-2xl">{item.icon}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Data Sources */}
-        <section className={`mb-12 transition-all duration-700 delay-600 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="bg-slate-100 rounded-2xl p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-xl">📚</span>
-              <h3 className="font-semibold text-slate-900">官方数据来源</h3>
-            </div>
-            <ul className="space-y-2 text-sm text-slate-600">
-              <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                加拿大移民、难民及公民部（IRCC）官网公开信息
-              </li>
-              <li className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-                加拿大官方职业分类（NOC）与劳工市场数据
-              </li>
+          <div className="bg-white rounded-2xl border border-slate-200 p-6">
+            <ul className="space-y-4">
+              {[
+                { icon: "🗣️", text: "准备语言考试（雅思/思培），目标 CLB 7 以上" },
+                { icon: "📄", text: "整理学历和工作经历文件，准备 ECA 学历认证" },
+                { icon: "💬", text: "使用 AI 咨询深入了解具体项目要求" },
+                { icon: "👨‍⚖️", text: "考虑咨询持牌移民顾问（RCIC）获取专业建议" },
+              ].map((item, i) => (
+                <li key={i} className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                  <span className="text-2xl">{item.icon}</span>
+                  <span className="text-slate-700">{item.text}</span>
+                </li>
+              ))}
             </ul>
-            <p className="mt-4 text-xs text-slate-500">
-              注：移民政策与职业需求可能随时间调整，本报告内容基于生成当日的公开信息，不构成移民或法律建议。
-            </p>
           </div>
         </section>
 
         {/* CTA Section */}
-        <div className={`print:hidden transition-all duration-700 delay-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="bg-gradient-to-r from-red-600 to-orange-500 rounded-2xl p-8 text-white text-center">
-            <h3 className="text-2xl font-bold mb-2">准备好下一步了吗？</h3>
-            <p className="text-white/80 mb-6">与 AI 助理深入探讨您的移民方案</p>
-            <div className="flex flex-wrap justify-center gap-4">
+        <section className={`transition-all duration-700 delay-600 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-8 text-white text-center">
+            <h3 className="text-2xl font-bold mb-3">准备好开始您的移民之旅了吗？</h3>
+            <p className="text-slate-300 mb-6 max-w-lg mx-auto">
+              使用我们的 AI 助理获取更详细的指导，或开始填写正式申请表格
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a
-                href={`/chat?data=${encodeURIComponent(JSON.stringify(answers))}`}
-                className="px-6 py-3 rounded-xl bg-white text-red-600 font-semibold hover:bg-white/90 transition-colors duration-200 flex items-center gap-2"
+                href="/chat"
+                className="px-6 py-3 rounded-xl bg-white text-slate-900 font-semibold hover:bg-slate-100 transition-colors"
               >
-                <span className="relative flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                </span>
-                咨询 AI 助理
-              </a>
-              <a
-                href="/assessment"
-                className="px-6 py-3 rounded-xl border-2 border-white/30 text-white font-medium hover:bg-white/10 transition-colors duration-200"
-              >
-                重新评估
+                💬 咨询 AI 助理
               </a>
               <a
                 href="/applications"
-                className="px-6 py-3 rounded-xl border-2 border-white/30 text-white font-medium hover:bg-white/10 transition-colors duration-200"
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold hover:from-red-600 hover:to-orange-600 transition-colors"
               >
-                开始申请
+                📋 开始申请
               </a>
             </div>
           </div>
+        </section>
+
+        {/* Disclaimer */}
+        <div className="mt-12 text-center text-sm text-slate-500">
+          <p>
+            本报告由 AI 自动生成，仅供参考，不构成移民或法律建议。
+            <br />
+            具体申请请以加拿大移民局（IRCC）官方信息为准。
+          </p>
         </div>
       </div>
+    </>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
+      <div className="text-center">
+        <div className="w-16 h-16 border-4 border-red-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-slate-600">正在加载报告...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function ReportPage() {
+  return (
+    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <Suspense fallback={<LoadingFallback />}>
+        <ReportContent />
+      </Suspense>
     </main>
   );
 }
