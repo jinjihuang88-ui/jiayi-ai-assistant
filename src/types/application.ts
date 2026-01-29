@@ -3,6 +3,10 @@ export interface ApplicationField {
   label: string;
   value: string;
   aiHint?: string;
+  section?: number;
+  type?: "text" | "select" | "date" | "textarea";
+  options?: string[];
+  required?: boolean;
   review?: {
     status: "ok" | "fix";
     comment: string;
