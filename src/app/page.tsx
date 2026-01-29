@@ -103,7 +103,7 @@ export default function Home() {
             </h1>
 
             <p className="text-xl text-white/90 mt-6 max-w-2xl leading-relaxed">
-              覆盖加拿大 <span className="font-semibold">留学 · 就业 · 移民</span> 的 AI 路径评估与申请平台
+              覆盖加拿大 <span className="font-semibold">留学 · 旅游 · 移民</span> 的 AI 路径评估与申请平台
             </p>
 
             <p className="text-base text-white/70 mt-3 max-w-2xl">
@@ -167,6 +167,180 @@ export default function Home() {
           <svg className="w-6 h-6 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
           </svg>
+        </div>
+      </section>
+
+      {/* Services Section - NEW */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900">
+              我们的服务
+            </h2>
+            <p className="text-slate-600 mt-4 max-w-2xl mx-auto">
+              覆盖留学、旅游、移民全方位签证申请服务
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* 学签 */}
+            <a href="/applications/study-permit" className="group">
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-100 
+                              hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                  <span className="text-2xl">🎓</span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">学习签证</h3>
+                <p className="text-slate-600 text-sm mb-4">Study Permit (IMM 1294)</p>
+                <ul className="text-sm text-slate-500 space-y-1">
+                  <li>• 留学生签证申请</li>
+                  <li>• AI 智能填表引导</li>
+                  <li>• RCIC 专家审核</li>
+                </ul>
+                <div className="mt-4 text-blue-600 font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                  立即申请 <span>→</span>
+                </div>
+              </div>
+            </a>
+
+            {/* 访客签证 - NEW */}
+            <a href="/applications/visitor-visa" className="group">
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100 
+                              hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden">
+                {/* NEW Badge */}
+                <div className="absolute top-4 right-4 px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
+                  NEW
+                </div>
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                  <span className="text-2xl">✈️</span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">访客签证</h3>
+                <p className="text-slate-600 text-sm mb-4">Visitor Visa (IMM 5257)</p>
+                <ul className="text-sm text-slate-500 space-y-1">
+                  <li>• 旅游 / 探亲 / 商务</li>
+                  <li>• 超级签证 Super Visa</li>
+                  <li>• 全程 AI 辅助填写</li>
+                </ul>
+                <div className="mt-4 text-green-600 font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                  立即申请 <span>→</span>
+                </div>
+              </div>
+            </a>
+
+            {/* 工签 */}
+            <div className="group cursor-not-allowed">
+              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 
+                              opacity-70 relative">
+                <div className="absolute top-4 right-4 px-2 py-1 bg-slate-400 text-white text-xs font-bold rounded-full">
+                  即将推出
+                </div>
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-4 shadow-lg">
+                  <span className="text-2xl">💼</span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">工作签证</h3>
+                <p className="text-slate-600 text-sm mb-4">Work Permit</p>
+                <ul className="text-sm text-slate-500 space-y-1">
+                  <li>• PGWP 毕业工签</li>
+                  <li>• LMIA 雇主担保</li>
+                  <li>• 开放式工签</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* 移民 */}
+            <div className="group cursor-not-allowed">
+              <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 border border-orange-100 
+                              opacity-70 relative">
+                <div className="absolute top-4 right-4 px-2 py-1 bg-slate-400 text-white text-xs font-bold rounded-full">
+                  即将推出
+                </div>
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center mb-4 shadow-lg">
+                  <span className="text-2xl">🍁</span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">永久居民</h3>
+                <p className="text-slate-600 text-sm mb-4">Permanent Residence</p>
+                <ul className="text-sm text-slate-500 space-y-1">
+                  <li>• Express Entry 快速通道</li>
+                  <li>• 省提名 PNP</li>
+                  <li>• 家庭团聚</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Visitor Visa Highlight Section - NEW */}
+      <section className="py-20 bg-gradient-to-br from-green-600 to-emerald-500 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
+        
+        <div className="max-w-7xl mx-auto px-6 relative">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-6">
+                <span className="text-lg">✈️</span>
+                <span className="text-sm font-medium">新功能上线</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                加拿大访客签证<br />在线申请
+              </h2>
+              <p className="text-white/90 text-lg mb-8 leading-relaxed">
+                无论是旅游观光、探亲访友还是商务出行，我们的 AI 助手都能帮您轻松完成签证申请。
+                支持普通访客签证和超级签证（Super Visa）申请。
+              </p>
+              
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {[
+                  { icon: "🏖️", label: "旅游观光" },
+                  { icon: "👨‍👩‍👧‍👦", label: "探亲访友" },
+                  { icon: "💼", label: "商务访问" },
+                  { icon: "⭐", label: "超级签证" },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 bg-white/10 rounded-xl px-4 py-3">
+                    <span className="text-2xl">{item.icon}</span>
+                    <span className="font-medium">{item.label}</span>
+                  </div>
+                ))}
+              </div>
+
+              <a
+                href="/applications/visitor-visa"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white text-green-600 font-semibold 
+                           hover:bg-white/95 transition-all duration-300 shadow-2xl hover:-translate-y-1"
+              >
+                立即申请访客签证
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </a>
+            </div>
+
+            <div className="hidden md:block">
+              <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
+                <h3 className="text-xl font-semibold mb-6">为什么选择我们申请访客签证？</h3>
+                <div className="space-y-4">
+                  {[
+                    { title: "AI 智能填表", desc: "自动引导填写 IMM 5257 表格，避免遗漏" },
+                    { title: "即时 AI 咨询", desc: "遇到问题随时询问 AI 助手" },
+                    { title: "RCIC 专家审核", desc: "持牌移民顾问把关，提高通过率" },
+                    { title: "材料清单指导", desc: "根据您的情况生成个性化材料清单" },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="font-medium">{item.title}</div>
+                        <div className="text-sm text-white/70">{item.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -332,6 +506,7 @@ export default function Home() {
                 <li><a href="/assessment" className="hover:text-white transition-colors">免费评估</a></li>
                 <li><a href="/chat" className="hover:text-white transition-colors">AI 咨询</a></li>
                 <li><a href="/applications" className="hover:text-white transition-colors">我的申请</a></li>
+                <li><a href="/applications/visitor-visa" className="hover:text-white transition-colors">访客签证申请</a></li>
               </ul>
             </div>
 

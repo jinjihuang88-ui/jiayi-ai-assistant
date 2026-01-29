@@ -15,6 +15,18 @@ const applications = [
     features: ["AI 智能填写", "实时校验", "RCIC 审核"],
   },
   {
+    id: "visitor-visa",
+    title: "访客签证",
+    titleEn: "Visitor Visa",
+    desc: "官方表格 IMM 5257 · 旅游/探亲/商务",
+    icon: "✈️",
+    color: "from-green-500 to-emerald-500",
+    status: "available",
+    href: "/applications/visitor-visa",
+    features: ["旅游签证", "探亲签证", "超级签证"],
+    isNew: true,
+  },
+  {
     id: "express-entry",
     title: "EE 技术移民",
     titleEn: "Express Entry",
@@ -42,7 +54,7 @@ const applications = [
     titleEn: "Work Permit",
     desc: "LMIA / 开放工签申请",
     icon: "💼",
-    color: "from-green-500 to-emerald-500",
+    color: "from-indigo-500 to-purple-500",
     status: "coming",
     href: "#",
     features: ["雇主担保", "LMIA 指导", "续签服务"],
@@ -105,10 +117,15 @@ export default function ApplicationsPage() {
                     即将上线
                   </div>
                 )}
-                {app.status === 'available' && (
+                {app.status === 'available' && !app.isNew && (
                   <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-medium flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                     可用
+                  </div>
+                )}
+                {app.isNew && (
+                  <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold">
+                    NEW
                   </div>
                 )}
 
