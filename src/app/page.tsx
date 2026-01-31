@@ -2,12 +2,42 @@
 
 import { useEffect, useState } from "react";
 
+interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  avatar: string | null;
+  profile: {
+    familyName: string | null;
+    givenName: string | null;
+  } | null;
+}
+
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     setIsLoaded(true);
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      const data = await res.json();
+      if (data.success) {
+        setUser(data.user);
+      }
+    } catch (error) {
+      console.error("Auth check error:", error);
+    } finally {
+      setIsCheckingAuth(false);
+    }
+  };
+
+  const displayName = user?.profile?.givenName || user?.name || user?.email?.split("@")[0] || "";
 
   return (
     <main className="bg-slate-50 text-slate-900">
@@ -63,16 +93,47 @@ export default function Home() {
             </a>
           </nav>
 
-          {/* CTA */}
-          <a
-            href="/applications"
-            className="ml-4 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-500 text-white text-sm font-medium 
-                       hover:from-red-700 hover:to-red-600 transition-all duration-300 
-                       shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 
-                       hover:-translate-y-0.5 active:translate-y-0"
-          >
-            开始办理申请
-          </a>
+          {/* Member Entry / CTA */}
+          <div className="flex items-center gap-3">
+            {isCheckingAuth ? (
+              <div className="w-8 h-8 rounded-full bg-slate-200 animate-pulse" />
+            ) : user ? (
+              /* 已登录状态 */
+              <a
+                href="/member"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-all duration-300 group"
+              >
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-orange-500 flex items-center justify-center text-white text-sm font-medium shadow-md group-hover:shadow-lg transition-shadow">
+                  {displayName.charAt(0).toUpperCase()}
+                </div>
+                <span className="text-sm font-medium text-slate-700 hidden sm:inline">
+                  会员中心
+                </span>
+              </a>
+            ) : (
+              /* 未登录状态 */
+              <a
+                href="/auth/login"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-slate-200 hover:border-red-500 hover:bg-red-50 transition-all duration-300 group"
+              >
+                <svg className="w-5 h-5 text-slate-500 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span className="text-sm font-medium text-slate-600 group-hover:text-red-600 transition-colors">
+                  登录 / 注册
+                </span>
+              </a>
+            )}
+            <a
+              href="/applications"
+              className="ml-1 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-500 text-white text-sm font-medium 
+                         hover:from-red-700 hover:to-red-600 transition-all duration-300 
+                         shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 
+                         hover:-translate-y-0.5 active:translate-y-0"
+            >
+              开始办理申请
+            </a>
+          </div>
         </div>
       </header>
 
@@ -103,7 +164,7 @@ export default function Home() {
             </h1>
 
             <p className="text-xl text-white/90 mt-6 max-w-2xl leading-relaxed">
-              覆盖加拿大 <span className="font-semibold">留学 · 旅游 · 移民</span> 的 AI 路径评估与申请平台
+              覆盖加拿大 <span className="font-semibold">留学 · 旅游 · 工签 · 移民</span> 的 AI 路径评估与申请平台
             </p>
 
             <p className="text-base text-white/70 mt-3 max-w-2xl">
@@ -170,7 +231,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Services Section - NEW */}
+      {/* Services Section - UPDATED */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
@@ -178,15 +239,15 @@ export default function Home() {
               我们的服务
             </h2>
             <p className="text-slate-600 mt-4 max-w-2xl mx-auto">
-              覆盖留学、旅游、移民全方位签证申请服务
+              覆盖留学、旅游、工签、移民全方位签证申请服务
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* 学签 */}
             <a href="/applications/study-permit" className="group">
               <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-100 
-                              hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
+                              hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
                   <span className="text-2xl">🎓</span>
                 </div>
@@ -203,14 +264,10 @@ export default function Home() {
               </div>
             </a>
 
-            {/* 访客签证 - NEW */}
+            {/* 访客签证 */}
             <a href="/applications/visitor-visa" className="group">
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100 
-                              hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden">
-                {/* NEW Badge */}
-                <div className="absolute top-4 right-4 px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full">
-                  NEW
-                </div>
+                              hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden h-full">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
                   <span className="text-2xl">✈️</span>
                 </div>
@@ -227,119 +284,149 @@ export default function Home() {
               </div>
             </a>
 
-            {/* 工签 */}
-            <div className="group cursor-not-allowed">
+            {/* 工签 - NEW */}
+            <a href="/applications/work-permit" className="group">
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 
-                              opacity-70 relative">
-                <div className="absolute top-4 right-4 px-2 py-1 bg-slate-400 text-white text-xs font-bold rounded-full">
-                  即将推出
+                              hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden h-full">
+                <div className="absolute top-4 right-4 px-2 py-1 bg-purple-500 text-white text-xs font-bold rounded-full">
+                  NEW
                 </div>
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-4 shadow-lg">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
                   <span className="text-2xl">💼</span>
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">工作签证</h3>
-                <p className="text-slate-600 text-sm mb-4">Work Permit</p>
+                <p className="text-slate-600 text-sm mb-4">Work Permit (IMM 1295)</p>
                 <ul className="text-sm text-slate-500 space-y-1">
-                  <li>• PGWP 毕业工签</li>
-                  <li>• LMIA 雇主担保</li>
                   <li>• 开放式工签</li>
+                  <li>• 雇主指定工签</li>
+                  <li>• LMIA 指导</li>
                 </ul>
+                <div className="mt-4 text-purple-600 font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                  立即申请 <span>→</span>
+                </div>
               </div>
-            </div>
+            </a>
 
-            {/* 移民 */}
-            <div className="group cursor-not-allowed">
-              <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 border border-orange-100 
-                              opacity-70 relative">
-                <div className="absolute top-4 right-4 px-2 py-1 bg-slate-400 text-white text-xs font-bold rounded-full">
-                  即将推出
+            {/* EE 技术移民 - NEW */}
+            <a href="/applications/express-entry" className="group">
+              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl p-6 border border-indigo-100 
+                              hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden h-full">
+                <div className="absolute top-4 right-4 px-2 py-1 bg-indigo-500 text-white text-xs font-bold rounded-full">
+                  NEW
                 </div>
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center mb-4 shadow-lg">
-                  <span className="text-2xl">🍁</span>
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                  <span className="text-2xl">🚀</span>
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">永久居民</h3>
-                <p className="text-slate-600 text-sm mb-4">Permanent Residence</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">EE 技术移民</h3>
+                <p className="text-slate-600 text-sm mb-4">Express Entry (IMM 0008)</p>
                 <ul className="text-sm text-slate-500 space-y-1">
-                  <li>• Express Entry 快速通道</li>
-                  <li>• 省提名 PNP</li>
-                  <li>• 家庭团聚</li>
+                  <li>• 联邦技术移民 FSW</li>
+                  <li>• 加拿大经验类 CEC</li>
+                  <li>• 联邦技工类 FST</li>
                 </ul>
+                <div className="mt-4 text-indigo-600 font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                  立即申请 <span>→</span>
+                </div>
               </div>
-            </div>
+            </a>
+
+            {/* 省提名 - NEW */}
+            <a href="/applications/provincial-nominee" className="group">
+              <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 border border-orange-100 
+                              hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden h-full">
+                <div className="absolute top-4 right-4 px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded-full">
+                  NEW
+                </div>
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                  <span className="text-2xl">🏛️</span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">省提名项目</h3>
+                <p className="text-slate-600 text-sm mb-4">PNP (IMM 0008)</p>
+                <ul className="text-sm text-slate-500 space-y-1">
+                  <li>• 各省移民项目</li>
+                  <li>• 省份匹配分析</li>
+                  <li>• 职业条件评估</li>
+                </ul>
+                <div className="mt-4 text-orange-600 font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                  立即申请 <span>→</span>
+                </div>
+              </div>
+            </a>
+
+            {/* 更多服务 */}
+            <a href="/applications" className="group">
+              <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-2xl p-6 border border-slate-200 
+                              hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full flex flex-col items-center justify-center">
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-slate-400 to-gray-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                  <span className="text-2xl">📋</span>
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">查看全部</h3>
+                <p className="text-slate-600 text-sm text-center">浏览所有可用的申请类型</p>
+                <div className="mt-4 text-slate-600 font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                  查看更多 <span>→</span>
+                </div>
+              </div>
+            </a>
           </div>
         </div>
       </section>
 
-      {/* Visitor Visa Highlight Section - NEW */}
-      <section className="py-20 bg-gradient-to-br from-green-600 to-emerald-500 text-white relative overflow-hidden">
+      {/* New Services Highlight Section */}
+      <section className="py-20 bg-gradient-to-br from-indigo-600 to-purple-600 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
         
         <div className="max-w-7xl mx-auto px-6 relative">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-6">
-                <span className="text-lg">✈️</span>
-                <span className="text-sm font-medium">新功能上线</span>
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
-                加拿大访客签证<br />在线申请
-              </h2>
-              <p className="text-white/90 text-lg mb-8 leading-relaxed">
-                无论是旅游观光、探亲访友还是商务出行，我们的 AI 助手都能帮您轻松完成签证申请。
-                支持普通访客签证和超级签证（Super Visa）申请。
-              </p>
-              
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                {[
-                  { icon: "🏖️", label: "旅游观光" },
-                  { icon: "👨‍👩‍👧‍👦", label: "探亲访友" },
-                  { icon: "💼", label: "商务访问" },
-                  { icon: "⭐", label: "超级签证" },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 bg-white/10 rounded-xl px-4 py-3">
-                    <span className="text-2xl">{item.icon}</span>
-                    <span className="font-medium">{item.label}</span>
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-6">
+              <span className="text-lg">🎉</span>
+              <span className="text-sm font-medium">新功能上线</span>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              移民申请服务全面升级
+            </h2>
+            <p className="text-white/90 text-lg max-w-2xl mx-auto">
+              现已支持工签申请、Express Entry 技术移民、省提名项目，覆盖更多移民路径
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: "💼",
+                title: "工作签证",
+                desc: "开放式工签、雇主指定工签、LMIA 指导",
+                href: "/applications/work-permit",
+                color: "from-purple-400 to-pink-400",
+              },
+              {
+                icon: "🚀",
+                title: "EE 技术移民",
+                desc: "FSW、CEC、FST 三大类别全覆盖",
+                href: "/applications/express-entry",
+                color: "from-blue-400 to-indigo-400",
+              },
+              {
+                icon: "🏛️",
+                title: "省提名项目",
+                desc: "支持所有省份和地区的提名项目",
+                href: "/applications/provincial-nominee",
+                color: "from-orange-400 to-red-400",
+              },
+            ].map((item, i) => (
+              <a key={i} href={item.href} className="group">
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 
+                                hover:bg-white/20 transition-all duration-300 hover:-translate-y-2">
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${item.color} flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform`}>
+                    <span className="text-xl">{item.icon}</span>
                   </div>
-                ))}
-              </div>
-
-              <a
-                href="/applications/visitor-visa"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-white text-green-600 font-semibold 
-                           hover:bg-white/95 transition-all duration-300 shadow-2xl hover:-translate-y-1"
-              >
-                立即申请访客签证
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </a>
-            </div>
-
-            <div className="hidden md:block">
-              <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
-                <h3 className="text-xl font-semibold mb-6">为什么选择我们申请访客签证？</h3>
-                <div className="space-y-4">
-                  {[
-                    { title: "AI 智能填表", desc: "自动引导填写 IMM 5257 表格，避免遗漏" },
-                    { title: "即时 AI 咨询", desc: "遇到问题随时询问 AI 助手" },
-                    { title: "RCIC 专家审核", desc: "持牌移民顾问把关，提高通过率" },
-                    { title: "材料清单指导", desc: "根据您的情况生成个性化材料清单" },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="font-medium">{item.title}</div>
-                        <div className="text-sm text-white/70">{item.desc}</div>
-                      </div>
-                    </div>
-                  ))}
+                  <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                  <p className="text-white/80 text-sm mb-4">{item.desc}</p>
+                  <div className="text-white font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
+                    立即申请 <span>→</span>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </a>
+            ))}
           </div>
         </div>
       </section>
@@ -506,16 +593,18 @@ export default function Home() {
                 <li><a href="/assessment" className="hover:text-white transition-colors">免费评估</a></li>
                 <li><a href="/chat" className="hover:text-white transition-colors">AI 咨询</a></li>
                 <li><a href="/applications" className="hover:text-white transition-colors">我的申请</a></li>
-                <li><a href="/applications/visitor-visa" className="hover:text-white transition-colors">访客签证申请</a></li>
               </ul>
             </div>
 
-            {/* Contact */}
+            {/* Services */}
             <div>
-              <h4 className="font-semibold mb-4">联系我们</h4>
+              <h4 className="font-semibold mb-4">申请服务</h4>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li>support@maplepath.ai</li>
-                <li>周一至周五 9:00-18:00</li>
+                <li><a href="/applications/study-permit" className="hover:text-white transition-colors">学习签证</a></li>
+                <li><a href="/applications/visitor-visa" className="hover:text-white transition-colors">访客签证</a></li>
+                <li><a href="/applications/work-permit" className="hover:text-white transition-colors">工作签证</a></li>
+                <li><a href="/applications/express-entry" className="hover:text-white transition-colors">EE 技术移民</a></li>
+                <li><a href="/applications/provincial-nominee" className="hover:text-white transition-colors">省提名项目</a></li>
               </ul>
             </div>
           </div>

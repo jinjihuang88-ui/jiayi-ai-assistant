@@ -13,6 +13,22 @@ export default function VisitorVisaReviewPage() {
     }
   }, []);
 
+  const sectionTitles = [
+    "基本信息",
+    "个人信息",
+    "居住信息",
+    "婚姻状况",
+    "语言能力",
+    "护照信息",
+    "身份证件",
+    "联系方式",
+    "访问计划",
+    "教育背景",
+    "工作经历",
+    "背景信息",
+    "签名声明",
+  ];
+
   if (!application) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50">
@@ -23,6 +39,16 @@ export default function VisitorVisaReviewPage() {
       </main>
     );
   }
+
+  // 按 section 分组字段
+  const groupedFields: { [key: number]: typeof application.fields } = {};
+  application.fields.forEach((field) => {
+    const section = field.section ?? 0;
+    if (!groupedFields[section]) {
+      groupedFields[section] = [];
+    }
+    groupedFields[section].push(field);
+  });
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
@@ -90,19 +116,53 @@ export default function VisitorVisaReviewPage() {
           </div>
         </div>
 
-        {/* Application Summary */}
+        {/* Application Summary - Grouped by Section */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <h2 className="text-xl font-semibold text-slate-900 mb-6">申请信息摘要</h2>
-          <div className="space-y-4">
-            {application.fields.map((field) => (
-              <div key={field.key} className="flex justify-between py-2 border-b border-slate-100 last:border-0">
-                <span className="text-slate-600">{field.label}</span>
-                <span className="font-medium text-slate-900 max-w-[60%] text-right">
-                  {field.value || <span className="text-slate-400">未填写</span>}
-                </span>
+          
+          {Object.keys(groupedFields).sort((a, b) => Number(a) - Number(b)).map((sectionKey) => {
+            const sectionIndex = Number(sectionKey);
+            const fields = groupedFields[sectionIndex];
+            const hasFilledFields = fields.some(f => f.value);
+            
+            if (!hasFilledFields) return null;
+            
+            return (
+              <div key={sectionKey} className="mb-8 last:mb-0">
+                <h3 className="text-lg font-medium text-blue-600 mb-4 pb-2 border-b border-blue-100">
+                  {sectionTitles[sectionIndex] || `第 ${sectionIndex + 1} 部分`}
+                </h3>
+                <div className="space-y-3">
+                  {fields.map((field) => (
+                    field.value ? (
+                      <div key={field.key} className="flex justify-between py-2 border-b border-slate-100 last:border-0">
+                        <span className="text-slate-600 text-sm">{field.label}</span>
+                        <span className="font-medium text-slate-900 max-w-[60%] text-right text-sm">
+                          {field.value}
+                        </span>
+                      </div>
+                    ) : null
+                  ))}
+                </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="mt-8 flex gap-4">
+          <a
+            href="/applications/visitor-visa"
+            className="flex-1 py-3 px-6 bg-white border border-slate-300 rounded-xl text-center font-medium text-slate-700 hover:bg-slate-50 transition-all"
+          >
+            修改申请
+          </a>
+          <button
+            onClick={() => window.print()}
+            className="flex-1 py-3 px-6 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl text-center font-medium text-white hover:from-blue-700 hover:to-cyan-600 transition-all"
+          >
+            打印申请
+          </button>
         </div>
       </div>
     </main>
