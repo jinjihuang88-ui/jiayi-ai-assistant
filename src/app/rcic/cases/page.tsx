@@ -1,64 +1,173 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Application } from "@/types/application";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function RcicCasesPage() {
-  const [application, setApplication] = useState<Application | null>(null);
+interface RCIC {
+  id: string;
+  name: string;
+  licenseNo: string;
+}
+
+interface Application {
+  id: string;
+  type: string;
+  typeName: string;
+  status: string;
+  submittedAt: string;
+  user: {
+    id: string;
+    email: string;
+    name: string | null;
+    phone: string | null;
+  };
+  documents: any[];
+  _count: {
+    messages: number;
+  };
+}
+
+interface Stats {
+  pending: number;
+  underReview: number;
+  needsRevision: number;
+  approved: number;
+}
+
+export default function RCICCasesPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const statusFilter = searchParams.get("status");
+
+  const [rcic, setRcic] = useState<RCIC | null>(null);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [currentFilter, setCurrentFilter] = useState(statusFilter || "all");
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem("current_application");
-    if (raw) {
-      setApplication(JSON.parse(raw));
-    }
+    checkAuth();
     setIsLoaded(true);
   }, []);
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "submitted":
-        return { color: "bg-yellow-100 text-yellow-700", label: "待审核", icon: "⏳" };
-      case "needs_revision":
-        return { color: "bg-red-100 text-red-700", label: "需修改", icon: "⚠️" };
-      case "approved":
-        return { color: "bg-green-100 text-green-700", label: "已通过", icon: "✅" };
-      default:
-        return { color: "bg-slate-100 text-slate-700", label: "草稿", icon: "📝" };
+  useEffect(() => {
+    if (rcic) {
+      fetchCases();
+    }
+  }, [currentFilter, rcic]);
+
+  const checkAuth = async () => {
+    try {
+      const res = await fetch("/api/rcic/auth/me");
+      const data = await res.json();
+
+      if (!data.success) {
+        router.push("/rcic/login");
+        return;
+      }
+
+      setRcic(data.rcic);
+    } catch (error) {
+      router.push("/rcic/login");
     }
   };
+
+  const fetchCases = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (currentFilter !== "all") {
+        params.set("status", currentFilter);
+      }
+
+      const res = await fetch(`/api/rcic/cases?${params}`);
+      const data = await res.json();
+
+      if (data.success) {
+        setApplications(data.applications);
+        setStats(data.stats);
+      }
+    } catch (error) {
+      console.error("Error fetching cases:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await fetch("/api/rcic/auth/logout", { method: "POST" });
+    router.push("/rcic/login");
+  };
+
+  const statusMap: Record<string, { label: string; color: string; bgColor: string }> = {
+    submitted: { label: "待审核", color: "text-yellow-400", bgColor: "bg-yellow-500" },
+    under_review: { label: "审核中", color: "text-blue-400", bgColor: "bg-blue-500" },
+    needs_revision: { label: "需修改", color: "text-orange-400", bgColor: "bg-orange-500" },
+    approved: { label: "已通过", color: "text-green-400", bgColor: "bg-green-500" },
+    rejected: { label: "已拒绝", color: "text-red-400", bgColor: "bg-red-500" },
+  };
+
+  const typeIconMap: Record<string, string> = {
+    "study-permit": "🎓",
+    "visitor-visa": "✈️",
+    "work-permit": "💼",
+    "express-entry": "🚀",
+    "provincial-nominee": "🏛️",
+  };
+
+  const filters = [
+    { key: "all", label: "全部", count: (stats?.pending || 0) + (stats?.underReview || 0) + (stats?.needsRevision || 0) },
+    { key: "submitted", label: "待审核", count: stats?.pending || 0 },
+    { key: "under_review", label: "审核中", count: stats?.underReview || 0 },
+    { key: "needs_revision", label: "需修改", count: stats?.needsRevision || 0 },
+    { key: "approved", label: "已通过", count: stats?.approved || 0 },
+  ];
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-700/50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-3 group">
+          <a href="/rcic/dashboard" className="flex items-center gap-3 group">
             <img src="/logo.png" alt="Logo" className="h-8 w-8 rounded-lg" />
             <div>
               <span className="font-semibold text-white">加移AI助理</span>
-              <span className="ml-2 px-2 py-0.5 rounded text-xs bg-red-600 text-white">RCIC</span>
+              <span className="ml-2 px-2 py-0.5 rounded text-xs bg-emerald-600 text-white">RCIC</span>
             </div>
           </a>
+
+          <nav className="hidden md:flex items-center gap-6 text-sm">
+            <a href="/rcic/dashboard" className="text-slate-400 hover:text-white transition-colors">仪表板</a>
+            <a href="/rcic/cases" className="text-emerald-400 font-medium">案件管理</a>
+            <a href="/rcic/messages" className="text-slate-400 hover:text-white transition-colors">消息</a>
+          </nav>
+
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-sm text-slate-400">
               <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              在线
+              {rcic?.name}
             </div>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-sm hover:bg-slate-700 transition-colors"
+            >
+              退出
+            </button>
           </div>
         </div>
       </header>
 
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Page Header */}
-        <div className={`mb-12 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        <div className={`mb-8 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-2xl shadow-lg">
-              👨‍⚖️
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-2xl shadow-lg">
+              📋
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">RCIC 审核后台</h1>
-              <p className="text-slate-400">持牌移民顾问案件管理系统</p>
+              <h1 className="text-3xl font-bold text-white">案件管理</h1>
+              <p className="text-slate-400">查看和审核用户提交的移民申请</p>
             </div>
           </div>
         </div>
@@ -66,10 +175,10 @@ export default function RcicCasesPage() {
         {/* Stats Cards */}
         <div className={`grid grid-cols-4 gap-4 mb-8 transition-all duration-700 delay-100 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           {[
-            { label: "待审核", value: application ? "1" : "0", color: "from-yellow-500 to-orange-500", icon: "⏳" },
-            { label: "需修改", value: "0", color: "from-red-500 to-pink-500", icon: "⚠️" },
-            { label: "已通过", value: "0", color: "from-green-500 to-emerald-500", icon: "✅" },
-            { label: "总计", value: application ? "1" : "0", color: "from-blue-500 to-cyan-500", icon: "📊" },
+            { label: "待审核", value: stats?.pending || 0, color: "from-yellow-500 to-orange-500", icon: "⏳" },
+            { label: "审核中", value: stats?.underReview || 0, color: "from-blue-500 to-cyan-500", icon: "🔍" },
+            { label: "需修改", value: stats?.needsRevision || 0, color: "from-orange-500 to-red-500", icon: "✏️" },
+            { label: "已通过", value: stats?.approved || 0, color: "from-green-500 to-emerald-500", icon: "✅" },
           ].map((stat, i) => (
             <div key={i} className="bg-slate-800/50 backdrop-blur rounded-xl p-4 border border-slate-700/50">
               <div className="flex items-center justify-between mb-2">
@@ -83,105 +192,97 @@ export default function RcicCasesPage() {
           ))}
         </div>
 
-        {/* Cases List */}
-        <div className={`transition-all duration-700 delay-200 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">待审核案件</h2>
-            <div className="flex items-center gap-2">
-              <button className="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-sm hover:bg-slate-700 transition-colors">
-                刷新
-              </button>
-            </div>
-          </div>
+        {/* Filters */}
+        <div className={`flex gap-2 mb-6 overflow-x-auto pb-2 transition-all duration-700 delay-150 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          {filters.map((filter) => (
+            <button
+              key={filter.key}
+              onClick={() => setCurrentFilter(filter.key)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                currentFilter === filter.key
+                  ? "bg-emerald-600 text-white"
+                  : "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white"
+              }`}
+            >
+              {filter.label}
+              <span className="ml-2 px-2 py-0.5 rounded-full bg-black/20 text-xs">
+                {filter.count}
+              </span>
+            </button>
+          ))}
+        </div>
 
-          {!application ? (
-            <div className="bg-slate-800/30 backdrop-blur rounded-2xl border border-slate-700/50 p-12 text-center">
+        {/* Cases List */}
+        <div className={`bg-slate-800/30 backdrop-blur rounded-2xl border border-slate-700/50 overflow-hidden transition-all duration-700 delay-200 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          {loading ? (
+            <div className="p-12 flex items-center justify-center">
+              <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : applications.length === 0 ? (
+            <div className="p-12 text-center">
               <div className="w-20 h-20 rounded-full bg-slate-800 flex items-center justify-center text-4xl mx-auto mb-4">
                 📭
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">暂无待审核案件</h3>
+              <h3 className="text-xl font-semibold text-white mb-2">暂无案件</h3>
               <p className="text-slate-400 max-w-md mx-auto">
                 当用户提交申请后，案件将显示在这里等待您的审核
               </p>
             </div>
           ) : (
-            <div className="bg-slate-800/30 backdrop-blur rounded-2xl border border-slate-700/50 overflow-hidden hover:border-slate-600/50 transition-colors">
-              <div className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-xl">
-                      🎓
+            <div className="divide-y divide-slate-700/50">
+              {applications.map((app) => (
+                <a
+                  key={app.id}
+                  href={`/rcic/cases/${app.id}`}
+                  className="flex items-center gap-4 p-5 hover:bg-slate-700/30 transition-colors"
+                >
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-slate-700 to-slate-600 flex items-center justify-center text-2xl">
+                    {typeIconMap[app.type] || "📄"}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <span className="font-semibold text-white">{app.typeName}</span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs text-white ${statusMap[app.status]?.bgColor || "bg-slate-500"}`}>
+                        {statusMap[app.status]?.label || app.status}
+                      </span>
+                      {app._count.messages > 0 && (
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-red-500 text-white animate-pulse">
+                          {app._count.messages} 条新消息
+                        </span>
+                      )}
+                      {app.documents.length > 0 && (
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-slate-600 text-slate-300">
+                          📎 {app.documents.length} 个附件
+                        </span>
+                      )}
                     </div>
-                    <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <h3 className="text-lg font-semibold text-white">学签申请</h3>
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(application.status).color}`}>
-                          {getStatusBadge(application.status).icon} {getStatusBadge(application.status).label}
-                        </span>
-                      </div>
-                      <p className="text-slate-400 text-sm">IMM 1294 · Study Permit Application</p>
-                      <div className="flex items-center gap-4 mt-3 text-sm text-slate-500">
-                        <span className="flex items-center gap-1">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-                          </svg>
-                          {application.id}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          {application.fields?.length || 0} 个字段
-                        </span>
-                      </div>
+                    <div className="text-sm text-slate-400">
+                      <span className="font-medium text-slate-300">{app.user.name || "未设置姓名"}</span>
+                      <span className="mx-2">·</span>
+                      <span>{app.user.email}</span>
+                      {app.user.phone && (
+                        <>
+                          <span className="mx-2">·</span>
+                          <span>{app.user.phone}</span>
+                        </>
+                      )}
+                    </div>
+                    <div className="text-xs text-slate-500 mt-1">
+                      申请编号: {app.id.slice(0, 8).toUpperCase()} · 提交于 {new Date(app.submittedAt).toLocaleString("zh-CN")}
                     </div>
                   </div>
-
-                  <a
-                    href={`/rcic/cases/${application.id}`}
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-medium 
-                               hover:from-red-600 hover:to-orange-600 transition-all duration-300
-                               shadow-lg shadow-red-500/20 hover:shadow-xl hover:shadow-red-500/30
-                               flex items-center gap-2"
-                  >
-                    开始审核
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-3">
+                    <span className="px-4 py-2 rounded-lg bg-emerald-600/20 text-emerald-400 text-sm font-medium">
+                      查看详情
+                    </span>
+                    <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
-                  </a>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="px-6 pb-6">
-                <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
-                  <span>审核进度</span>
-                  <span>0%</span>
-                </div>
-                <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                  <div className="h-full w-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-full" />
-                </div>
-              </div>
+                  </div>
+                </a>
+              ))}
             </div>
           )}
-        </div>
-
-        {/* Quick Actions */}
-        <div className={`mt-8 grid grid-cols-3 gap-4 transition-all duration-700 delay-300 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          {[
-            { icon: "📋", title: "审核指南", desc: "查看审核标准与流程" },
-            { icon: "📚", title: "政策更新", desc: "最新移民政策变化" },
-            { icon: "💬", title: "客户沟通", desc: "与申请人在线沟通" },
-          ].map((action, i) => (
-            <div 
-              key={i} 
-              className="bg-slate-800/30 backdrop-blur rounded-xl border border-slate-700/50 p-4 hover:bg-slate-800/50 hover:border-slate-600/50 transition-all duration-300 cursor-pointer"
-            >
-              <div className="text-2xl mb-2">{action.icon}</div>
-              <h4 className="font-medium text-white mb-1">{action.title}</h4>
-              <p className="text-sm text-slate-400">{action.desc}</p>
-            </div>
-          ))}
         </div>
       </div>
     </main>

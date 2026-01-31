@@ -109,81 +109,204 @@ export default function VisitorVisaPage() {
     status: "draft",
     fields: [
       // ===== 第1步：基本信息 =====
-      { key: "uci", label: "UCI 号码 (首次申请留空)", value: "", section: 0 },
-      { key: "service_language", label: "服务语言偏好", value: "English", section: 0 },
-      { key: "visa_type", label: "签证类型 Type of Visa", value: "", section: 0, aiHint: "旅游/探亲/商务/超级签证" },
+      { key: "uci", label: "UCI 号码 (首次申请留空)", value: "", section: 0, aiHint: "Universal Client Identification Number，8-10位数字，首次申请无需填写" },
+      { key: "service_language", label: "服务语言偏好 I want service in", value: "English", section: 0 },
+      { key: "visa_type", label: "签证类型 Visa Requested", value: "", section: 0, aiHint: "Visitor Visa 访客签证 / Transit Visa 过境签证" },
       
       // ===== 第2步：个人信息 =====
-      { key: "family_name", label: "姓 Family Name", value: "", section: 1, aiHint: "需与护照完全一致，使用拼音大写" },
-      { key: "given_name", label: "名 Given Name(s)", value: "", section: 1, aiHint: "需与护照完全一致，使用拼音大写" },
+      { key: "family_name", label: "姓 Family Name", value: "", section: 1, aiHint: "需与护照完全一致，使用拼音大写。如护照上无姓，请将所有名字填在此处" },
+      { key: "given_name", label: "名 Given Name(s)", value: "", section: 1, aiHint: "需与护照完全一致，使用拼音大写。如护照上无名，请留空" },
+      { key: "used_other_name", label: "是否曾用其他姓名 Used Other Name", value: "", section: 1, aiHint: "包括曾用名、婚前姓、昵称等" },
+      { key: "other_family_name", label: "其他姓氏 Other Family Name", value: "", section: 1, aiHint: "如选是，请填写曾用姓氏" },
+      { key: "other_given_name", label: "其他名字 Other Given Name(s)", value: "", section: 1, aiHint: "如选是，请填写曾用名字" },
       { key: "sex", label: "性别 Sex", value: "", section: 1 },
-      { key: "date_of_birth", label: "出生日期 Date of Birth", value: "", section: 1, aiHint: "格式：YYYY-MM-DD" },
-      { key: "country_of_birth", label: "出生国家 Country of Birth", value: "", section: 1 },
-      { key: "city_of_birth", label: "出生城市 City of Birth", value: "", section: 1 },
-      { key: "citizenship", label: "国籍 Country of Citizenship", value: "", section: 1 },
-      { key: "marital_status", label: "婚姻状况 Marital Status", value: "", section: 1, aiHint: "Single/Married/Common-law/Divorced/Widowed" },
+      { key: "date_of_birth", label: "出生日期 Date of Birth", value: "", section: 1, aiHint: "格式：YYYY-MM-DD，需与护照一致" },
+      { key: "city_of_birth", label: "出生城市 City/Town of Birth", value: "", section: 1, aiHint: "需与护照一致" },
+      { key: "country_of_birth", label: "出生国家 Country of Birth", value: "", section: 1, aiHint: "需与护照一致" },
+      { key: "citizenship", label: "国籍 Citizenship", value: "", section: 1, aiHint: "需与护照一致，如有多国籍选择此次旅行使用的护照国籍" },
       
-      // ===== 第3步：护照信息 =====
-      { key: "passport_number", label: "护照号码 Passport Number", value: "", section: 2, aiHint: "需与护照完全一致" },
-      { key: "passport_country", label: "护照签发国 Country of Issue", value: "", section: 2 },
-      { key: "passport_issue_date", label: "护照签发日期 Issue Date", value: "", section: 2, aiHint: "格式：YYYY-MM-DD" },
-      { key: "passport_expiry_date", label: "护照有效期 Expiry Date", value: "", section: 2, aiHint: "格式：YYYY-MM-DD，建议有效期超过计划离开加拿大日期至少6个月" },
+      // ===== 第3步：居住信息 =====
+      { key: "residence_country", label: "现居住国家 Current Country of Residence", value: "", section: 2, aiHint: "您目前合法居住的国家" },
+      { key: "residence_status", label: "居住身份 Immigration Status", value: "", section: 2, aiHint: "在现居住国的身份状态" },
+      { key: "residence_status_other", label: "其他身份说明 Other Status Details", value: "", section: 2, aiHint: "如选择Other，请说明具体身份" },
+      { key: "residence_from", label: "居住开始日期 From", value: "", section: 2, aiHint: "格式：YYYY-MM-DD" },
+      { key: "residence_to", label: "居住结束日期 To", value: "", section: 2, aiHint: "格式：YYYY-MM-DD，如仍居住可填当前日期或留空" },
+      { key: "lived_other_country", label: "过去5年是否在其他国家居住超过6个月", value: "", section: 2, aiHint: "除国籍国和现居住国外" },
+      { key: "previous_country", label: "曾居住国家 Previous Country", value: "", section: 2, aiHint: "如选是，填写曾居住国家" },
+      { key: "previous_status", label: "曾居住身份 Previous Status", value: "", section: 2, aiHint: "在该国的身份状态" },
+      { key: "previous_from", label: "曾居住开始日期 Previous From", value: "", section: 2, aiHint: "格式：YYYY-MM-DD" },
+      { key: "previous_to", label: "曾居住结束日期 Previous To", value: "", section: 2, aiHint: "格式：YYYY-MM-DD" },
+      { key: "applying_from_residence", label: "是否从居住国申请 Applying from Country of Residence", value: "", section: 2, aiHint: "如果您在第三国申请，选择No" },
+      { key: "applying_country", label: "申请国家 Country Where Applying", value: "", section: 2, aiHint: "如不是从居住国申请，填写申请所在国" },
+      { key: "applying_status", label: "申请国身份 Status in Applying Country", value: "", section: 2, aiHint: "在申请国的身份状态" },
       
-      // ===== 第4步：联系方式 =====
-      { key: "current_address", label: "现居住地址 Current Address", value: "", section: 3, aiHint: "包括街道、城市、省份、邮编、国家" },
-      { key: "mailing_address", label: "邮寄地址 Mailing Address", value: "", section: 3, aiHint: "如与现居住地址相同，填写 Same as above" },
-      { key: "phone_number", label: "电话号码 Phone Number", value: "", section: 3, aiHint: "包含国家代码，如 +86" },
-      { key: "email", label: "电子邮箱 Email", value: "", section: 3, aiHint: "用于接收 IRCC 通知，请确保可正常接收" },
+      // ===== 第4步：婚姻状况 =====
+      { key: "marital_status", label: "婚姻状况 Marital Status", value: "", section: 3, aiHint: "当前婚姻状况" },
+      { key: "marriage_date", label: "结婚/同居日期 Date of Marriage/Common-law", value: "", section: 3, aiHint: "格式：YYYY-MM-DD，如已婚或同居需填写" },
+      { key: "spouse_family_name", label: "配偶姓 Spouse Family Name", value: "", section: 3, aiHint: "如已婚或同居需填写" },
+      { key: "spouse_given_name", label: "配偶名 Spouse Given Name(s)", value: "", section: 3, aiHint: "如已婚或同居需填写" },
+      { key: "previously_married", label: "是否曾经结婚或同居 Previously Married/Common-law", value: "", section: 3 },
+      { key: "prev_spouse_family_name", label: "前配偶姓 Previous Spouse Family Name", value: "", section: 3 },
+      { key: "prev_spouse_given_name", label: "前配偶名 Previous Spouse Given Name(s)", value: "", section: 3 },
+      { key: "prev_spouse_dob", label: "前配偶出生日期 Previous Spouse DOB", value: "", section: 3, aiHint: "格式：YYYY-MM-DD" },
+      { key: "prev_relationship_type", label: "前关系类型 Previous Relationship Type", value: "", section: 3 },
+      { key: "prev_relationship_from", label: "前关系开始日期 Previous Relationship From", value: "", section: 3 },
+      { key: "prev_relationship_to", label: "前关系结束日期 Previous Relationship To", value: "", section: 3 },
       
-      // ===== 第5步：访问计划 =====
-      { key: "purpose_of_visit", label: "访问目的 Purpose of Visit", value: "", section: 4, aiHint: "如：旅游观光/探亲访友/商务会议" },
-      { key: "visit_start_date", label: "计划入境日期 Planned Entry Date", value: "", section: 4, aiHint: "格式：YYYY-MM-DD" },
-      { key: "visit_end_date", label: "计划离境日期 Planned Departure Date", value: "", section: 4, aiHint: "格式：YYYY-MM-DD" },
-      { key: "visit_duration", label: "预计停留时间 Length of Stay", value: "", section: 4, aiHint: "如：14 days / 1 month" },
-      { key: "funds_for_trip", label: "旅行资金 Funds for Trip (CAD)", value: "", section: 4, aiHint: "用于支付在加拿大期间的费用" },
-      { key: "canada_address", label: "加拿大住址 Address in Canada", value: "", section: 4, aiHint: "酒店地址或亲友住址" },
+      // ===== 第5步：语言能力 =====
+      { key: "native_language", label: "母语 Native Language/Mother Tongue", value: "", section: 4, aiHint: "您的第一语言" },
+      { key: "can_communicate_en_fr", label: "能否用英语或法语交流 Communicate in English/French", value: "", section: 4 },
+      { key: "language_preference", label: "最熟练的语言 Language Most at Ease", value: "", section: 4, aiHint: "English/French/Neither" },
+      { key: "language_test_taken", label: "是否参加过语言测试 Language Test Taken", value: "", section: 4, aiHint: "是否参加过指定机构的语言测试" },
       
-      // ===== 第6步：邀请人/联系人信息 =====
-      { key: "contact_name", label: "加拿大联系人姓名 Contact Name", value: "", section: 5, aiHint: "如无联系人填 N/A" },
-      { key: "contact_relationship", label: "与联系人关系 Relationship", value: "", section: 5, aiHint: "如：朋友/亲属/商业伙伴" },
-      { key: "contact_address", label: "联系人地址 Contact Address", value: "", section: 5 },
-      { key: "contact_phone", label: "联系人电话 Contact Phone", value: "", section: 5 },
+      // ===== 第6步：护照信息 =====
+      { key: "passport_number", label: "护照号码 Passport Number", value: "", section: 5, aiHint: "需与护照完全一致" },
+      { key: "passport_country", label: "护照签发国 Country of Issue", value: "", section: 5 },
+      { key: "passport_issue_date", label: "护照签发日期 Issue Date", value: "", section: 5, aiHint: "格式：YYYY-MM-DD" },
+      { key: "passport_expiry_date", label: "护照有效期 Expiry Date", value: "", section: 5, aiHint: "格式：YYYY-MM-DD，建议有效期超过计划离开加拿大日期至少6个月" },
+      { key: "taiwan_passport_with_id", label: "是否使用含身份证号的台湾护照", value: "", section: 5, aiHint: "台湾外交部签发的含个人身份证号的护照" },
+      { key: "israeli_passport", label: "是否使用以色列国民护照", value: "", section: 5 },
       
-      // ===== 第7步：资金证明 =====
-      { key: "funds_available", label: "可用资金总额 Total Funds Available", value: "", section: 6, aiHint: "银行存款、投资等" },
-      { key: "funds_source", label: "资金来源 Source of Funds", value: "", section: 6, aiHint: "如：工资收入/退休金/存款/子女资助" },
-      { key: "monthly_income", label: "月收入 Monthly Income", value: "", section: 6 },
+      // ===== 第7步：身份证件 =====
+      { key: "has_national_id", label: "是否有国民身份证 National Identity Document", value: "", section: 6 },
+      { key: "national_id_number", label: "身份证号码 Document Number", value: "", section: 6 },
+      { key: "national_id_country", label: "身份证签发国 Country of Issue", value: "", section: 6 },
+      { key: "national_id_issue_date", label: "身份证签发日期 Issue Date", value: "", section: 6, aiHint: "格式：YYYY-MM-DD" },
+      { key: "national_id_expiry_date", label: "身份证有效期 Expiry Date", value: "", section: 6, aiHint: "格式：YYYY-MM-DD" },
+      { key: "has_us_pr_card", label: "是否持有美国绿卡 US PR Card", value: "", section: 6 },
+      { key: "us_pr_card_number", label: "绿卡号码 US PR Card Number", value: "", section: 6 },
+      { key: "us_pr_card_expiry", label: "绿卡有效期 US PR Card Expiry", value: "", section: 6, aiHint: "格式：YYYY-MM-DD" },
       
-      // ===== 第8步：工作/职业信息 =====
-      { key: "current_occupation", label: "当前职业 Current Occupation", value: "", section: 7, aiHint: "如：Employed/Self-employed/Retired/Student" },
-      { key: "employer_name", label: "雇主名称 Employer Name", value: "", section: 7, aiHint: "如退休或无业填 N/A" },
-      { key: "employer_address", label: "雇主地址 Employer Address", value: "", section: 7 },
-      { key: "job_title", label: "职位 Job Title", value: "", section: 7 },
-      { key: "employment_start_date", label: "入职日期 Employment Start Date", value: "", section: 7 },
+      // ===== 第8步：联系方式 =====
+      { key: "mailing_po_box", label: "邮政信箱 P.O. Box", value: "", section: 7 },
+      { key: "mailing_apt_unit", label: "公寓/单元号 Apt/Unit", value: "", section: 7 },
+      { key: "mailing_street_no", label: "街道号 Street No.", value: "", section: 7 },
+      { key: "mailing_street_name", label: "街道名 Street Name", value: "", section: 7 },
+      { key: "mailing_city", label: "城市 City/Town", value: "", section: 7 },
+      { key: "mailing_country", label: "国家 Country", value: "", section: 7 },
+      { key: "mailing_province", label: "省/州 Province/State", value: "", section: 7 },
+      { key: "mailing_postal_code", label: "邮编 Postal Code", value: "", section: 7 },
+      { key: "mailing_district", label: "区 District", value: "", section: 7 },
+      { key: "residential_same", label: "居住地址与邮寄地址相同", value: "", section: 7 },
+      { key: "residential_apt_unit", label: "居住公寓/单元号 Residential Apt/Unit", value: "", section: 7 },
+      { key: "residential_street_no", label: "居住街道号 Residential Street No.", value: "", section: 7 },
+      { key: "residential_street_name", label: "居住街道名 Residential Street Name", value: "", section: 7 },
+      { key: "residential_city", label: "居住城市 Residential City", value: "", section: 7 },
+      { key: "residential_country", label: "居住国家 Residential Country", value: "", section: 7 },
+      { key: "residential_province", label: "居住省/州 Residential Province", value: "", section: 7 },
+      { key: "residential_postal_code", label: "居住邮编 Residential Postal Code", value: "", section: 7 },
+      { key: "phone_type", label: "电话类型 Phone Type", value: "", section: 7, aiHint: "Cell/Home/Business" },
+      { key: "phone_country_code", label: "电话国家代码 Country Code", value: "", section: 7, aiHint: "如中国 +86" },
+      { key: "phone_number", label: "电话号码 Phone Number", value: "", section: 7 },
+      { key: "phone_ext", label: "分机号 Extension", value: "", section: 7 },
+      { key: "alt_phone_type", label: "备用电话类型 Alt Phone Type", value: "", section: 7 },
+      { key: "alt_phone_country_code", label: "备用电话国家代码 Alt Country Code", value: "", section: 7 },
+      { key: "alt_phone_number", label: "备用电话号码 Alt Phone Number", value: "", section: 7 },
+      { key: "fax_number", label: "传真号码 Fax Number", value: "", section: 7 },
+      { key: "email", label: "电子邮箱 Email", value: "", section: 7, aiHint: "用于接收 IRCC 通知，请确保可正常接收" },
       
-      // ===== 第9步：背景信息 =====
-      { key: "travel_history", label: "旅行史 Travel History", value: "", section: 8, aiHint: "列出过去10年出境记录，特别是发达国家旅行记录" },
-      { key: "previous_canada_visit", label: "以往加拿大访问记录", value: "", section: 8, aiHint: "如有请详细说明日期和目的，无则填 No" },
-      { key: "refusal_history", label: "拒签史 Refusal History", value: "", section: 8, aiHint: "如有拒签经历请详细说明，无则填 No" },
-      { key: "criminal_record", label: "犯罪记录 Criminal Record", value: "", section: 8, aiHint: "如无犯罪记录填 No" },
-      { key: "medical_condition", label: "健康状况 Medical Condition", value: "", section: 8, aiHint: "如有重大疾病请说明，无则填 Good health" },
-      { key: "family_in_canada", label: "加拿大亲属 Family in Canada", value: "", section: 8, aiHint: "如有在加拿大的亲属请说明关系和身份" },
+      // ===== 第9步：访问计划 =====
+      { key: "purpose_of_visit", label: "访问目的 Purpose of Visit", value: "", section: 8, aiHint: "如：Tourism/Family Visit/Business/Study/Work/Other" },
+      { key: "purpose_other", label: "其他目的说明 Other Purpose Details", value: "", section: 8 },
+      { key: "visit_from_date", label: "计划入境日期 From Date", value: "", section: 8, aiHint: "格式：YYYY-MM-DD" },
+      { key: "visit_to_date", label: "计划离境日期 To Date", value: "", section: 8, aiHint: "格式：YYYY-MM-DD" },
+      { key: "funds_available", label: "可用资金 Funds Available (CAD)", value: "", section: 8, aiHint: "在加拿大期间可用的资金总额" },
+      { key: "contact1_name", label: "联系人1姓名 Contact 1 Name", value: "", section: 8, aiHint: "将在加拿大访问的人员或机构" },
+      { key: "contact1_relationship", label: "联系人1关系 Contact 1 Relationship", value: "", section: 8, aiHint: "与您的关系，如：Friend/Relative/Business Partner/School" },
+      { key: "contact1_address", label: "联系人1地址 Contact 1 Address in Canada", value: "", section: 8 },
+      { key: "contact2_name", label: "联系人2姓名 Contact 2 Name", value: "", section: 8 },
+      { key: "contact2_relationship", label: "联系人2关系 Contact 2 Relationship", value: "", section: 8 },
+      { key: "contact2_address", label: "联系人2地址 Contact 2 Address in Canada", value: "", section: 8 },
+      
+      // ===== 第10步：教育背景 =====
+      { key: "has_post_secondary", label: "是否有高等教育经历 Post-Secondary Education", value: "", section: 9, aiHint: "大学、学院或学徒培训" },
+      { key: "education_from", label: "教育开始日期 Education From", value: "", section: 9, aiHint: "格式：YYYY-MM" },
+      { key: "education_to", label: "教育结束日期 Education To", value: "", section: 9, aiHint: "格式：YYYY-MM" },
+      { key: "education_field", label: "学习领域 Field of Study", value: "", section: 9 },
+      { key: "education_school", label: "学校名称 School/Facility Name", value: "", section: 9 },
+      { key: "education_city", label: "学校城市 City/Town", value: "", section: 9 },
+      { key: "education_country", label: "学校国家 Country", value: "", section: 9 },
+      { key: "education_province", label: "学校省/州 Province/State", value: "", section: 9 },
+      
+      // ===== 第11步：工作经历 =====
+      { key: "employment1_from", label: "工作1开始日期 Employment 1 From", value: "", section: 10, aiHint: "格式：YYYY-MM，填写过去10年工作经历" },
+      { key: "employment1_to", label: "工作1结束日期 Employment 1 To", value: "", section: 10, aiHint: "格式：YYYY-MM，当前工作可填Present" },
+      { key: "employment1_occupation", label: "工作1职业 Occupation", value: "", section: 10, aiHint: "当前职业/活动，如退休填Retired，学生填Student" },
+      { key: "employment1_company", label: "工作1公司 Company/Employer", value: "", section: 10 },
+      { key: "employment1_city", label: "工作1城市 City/Town", value: "", section: 10 },
+      { key: "employment1_country", label: "工作1国家 Country", value: "", section: 10 },
+      { key: "employment1_province", label: "工作1省/州 Province/State", value: "", section: 10 },
+      { key: "employment2_from", label: "工作2开始日期 Employment 2 From", value: "", section: 10 },
+      { key: "employment2_to", label: "工作2结束日期 Employment 2 To", value: "", section: 10 },
+      { key: "employment2_occupation", label: "工作2职业 Occupation", value: "", section: 10 },
+      { key: "employment2_company", label: "工作2公司 Company/Employer", value: "", section: 10 },
+      { key: "employment2_city", label: "工作2城市 City/Town", value: "", section: 10 },
+      { key: "employment2_country", label: "工作2国家 Country", value: "", section: 10 },
+      { key: "employment3_from", label: "工作3开始日期 Employment 3 From", value: "", section: 10 },
+      { key: "employment3_to", label: "工作3结束日期 Employment 3 To", value: "", section: 10 },
+      { key: "employment3_occupation", label: "工作3职业 Occupation", value: "", section: 10 },
+      { key: "employment3_company", label: "工作3公司 Company/Employer", value: "", section: 10 },
+      { key: "employment3_city", label: "工作3城市 City/Town", value: "", section: 10 },
+      { key: "employment3_country", label: "工作3国家 Country", value: "", section: 10 },
+      
+      // ===== 第12步：背景信息 =====
+      { key: "tuberculosis_contact", label: "过去两年是否接触过肺结核患者 Tuberculosis Contact", value: "", section: 11, aiHint: "您或家人是否曾患肺结核或与肺结核患者密切接触" },
+      { key: "medical_condition", label: "是否有需要医疗服务的疾病 Medical Condition", value: "", section: 11, aiHint: "是否有需要在加拿大期间接受社会或健康服务的身体或精神疾病" },
+      { key: "medical_details", label: "健康状况详情 Medical Details", value: "", section: 11, aiHint: "如上述问题回答是，请提供详情" },
+      { key: "overstayed_canada", label: "是否曾在加拿大逾期停留/未经授权学习或工作", value: "", section: 11 },
+      { key: "visa_refused", label: "是否曾被拒签或拒绝入境 Visa Refused/Denied Entry", value: "", section: 11, aiHint: "是否曾被任何国家拒签、拒绝入境或要求离开" },
+      { key: "previous_canada_application", label: "是否曾申请进入或留在加拿大 Previous Canada Application", value: "", section: 11 },
+      { key: "refusal_details", label: "拒签详情 Refusal Details", value: "", section: 11, aiHint: "如有拒签经历请详细说明国家、时间、原因" },
+      { key: "previous_canada_details", label: "以往加拿大申请详情 Previous Canada Application Details", value: "", section: 11 },
+      { key: "criminal_record", label: "是否有犯罪记录 Criminal Record", value: "", section: 11, aiHint: "是否曾被逮捕、指控或定罪任何刑事犯罪" },
+      { key: "criminal_details", label: "犯罪记录详情 Criminal Details", value: "", section: 11, aiHint: "如有请详细说明" },
+      { key: "military_service", label: "是否有军队/安全服务经历 Military/Security Service", value: "", section: 11, aiHint: "是否曾在军队、民兵、民防单位或安全组织/警察部队服役" },
+      { key: "military_details", label: "军事服役详情 Military Service Details", value: "", section: 11, aiHint: "如有请说明服役日期和国家" },
+      { key: "political_association", label: "是否有政治组织关联 Political Association", value: "", section: 11, aiHint: "是否曾是或关联任何从事暴力活动的政治组织" },
+      { key: "witnessed_ill_treatment", label: "是否曾目睹或参与虐待行为 Witnessed Ill Treatment", value: "", section: 11, aiHint: "是否曾目睹或参与虐待囚犯、平民或亵渎宗教建筑" },
+      
+      // ===== 第13步：签名声明 =====
+      { key: "consent_to_contact", label: "是否同意未来被联系 Consent to Contact", value: "", section: 12, aiHint: "是否同意IRCC或其授权机构在未来联系您" },
+      { key: "declaration_agree", label: "声明确认 Declaration", value: "", section: 12, aiHint: "我声明本申请中所有问题的回答均真实完整" },
+      { key: "signature_date", label: "签名日期 Signature Date", value: "", section: 12, aiHint: "格式：YYYY-MM-DD" },
     ],
   });
 
   const steps = [
     { title: "基本信息", icon: "📋" },
     { title: "个人信息", icon: "👤" },
+    { title: "居住信息", icon: "🏠" },
+    { title: "婚姻状况", icon: "💑" },
+    { title: "语言能力", icon: "🗣️" },
     { title: "护照信息", icon: "🛂" },
+    { title: "身份证件", icon: "🪪" },
     { title: "联系方式", icon: "📞" },
     { title: "访问计划", icon: "✈️" },
-    { title: "邀请人信息", icon: "🤝" },
-    { title: "资金证明", icon: "💰" },
-    { title: "职业信息", icon: "💼" },
+    { title: "教育背景", icon: "🎓" },
+    { title: "工作经历", icon: "💼" },
     { title: "背景信息", icon: "📝" },
+    { title: "签名声明", icon: "✍️" },
   ];
 
   const currentFields = application.fields.filter(f => f.section === currentStep);
+
+  // 可选字段列表
+  const optionalFields = [
+    "uci", "other_family_name", "other_given_name", "residence_status_other", "residence_to",
+    "previous_country", "previous_status", "previous_from", "previous_to",
+    "applying_country", "applying_status", "marriage_date", "spouse_family_name", "spouse_given_name",
+    "prev_spouse_family_name", "prev_spouse_given_name", "prev_spouse_dob", "prev_relationship_type",
+    "prev_relationship_from", "prev_relationship_to", "mailing_po_box", "mailing_apt_unit", "mailing_district",
+    "residential_apt_unit", "phone_ext", "alt_phone_type", "alt_phone_country_code", "alt_phone_number",
+    "fax_number", "purpose_other", "contact2_name", "contact2_relationship", "contact2_address",
+    "education_from", "education_to", "education_field", "education_school", "education_city",
+    "education_country", "education_province", "employment2_from", "employment2_to", "employment2_occupation",
+    "employment2_company", "employment2_city", "employment2_country", "employment3_from", "employment3_to",
+    "employment3_occupation", "employment3_company", "employment3_city", "employment3_country",
+    "medical_details", "refusal_details", "previous_canada_details", "criminal_details", "military_details",
+    "national_id_number", "national_id_country", "national_id_issue_date", "national_id_expiry_date",
+    "us_pr_card_number", "us_pr_card_expiry"
+  ];
 
   function updateField(key: string, value: string) {
     setApplication((prev) => ({
@@ -193,6 +316,283 @@ export default function VisitorVisaPage() {
       ),
     }));
   }
+
+  const renderField = (field: { key: string; label: string; value: string; aiHint?: string }) => {
+    // Yes/No 选择框
+    const yesNoFields = [
+      "used_other_name", "lived_other_country", "applying_from_residence", "previously_married",
+      "language_test_taken", "taiwan_passport_with_id", "israeli_passport", "has_national_id",
+      "has_us_pr_card", "residential_same", "has_post_secondary", "tuberculosis_contact",
+      "medical_condition", "overstayed_canada", "visa_refused", "previous_canada_application",
+      "criminal_record", "military_service", "political_association", "witnessed_ill_treatment",
+      "consent_to_contact", "declaration_agree"
+    ];
+    
+    if (yesNoFields.includes(field.key)) {
+      return (
+        <select
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        >
+          <option value="">请选择</option>
+          <option value="No">No 否</option>
+          <option value="Yes">Yes 是</option>
+        </select>
+      );
+    }
+
+    // 性别选择
+    if (field.key === "sex") {
+      return (
+        <select
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        >
+          <option value="">请选择</option>
+          <option value="Female">Female 女</option>
+          <option value="Male">Male 男</option>
+          <option value="Unknown">Unknown 未知</option>
+          <option value="Another gender">Another gender 其他</option>
+        </select>
+      );
+    }
+
+    // 婚姻状况选择
+    if (field.key === "marital_status") {
+      return (
+        <select
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        >
+          <option value="">请选择</option>
+          <option value="Single">Single 单身</option>
+          <option value="Married">Married 已婚</option>
+          <option value="Common-Law">Common-Law 同居</option>
+          <option value="Divorced">Divorced 离异</option>
+          <option value="Separated">Separated 分居</option>
+          <option value="Widowed">Widowed 丧偶</option>
+          <option value="Annulled Marriage">Annulled Marriage 婚姻无效</option>
+        </select>
+      );
+    }
+
+    // 服务语言选择
+    if (field.key === "service_language") {
+      return (
+        <select
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        >
+          <option value="English">English 英语</option>
+          <option value="French">French 法语</option>
+        </select>
+      );
+    }
+
+    // 签证类型选择
+    if (field.key === "visa_type") {
+      return (
+        <select
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        >
+          <option value="">请选择</option>
+          <option value="Visitor Visa">Visitor Visa 访客签证</option>
+          <option value="Transit Visa">Transit Visa 过境签证</option>
+        </select>
+      );
+    }
+
+    // 居住身份选择
+    if (field.key === "residence_status" || field.key === "previous_status" || field.key === "applying_status") {
+      return (
+        <select
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        >
+          <option value="">请选择</option>
+          <option value="Citizen">Citizen 公民</option>
+          <option value="Permanent Resident">Permanent Resident 永久居民</option>
+          <option value="Visitor">Visitor 访客</option>
+          <option value="Worker">Worker 工作者</option>
+          <option value="Student">Student 学生</option>
+          <option value="Protected Person">Protected Person 受保护人士</option>
+          <option value="Refugee Claimant">Refugee Claimant 难民申请人</option>
+          <option value="Other">Other 其他</option>
+        </select>
+      );
+    }
+
+    // 前关系类型选择
+    if (field.key === "prev_relationship_type") {
+      return (
+        <select
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        >
+          <option value="">请选择</option>
+          <option value="Married">Married 已婚</option>
+          <option value="Common-Law">Common-Law 同居</option>
+        </select>
+      );
+    }
+
+    // 语言能力选择
+    if (field.key === "can_communicate_en_fr") {
+      return (
+        <select
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        >
+          <option value="">请选择</option>
+          <option value="English">English 英语</option>
+          <option value="French">French 法语</option>
+          <option value="Both">Both 两者都会</option>
+          <option value="Neither">Neither 都不会</option>
+        </select>
+      );
+    }
+
+    // 语言偏好选择
+    if (field.key === "language_preference") {
+      return (
+        <select
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        >
+          <option value="">请选择</option>
+          <option value="English">English 英语</option>
+          <option value="French">French 法语</option>
+          <option value="Neither">Neither 都不是</option>
+        </select>
+      );
+    }
+
+    // 电话类型选择
+    if (field.key === "phone_type" || field.key === "alt_phone_type") {
+      return (
+        <select
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        >
+          <option value="">请选择</option>
+          <option value="Cell">Cell 手机</option>
+          <option value="Home">Home 家庭电话</option>
+          <option value="Business">Business 工作电话</option>
+        </select>
+      );
+    }
+
+    // 访问目的选择
+    if (field.key === "purpose_of_visit") {
+      return (
+        <select
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        >
+          <option value="">请选择</option>
+          <option value="Tourism">Tourism 旅游观光</option>
+          <option value="Family Visit">Family Visit 探亲访友</option>
+          <option value="Business">Business 商务访问</option>
+          <option value="Short-term Studies">Short-term Studies 短期学习</option>
+          <option value="Returning Student">Returning Student 返校学生</option>
+          <option value="Returning Worker">Returning Worker 返工人员</option>
+          <option value="Super Visa">Super Visa 超级签证</option>
+          <option value="Medical">Medical 医疗</option>
+          <option value="Other">Other 其他</option>
+        </select>
+      );
+    }
+
+    // 多行文本框
+    const textareaFields = [
+      "medical_details", "refusal_details", "previous_canada_details", "criminal_details",
+      "military_details", "contact1_address", "contact2_address", "purpose_other"
+    ];
+    
+    if (textareaFields.includes(field.key)) {
+      return (
+        <textarea
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          rows={3}
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+          placeholder={field.aiHint || `请输入${field.label}`}
+        />
+      );
+    }
+
+    // 日期输入
+    const dateFields = [
+      "date_of_birth", "residence_from", "residence_to", "previous_from", "previous_to",
+      "marriage_date", "prev_spouse_dob", "prev_relationship_from", "prev_relationship_to",
+      "passport_issue_date", "passport_expiry_date", "national_id_issue_date", "national_id_expiry_date",
+      "us_pr_card_expiry", "visit_from_date", "visit_to_date", "signature_date"
+    ];
+    
+    if (dateFields.includes(field.key)) {
+      return (
+        <input
+          type="date"
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        />
+      );
+    }
+
+    // 年月输入
+    const monthFields = [
+      "education_from", "education_to", "employment1_from", "employment1_to",
+      "employment2_from", "employment2_to", "employment3_from", "employment3_to"
+    ];
+    
+    if (monthFields.includes(field.key)) {
+      return (
+        <input
+          type="month"
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+        />
+      );
+    }
+
+    // 邮箱输入
+    if (field.key === "email") {
+      return (
+        <input
+          type="email"
+          className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          value={field.value}
+          onChange={(e) => updateField(field.key, e.target.value)}
+          placeholder={field.aiHint || `请输入${field.label}`}
+        />
+      );
+    }
+
+    // 默认文本输入
+    return (
+      <input
+        type="text"
+        className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+        value={field.value}
+        onChange={(e) => updateField(field.key, e.target.value)}
+        placeholder={field.aiHint || `请输入${field.label}`}
+      />
+    );
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
@@ -213,7 +613,7 @@ export default function VisitorVisaPage() {
         {/* Title */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900">访客签证申请 Visitor Visa (IMM 5257)</h1>
-          <p className="text-slate-600 mt-2">适用于旅游、探亲、商务访问 · 基于 IRCC 官方表格</p>
+          <p className="text-slate-600 mt-2">适用于旅游、探亲、商务访问 · 基于 IRCC 官方表格 (2023年9月版)</p>
         </div>
 
         {/* Progress Steps */}
@@ -257,7 +657,7 @@ export default function VisitorVisaPage() {
                 <div className="flex items-center justify-between mb-2">
                   <label className="block font-medium text-slate-700">
                     {field.label}
-                    {field.key !== "uci" && !field.key.includes("contact") && (
+                    {!optionalFields.includes(field.key) && (
                       <span className="text-red-500 ml-1">*</span>
                     )}
                   </label>
@@ -272,82 +672,7 @@ export default function VisitorVisaPage() {
                   </button>
                 </div>
                 
-                {field.key.includes("history") || field.key.includes("address") || field.key === "purpose_of_visit" ? (
-                  <textarea
-                    className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    rows={4}
-                    value={field.value}
-                    onChange={(e) => updateField(field.key, e.target.value)}
-                    placeholder={field.aiHint || `请输入${field.label}`}
-                  />
-                ) : field.key === "sex" ? (
-                  <select
-                    className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={field.value}
-                    onChange={(e) => updateField(field.key, e.target.value)}
-                  >
-                    <option value="">请选择</option>
-                    <option value="Male">Male 男</option>
-                    <option value="Female">Female 女</option>
-                    <option value="Another gender">Another gender 其他</option>
-                  </select>
-                ) : field.key === "marital_status" ? (
-                  <select
-                    className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={field.value}
-                    onChange={(e) => updateField(field.key, e.target.value)}
-                  >
-                    <option value="">请选择</option>
-                    <option value="Single">Single 单身</option>
-                    <option value="Married">Married 已婚</option>
-                    <option value="Common-law">Common-law 同居</option>
-                    <option value="Divorced">Divorced 离异</option>
-                    <option value="Widowed">Widowed 丧偶</option>
-                  </select>
-                ) : field.key === "service_language" ? (
-                  <select
-                    className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={field.value}
-                    onChange={(e) => updateField(field.key, e.target.value)}
-                  >
-                    <option value="English">English 英语</option>
-                    <option value="French">French 法语</option>
-                  </select>
-                ) : field.key === "visa_type" ? (
-                  <select
-                    className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={field.value}
-                    onChange={(e) => updateField(field.key, e.target.value)}
-                  >
-                    <option value="">请选择</option>
-                    <option value="Tourism">Tourism 旅游观光</option>
-                    <option value="Family Visit">Family Visit 探亲访友</option>
-                    <option value="Business">Business 商务访问</option>
-                    <option value="Super Visa">Super Visa 超级签证</option>
-                  </select>
-                ) : field.key === "current_occupation" ? (
-                  <select
-                    className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    value={field.value}
-                    onChange={(e) => updateField(field.key, e.target.value)}
-                  >
-                    <option value="">请选择</option>
-                    <option value="Employed">Employed 在职</option>
-                    <option value="Self-employed">Self-employed 自雇</option>
-                    <option value="Retired">Retired 退休</option>
-                    <option value="Student">Student 学生</option>
-                    <option value="Homemaker">Homemaker 家庭主妇/夫</option>
-                    <option value="Unemployed">Unemployed 待业</option>
-                  </select>
-                ) : (
-                  <input
-                    type={field.key.includes("date") ? "date" : field.key === "email" ? "email" : "text"}
-                    className="w-full border border-slate-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    value={field.value}
-                    onChange={(e) => updateField(field.key, e.target.value)}
-                    placeholder={field.aiHint || `请输入${field.label}`}
-                  />
-                )}
+                {renderField(field)}
                 
                 {field.aiHint && (
                   <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">

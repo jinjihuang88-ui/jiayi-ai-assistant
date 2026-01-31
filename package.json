@@ -1,26 +1,37 @@
 {
-  "name": "jiayi-ai-assistant",
-  "version": "0.1.0",
+  "name": "immigration-assistant",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio",
+    "db:generate": "prisma generate",
+    "db:seed": "ts-node prisma/seed.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
-    "next": "16.1.5",
-    "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "@prisma/client": "^5.22.0",
+    "next": "^16.1.6",
+    "react": "^18",
+    "react-dom": "^18",
+    "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.1.5",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.1.6",
+    "postcss": "^8.5.6",
+    "prisma": "^5.22.0",
+    "typescript": "^5",
+    "ts-node": "^10.9.2"
   }
 }

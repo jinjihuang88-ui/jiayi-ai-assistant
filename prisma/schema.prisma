@@ -1,0 +1,274 @@
+// Prisma Schema for Immigration Assistant Member System
+// 使用 SQLite 作为开发数据库，可轻松迁移到 MySQL/PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  phone         String?
+  avatar        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+  
+  // 个人资料
+  profile       UserProfile?
+  
+  // 关联
+  applications  Application[]
+  messages      Message[]
+  notifications Notification[]
+  sessions      Session[]
+  verificationCodes VerificationCode[]
+  
+  // 常用信息（避免重复填写）
+  savedInfo     SavedInfo?
+}
+
+// 用户详细资料
+model UserProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 基本信息
+  familyName      String?
+  givenName       String?
+  gender          String?
+  dateOfBirth     String?
+  countryOfBirth  String?
+  nationality     String?
+  
+  // 联系地址
+  address         String?
+  city            String?
+  province        String?
+  postalCode      String?
+  country         String?
+  
+  // 护照信息
+  passportNumber  String?
+  passportCountry String?
+  passportExpiry  String?
+  
+  // 通知设置
+  emailNotifications Boolean @default(true)
+  smsNotifications   Boolean @default(false)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// 常用信息（用于快速填表）
+model SavedInfo {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // JSON 格式存储常用信息
+  personalInfo    String?  // JSON
+  contactInfo     String?  // JSON
+  educationInfo   String?  // JSON
+  workInfo        String?  // JSON
+  familyInfo      String?  // JSON
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// 验证码表
+model VerificationCode {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  email     String
+  code      String
+  type      String   @default("login") // login, register, reset
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+// 会话表
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userAgent String?
+  ipAddress String?
+}
+
+// 申请表
+model Application {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 申请类型
+  type            String   // study-permit, visitor-visa, express-entry, provincial-nominee, work-permit
+  typeName        String   // 中文名称
+  
+  // 申请状态
+  status          String   @default("draft") // draft, submitted, under_review, needs_revision, approved, rejected
+  
+  // 表单数据（JSON格式）
+  formData        String   // JSON
+  
+  // RCIC 审核
+  rcicId          String?
+  rcicName        String?
+  rcicComment     String?
+  rcicReviewedAt  DateTime?
+  
+  // 时间戳
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  submittedAt     DateTime?
+  
+  // 关联
+  messages        Message[]
+  documents       Document[]
+  statusHistory   StatusHistory[]
+}
+
+// 申请状态历史
+model StatusHistory {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  
+  fromStatus    String?
+  toStatus      String
+  comment       String?
+  changedBy     String?     // user, rcic, system
+  changedAt     DateTime    @default(now())
+}
+
+// 文档表
+model Document {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  
+  name          String
+  type          String      // passport, photo, letter, etc.
+  url           String
+  size          Int
+  mimeType      String
+  
+  uploadedAt    DateTime    @default(now())
+}
+
+// 消息表（用户与顾问沟通）
+model Message {
+  id            String       @id @default(cuid())
+  applicationId String?
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  
+  userId        String
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 消息内容
+  content       String
+  senderType    String       // user, rcic, system
+  senderName    String?
+  senderId      String?      // 顾问 ID（如果是顾问发送）
+  
+  // 附件支持
+  messageType   String       @default("text") // text, image, file
+  attachments   MessageAttachment[]
+  
+  // 已读状态
+  isRead        Boolean      @default(false)
+  readAt        DateTime?
+  
+  createdAt     DateTime     @default(now())
+}
+
+// 消息附件表
+model MessageAttachment {
+  id          String   @id @default(cuid())
+  messageId   String
+  message     Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  
+  fileName    String
+  fileType    String   // image, document, pdf, etc.
+  fileSize    Int
+  mimeType    String
+  url         String
+  
+  createdAt   DateTime @default(now())
+}
+
+// 通知表
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 通知内容
+  type      String   // status_change, message, reminder, system
+  title     String
+  content   String
+  link      String?
+  
+  // 已读状态
+  isRead    Boolean  @default(false)
+  readAt    DateTime?
+  
+  createdAt DateTime @default(now())
+}
+
+// RCIC 顾问表
+model RCIC {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String
+  licenseNo   String
+  phone       String?
+  avatar      String?
+  isActive    Boolean  @default(true)
+  isOnline    Boolean  @default(false)
+  lastActiveAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 关联
+  sessions    RCICSession[]
+}
+
+// RCIC 顾问会话表
+model RCICSession {
+  id        String   @id @default(cuid())
+  rcicId    String
+  rcic      RCIC     @relation(fields: [rcicId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userAgent String?
+  ipAddress String?
+}
+
+// RCIC 验证码表
+model RCICVerificationCode {
+  id        String   @id @default(cuid())
+  rcicId    String?
+  email     String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
