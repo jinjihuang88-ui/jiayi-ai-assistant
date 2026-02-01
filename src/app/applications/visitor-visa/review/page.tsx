@@ -42,7 +42,7 @@ export default function VisitorVisaReviewPage() {
 
   // 按 section 分组字段
   const groupedFields: { [key: number]: typeof application.fields } = {};
-  application.fields.forEach((field) => {
+  (application.fields || []).forEach((field) => {
     const section = field.section ?? 0;
     if (!groupedFields[section]) {
       groupedFields[section] = [];
@@ -122,7 +122,7 @@ export default function VisitorVisaReviewPage() {
           
           {Object.keys(groupedFields).sort((a, b) => Number(a) - Number(b)).map((sectionKey) => {
             const sectionIndex = Number(sectionKey);
-            const fields = groupedFields[sectionIndex];
+            const fields = groupedFields[sectionIndex] || [];
             const hasFilledFields = fields.some(f => f.value);
             
             if (!hasFilledFields) return null;

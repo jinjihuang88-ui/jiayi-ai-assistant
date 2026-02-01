@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface RCIC {
@@ -52,7 +52,7 @@ interface Conversation {
   unreadCount: number;
 }
 
-export default function RCICMessagesPage() {
+function MessagesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const applicationIdParam = searchParams.get("applicationId");
@@ -554,5 +554,17 @@ export default function RCICMessagesPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function RCICMessagesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <MessagesContent />
+    </Suspense>
   );
 }
