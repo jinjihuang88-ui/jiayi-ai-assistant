@@ -288,7 +288,7 @@ export default function VisitorVisaPage() {
     { title: "签名声明", icon: "✍️" },
   ];
 
-  const currentFields = application.fields.filter(f => f.section === currentStep);
+  const currentFields = (application.fields || []).filter(f => f.section === currentStep);
 
   // 可选字段列表
   const optionalFields = [
@@ -311,7 +311,7 @@ export default function VisitorVisaPage() {
   function updateField(key: string, value: string) {
     setApplication((prev) => ({
       ...prev,
-      fields: prev.fields.map((f) =>
+      fields: (prev.fields || []).map((f) =>
         f.key === key ? { ...f, value } : f
       ),
     }));

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface RCIC {
@@ -34,7 +34,7 @@ interface Stats {
   approved: number;
 }
 
-export default function RCICCasesPage() {
+function CasesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const statusFilter = searchParams.get("status");
@@ -286,5 +286,17 @@ export default function RCICCasesPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function RCICCasesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <CasesContent />
+    </Suspense>
   );
 }
