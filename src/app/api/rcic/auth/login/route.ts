@@ -5,6 +5,41 @@ import { createRCICSession, generateVerificationCode } from '@/lib/rcic-auth';
 
 const RCIC_SESSION_COOKIE = 'rcic_session_token';
 
+// 默认测试顾问列表（如果数据库中不存在则自动创建）
+const DEFAULT_RCICS = [
+  {
+    email: 'rcic@example.com',
+    name: '张顾问',
+    licenseNo: 'R123456',
+    phone: '+1 604-123-4567',
+  },
+  {
+    email: 'consultant@example.com',
+    name: '李移民',
+    licenseNo: 'R789012',
+    phone: '+1 416-987-6543',
+  },
+];
+
+// 确保测试顾问存在
+async function ensureDefaultRCICs() {
+  for (const rcicData of DEFAULT_RCICS) {
+    try {
+      await prisma.rCIC.upsert({
+        where: { email: rcicData.email },
+        update: {},
+        create: {
+          ...rcicData,
+          isActive: true,
+          isOnline: false,
+        },
+      });
+    } catch (error) {
+      console.error(`Failed to create default RCIC ${rcicData.email}:`, error);
+    }
+  }
+}
+
 // 发送验证码
 export async function POST(request: NextRequest) {
   try {
@@ -17,8 +52,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 检查数据库连接
+    try {
+      await prisma.$connect();
+    } catch (dbError) {
+      console.error('Database connection error:', dbError);
+      return NextResponse.json(
+        { success: false, message: '数据库连接失败，请检查配置' },
+        { status: 503 }
+      );
+    }
+
+    // 确保默认顾问存在
+    await ensureDefaultRCICs();
+
     // 检查顾问是否存在
-    const rcic = await prisma.rCIC.findUnique({
+    let rcic = await prisma.rCIC.findUnique({
       where: { email: email.toLowerCase() },
     });
 
@@ -58,8 +107,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: '验证码已发送',
-        // 开发环境返回验证码，生产环境删除此行
-        devCode: process.env.NODE_ENV === 'development' ? verificationCode : undefined,
+        // 临时：在所有环境返回验证码，直到邮件服务配置完成
+        devCode: verificationCode,
       });
     }
 
@@ -130,8 +179,13 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('RCIC login error:', error);
+    const errorMessage = error instanceof Error ? error.message : '未知错误';
     return NextResponse.json(
-      { success: false, message: '登录失败' },
+      { 
+        success: false, 
+        message: '登录失败',
+        debug: process.env.NODE_ENV !== 'production' ? errorMessage : undefined
+      },
       { status: 500 }
     );
   }

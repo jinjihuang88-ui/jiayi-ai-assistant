@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Application } from "@/types/application";
 
@@ -308,7 +308,7 @@ const colorClasses: Record<string, { bg: string; border: string; text: string }>
   gray: { bg: "bg-gray-50", border: "border-gray-200", text: "text-gray-800" },
 };
 
-function ReviewContent() {
+export default function ExpressEntryReviewPage() {
   const searchParams = useSearchParams();
   const [application, setApplication] = useState<Application | null>(null);
 
@@ -429,20 +429,5 @@ function ReviewContent() {
         </div>
       </div>
     </div>
-  );
-}
-
-export default function ExpressEntryReviewPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">加载中...</p>
-        </div>
-      </div>
-    }>
-      <ReviewContent />
-    </Suspense>
   );
 }
