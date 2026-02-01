@@ -5,11 +5,9 @@ import { getCurrentUser } from '@/lib/auth';
 // 获取单个申请详情
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
-    
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json(
@@ -20,7 +18,7 @@ export async function GET(
 
     const application = await prisma.application.findFirst({
       where: {
-        id: id,
+        id: params.id,
         userId: user.id,
       },
       include: {
@@ -63,11 +61,9 @@ export async function GET(
 // 更新申请（保存草稿或修改）
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
-    
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json(
@@ -81,7 +77,7 @@ export async function PUT(
     // 验证申请所有权
     const application = await prisma.application.findFirst({
       where: {
-        id: id,
+        id: params.id,
         userId: user.id,
       },
     });
@@ -114,7 +110,7 @@ export async function PUT(
       // 记录状态变更
       await prisma.statusHistory.create({
         data: {
-          applicationId: id,
+          applicationId: params.id,
           fromStatus: application.status,
           toStatus: 'submitted',
           changedBy: 'user',
@@ -129,13 +125,13 @@ export async function PUT(
           type: 'status_change',
           title: '申请已提交',
           content: `您的${application.typeName}申请已成功提交，我们的移民顾问将尽快审核。`,
-          link: `/member/applications/${id}`,
+          link: `/member/applications/${params.id}`,
         },
       });
     }
 
     const updated = await prisma.application.update({
-      where: { id: id },
+      where: { id: params.id },
       data: updateData,
     });
 
@@ -160,11 +156,9 @@ export async function PUT(
 // 删除申请（仅草稿可删除）
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params;
-    
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json(
@@ -175,7 +169,7 @@ export async function DELETE(
 
     const application = await prisma.application.findFirst({
       where: {
-        id: id,
+        id: params.id,
         userId: user.id,
       },
     });
@@ -195,7 +189,7 @@ export async function DELETE(
     }
 
     await prisma.application.delete({
-      where: { id: id },
+      where: { id: params.id },
     });
 
     return NextResponse.json({

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Application } from "@/types/application";
 
@@ -49,40 +49,36 @@ const fieldGroups = [
       { key: "eyeColour", label: "眼睛颜色" },
       { key: "height", label: "身高" },
       { key: "dateOfBirth", label: "出生日期" },
-      { key: "placeOfBirth", label: "出生地点" },
+      { key: "cityOfBirth", label: "出生城市" },
       { key: "countryOfBirth", label: "出生国家" },
       { key: "citizenship", label: "国籍" },
       { key: "secondCitizenship", label: "第二国籍" },
-      { key: "currentCountry", label: "现居国家" },
+      { key: "currentCountryOfResidence", label: "当前居住国" },
       { key: "immigrationStatus", label: "移民身份" },
-      { key: "statusFromDate", label: "身份起始日期" },
-      { key: "statusToDate", label: "身份到期日期" },
-      { key: "previousCountry", label: "之前居住国家" },
-      { key: "previousStatus", label: "之前身份" },
-      { key: "previousFromDate", label: "之前身份起始" },
-      { key: "previousToDate", label: "之前身份到期" },
+      { key: "statusFromDate", label: "身份开始日期" },
+      { key: "statusToDate", label: "身份结束日期" },
       { key: "maritalStatus", label: "婚姻状况" },
       { key: "marriageDate", label: "结婚日期" },
-      { key: "spouseName", label: "配偶姓名" },
+      { key: "spouseFamilyName", label: "配偶姓" },
+      { key: "spouseGivenNames", label: "配偶名" },
     ],
   },
   {
-    title: "联系信息 (IMM 0008)",
+    title: "联系方式 (IMM 0008)",
     color: "red",
     fields: [
-      { key: "currentAddress", label: "现居地址" },
-      { key: "currentCity", label: "城市" },
-      { key: "currentProvince", label: "省/州" },
-      { key: "currentPostalCode", label: "邮编" },
-      { key: "currentCountryAddress", label: "国家" },
-      { key: "mailingAddress", label: "邮寄地址" },
-      { key: "mailingCity", label: "邮寄城市" },
-      { key: "mailingProvince", label: "邮寄省/州" },
-      { key: "mailingPostalCode", label: "邮寄邮编" },
-      { key: "mailingCountry", label: "邮寄国家" },
-      { key: "phoneNumber", label: "电话号码" },
-      { key: "altPhoneNumber", label: "备用电话" },
+      { key: "poBox", label: "邮政信箱" },
+      { key: "aptUnit", label: "公寓/单元号" },
+      { key: "streetNumber", label: "街道号码" },
+      { key: "streetName", label: "街道名称" },
+      { key: "city", label: "城市" },
+      { key: "country", label: "国家" },
+      { key: "provinceState", label: "省/州" },
+      { key: "postalCode", label: "邮政编码" },
       { key: "email", label: "电子邮箱" },
+      { key: "phoneType", label: "电话类型" },
+      { key: "phoneCountryCode", label: "国家代码" },
+      { key: "phoneNumber", label: "电话号码" },
     ],
   },
   {
@@ -93,18 +89,29 @@ const fieldGroups = [
       { key: "passportCountry", label: "签发国家" },
       { key: "passportIssueDate", label: "签发日期" },
       { key: "passportExpiryDate", label: "到期日期" },
-      { key: "taiwanIdNumber", label: "台湾身份证号" },
-      { key: "israelIdNumber", label: "以色列身份证号" },
-      { key: "usPrCardNumber", label: "美国绿卡号" },
+      { key: "taiwanPassportWithId", label: "台湾护照带身份证号" },
+      { key: "israeliPassport", label: "以色列护照" },
     ],
   },
   {
-    title: "教育背景 (IMM 0008)",
+    title: "身份证件 (IMM 0008)",
     color: "red",
     fields: [
-      { key: "educationLevel", label: "最高学历" },
-      { key: "educationYears", label: "受教育年数" },
-      { key: "educationHistory", label: "教育经历详情" },
+      { key: "hasNationalId", label: "是否有国民身份证" },
+      { key: "nationalIdNumber", label: "证件号码" },
+      { key: "nationalIdCountry", label: "签发国家" },
+      { key: "nationalIdIssueDate", label: "签发日期" },
+      { key: "nationalIdExpiryDate", label: "到期日期" },
+    ],
+  },
+  {
+    title: "教育与职业 (IMM 0008)",
+    color: "red",
+    fields: [
+      { key: "highestEducation", label: "最高学历" },
+      { key: "yearsOfStudy", label: "受教育年数" },
+      { key: "currentOccupation", label: "当前职业" },
+      { key: "intendedOccupation", label: "计划职业" },
     ],
   },
   {
@@ -114,99 +121,151 @@ const fieldGroups = [
       { key: "nativeLanguage", label: "母语" },
       { key: "englishFluency", label: "英语流利程度" },
       { key: "frenchFluency", label: "法语流利程度" },
-      { key: "languageTest", label: "语言考试类型" },
-      { key: "languageTestDate", label: "考试日期" },
-      { key: "listeningScore", label: "听力分数" },
-      { key: "readingScore", label: "阅读分数" },
-      { key: "writingScore", label: "写作分数" },
-      { key: "speakingScore", label: "口语分数" },
+      { key: "englishTestType", label: "英语测试类型" },
+      { key: "englishTestDate", label: "英语测试日期" },
+      { key: "englishListening", label: "英语听力" },
+      { key: "englishReading", label: "英语阅读" },
+      { key: "englishWriting", label: "英语写作" },
+      { key: "englishSpeaking", label: "英语口语" },
     ],
   },
   {
-    title: "工作经历 (IMM 0008)",
+    title: "随行家属 (IMM 0008)",
     color: "red",
     fields: [
-      { key: "currentOccupation", label: "当前职业" },
-      { key: "intendedOccupation", label: "计划职业" },
-      { key: "employmentHistory", label: "工作经历详情" },
+      { key: "hasDependants", label: "是否有随行家属" },
+      { key: "dependant1Relationship", label: "家属1关系" },
+      { key: "dependant1FamilyName", label: "家属1姓" },
+      { key: "dependant1GivenNames", label: "家属1名" },
+      { key: "dependant1Sex", label: "家属1性别" },
+      { key: "dependant1DateOfBirth", label: "家属1出生日期" },
+      { key: "dependant1CountryOfBirth", label: "家属1出生国家" },
+      { key: "dependant1Citizenship", label: "家属1国籍" },
+      { key: "dependant1MaritalStatus", label: "家属1婚姻状况" },
+      { key: "dependant1Accompanying", label: "家属1是否随行" },
     ],
   },
   {
-    title: "背景声明 (IMM 0008)",
-    color: "red",
-    fields: [
-      { key: "medicalCondition", label: "是否有健康问题" },
-      { key: "criminalRecord", label: "是否有犯罪记录" },
-      { key: "previousRefusal", label: "是否曾被拒签" },
-      { key: "previousDeportation", label: "是否曾被驱逐" },
-      { key: "militaryService", label: "是否有军队服役" },
-      { key: "governmentPosition", label: "是否担任过政府职务" },
-    ],
-  },
-  {
-    title: "家庭成员 (IMM 5406)",
-    color: "blue",
-    fields: [
-      { key: "spouseFamilyName", label: "配偶姓" },
-      { key: "spouseGivenNames", label: "配偶名" },
-      { key: "spouseDob", label: "配偶出生日期" },
-      { key: "spouseBirthplace", label: "配偶出生地" },
-      { key: "spouseRelationship", label: "与配偶关系" },
-      { key: "spouseAccompanying", label: "配偶是否随行" },
-      { key: "spouseAddress", label: "配偶地址" },
-      { key: "childrenInfo", label: "子女信息" },
-      { key: "motherName", label: "母亲姓名" },
-      { key: "motherDob", label: "母亲出生日期" },
-      { key: "motherBirthplace", label: "母亲出生地" },
-      { key: "motherStatus", label: "母亲状态" },
-      { key: "motherAddress", label: "母亲地址" },
-      { key: "fatherName", label: "父亲姓名" },
-      { key: "fatherDob", label: "父亲出生日期" },
-      { key: "fatherBirthplace", label: "父亲出生地" },
-      { key: "fatherStatus", label: "父亲状态" },
-      { key: "fatherAddress", label: "父亲地址" },
-      { key: "siblingsInfo", label: "兄弟姐妹信息" },
-    ],
-  },
-  {
-    title: "旅行历史 (Schedule A)",
-    color: "purple",
-    fields: [
-      { key: "travelHistory", label: "过去10年旅行记录" },
-      { key: "addressHistory", label: "过去10年地址记录" },
-      { key: "educationDetails", label: "教育详情" },
-      { key: "employmentDetails", label: "工作详情" },
-      { key: "membershipOrganizations", label: "组织成员身份" },
-      { key: "governmentPositions", label: "政府职位详情" },
-      { key: "militaryDetails", label: "军队服役详情" },
-    ],
-  },
-  {
-    title: "资金证明 (IMM 5690)",
-    color: "green",
-    fields: [
-      { key: "settlementFunds", label: "安家资金总额" },
-      { key: "bankBalance", label: "银行存款" },
-      { key: "investments", label: "投资" },
-      { key: "property", label: "房产" },
-      { key: "otherAssets", label: "其他资产" },
-      { key: "debts", label: "负债" },
-      { key: "netWorth", label: "净资产" },
-      { key: "fundsSource", label: "资金来源说明" },
-    ],
-  },
-  {
-    title: "代理人信息 (IMM 5476)",
+    title: "背景问题 (IMM 5669)",
     color: "amber",
     fields: [
-      { key: "hasRepresentative", label: "是否有代理人" },
-      { key: "representativeType", label: "代理人类型" },
-      { key: "representativeName", label: "代理人姓名" },
-      { key: "representativeCompany", label: "代理公司" },
-      { key: "representativeRcicNumber", label: "RCIC编号" },
-      { key: "representativePhone", label: "代理人电话" },
-      { key: "representativeEmail", label: "代理人邮箱" },
-      { key: "representativeAddress", label: "代理人地址" },
+      { key: "criminalConviction", label: "犯罪记录" },
+      { key: "criminalConvictionDetails", label: "犯罪记录详情" },
+      { key: "currentlyCharged", label: "当前被起诉" },
+      { key: "previousRefugee", label: "曾申请难民" },
+      { key: "previousRefusal", label: "曾被拒签" },
+      { key: "previousDeportation", label: "曾被驱逐" },
+      { key: "warCrimes", label: "战争罪" },
+      { key: "armedStruggle", label: "武装斗争" },
+      { key: "associatedWithViolence", label: "与暴力组织关联" },
+      { key: "criminalOrganization", label: "犯罪组织成员" },
+      { key: "detained", label: "曾被拘留" },
+      { key: "healthCondition", label: "健康状况" },
+    ],
+  },
+  {
+    title: "教育历史 (IMM 5669)",
+    color: "amber",
+    fields: [
+      { key: "elementaryYears", label: "小学年数" },
+      { key: "secondaryYears", label: "中学年数" },
+      { key: "universityYears", label: "大学年数" },
+      { key: "tradeSchoolYears", label: "职业学校年数" },
+      { key: "edu1From", label: "教育1开始" },
+      { key: "edu1To", label: "教育1结束" },
+      { key: "edu1Institution", label: "教育1学校" },
+      { key: "edu1CityCountry", label: "教育1地点" },
+      { key: "edu1Certificate", label: "教育1证书" },
+      { key: "edu1FieldOfStudy", label: "教育1专业" },
+    ],
+  },
+  {
+    title: "个人历史 (IMM 5669)",
+    color: "amber",
+    fields: [
+      { key: "history1From", label: "历史1开始" },
+      { key: "history1To", label: "历史1结束" },
+      { key: "history1Activity", label: "历史1活动" },
+      { key: "history1CityCountry", label: "历史1地点" },
+      { key: "history1Status", label: "历史1身份" },
+      { key: "history1Employer", label: "历史1雇主" },
+      { key: "history2From", label: "历史2开始" },
+      { key: "history2To", label: "历史2结束" },
+      { key: "history2Activity", label: "历史2活动" },
+      { key: "history2CityCountry", label: "历史2地点" },
+      { key: "history2Status", label: "历史2身份" },
+      { key: "history2Employer", label: "历史2雇主" },
+    ],
+  },
+  {
+    title: "组织会员 (IMM 5669)",
+    color: "amber",
+    fields: [
+      { key: "hasMemberships", label: "是否有组织会员" },
+      { key: "org1From", label: "组织1开始" },
+      { key: "org1To", label: "组织1结束" },
+      { key: "org1Name", label: "组织1名称" },
+      { key: "org1Type", label: "组织1类型" },
+      { key: "org1Position", label: "组织1职位" },
+      { key: "org1CityCountry", label: "组织1地点" },
+    ],
+  },
+  {
+    title: "军事服务 (IMM 5669)",
+    color: "amber",
+    fields: [
+      { key: "hasMilitaryService", label: "是否有军事服务" },
+      { key: "military1Country", label: "军事1国家" },
+      { key: "military1From", label: "军事1开始" },
+      { key: "military1To", label: "军事1结束" },
+      { key: "military1Branch", label: "军事1分支" },
+      { key: "military1Rank", label: "军事1军衔" },
+      { key: "military1Combat", label: "军事1实战" },
+      { key: "military1EndReason", label: "军事1结束原因" },
+    ],
+  },
+  {
+    title: "地址历史 (IMM 5669)",
+    color: "amber",
+    fields: [
+      { key: "addr1From", label: "地址1开始" },
+      { key: "addr1To", label: "地址1结束" },
+      { key: "addr1Street", label: "地址1街道" },
+      { key: "addr1City", label: "地址1城市" },
+      { key: "addr1Province", label: "地址1省份" },
+      { key: "addr1PostalCode", label: "地址1邮编" },
+      { key: "addr1Country", label: "地址1国家" },
+    ],
+  },
+  {
+    title: "家庭信息 (IMM 5406)",
+    color: "green",
+    fields: [
+      { key: "fatherFamilyName", label: "父亲姓" },
+      { key: "fatherGivenNames", label: "父亲名" },
+      { key: "fatherDateOfBirth", label: "父亲出生日期" },
+      { key: "fatherCountryOfBirth", label: "父亲出生国家" },
+      { key: "fatherCurrentAddress", label: "父亲现居地址" },
+      { key: "fatherMaritalStatus", label: "父亲婚姻状况" },
+      { key: "fatherInCanada", label: "父亲是否在加拿大" },
+      { key: "motherFamilyNameAtBirth", label: "母亲出生时姓" },
+      { key: "motherGivenNames", label: "母亲名" },
+      { key: "motherDateOfBirth", label: "母亲出生日期" },
+      { key: "motherCountryOfBirth", label: "母亲出生国家" },
+      { key: "motherCurrentAddress", label: "母亲现居地址" },
+      { key: "motherMaritalStatus", label: "母亲婚姻状况" },
+      { key: "motherInCanada", label: "母亲是否在加拿大" },
+      { key: "hasChildren", label: "是否有子女" },
+      { key: "hasSiblings", label: "是否有兄弟姐妹" },
+    ],
+  },
+  {
+    title: "声明与签名",
+    color: "gray",
+    fields: [
+      { key: "declarationAgree", label: "同意声明" },
+      { key: "signatureDate", label: "签名日期" },
+      { key: "applicantSignature", label: "申请人签名" },
     ],
   },
 ];
@@ -214,14 +273,12 @@ const fieldGroups = [
 const colorClasses: Record<string, { bg: string; border: string; text: string }> = {
   orange: { bg: "bg-orange-50", border: "border-orange-200", text: "text-orange-800" },
   red: { bg: "bg-red-50", border: "border-red-200", text: "text-red-800" },
-  blue: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-800" },
-  purple: { bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-800" },
   amber: { bg: "bg-amber-50", border: "border-amber-200", text: "text-amber-800" },
   green: { bg: "bg-green-50", border: "border-green-200", text: "text-green-800" },
   gray: { bg: "bg-gray-50", border: "border-gray-200", text: "text-gray-800" },
 };
 
-function ReviewContent() {
+export default function ProvincialNomineeReviewPage() {
   const searchParams = useSearchParams();
   const [application, setApplication] = useState<Application | null>(null);
 
@@ -271,23 +328,33 @@ function ReviewContent() {
         <div className="space-y-6">
           {fieldGroups.map((group, groupIndex) => {
             const colors = colorClasses[group.color] || colorClasses.gray;
-            const filledFields = group.fields.filter(f => formData[f.key]);
-            
-            if (filledFields.length === 0) return null;
+            const hasData = group.fields.some(
+              (field) => formData[field.key] && formData[field.key].trim() !== ""
+            );
+
+            if (!hasData) return null;
 
             return (
-              <div key={groupIndex} className={`rounded-xl border ${colors.border} ${colors.bg} overflow-hidden`}>
-                <div className={`px-6 py-4 border-b ${colors.border}`}>
+              <div
+                key={groupIndex}
+                className={`${colors.bg} ${colors.border} border rounded-xl overflow-hidden`}
+              >
+                <div className={`px-6 py-4 ${colors.border} border-b`}>
                   <h2 className={`font-semibold ${colors.text}`}>{group.title}</h2>
                 </div>
-                <div className="px-6 py-4 bg-white/50">
+                <div className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {filledFields.map((field) => (
-                      <div key={field.key} className="flex flex-col">
-                        <span className="text-sm text-gray-500">{field.label}</span>
-                        <span className="font-medium text-gray-900">{formData[field.key]}</span>
-                      </div>
-                    ))}
+                    {group.fields.map((field, fieldIndex) => {
+                      const value = formData[field.key];
+                      if (!value || value.trim() === "") return null;
+
+                      return (
+                        <div key={fieldIndex} className="bg-white rounded-lg p-3 shadow-sm">
+                          <p className="text-xs text-gray-500 mb-1">{field.label}</p>
+                          <p className="text-gray-900 font-medium">{value}</p>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -295,37 +362,42 @@ function ReviewContent() {
           })}
         </div>
 
-        {/* Action Buttons */}
-        <div className="mt-8 flex justify-center gap-4">
-          <a
-            href="/applications/provincial-nominee"
-            className="px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
-          >
-            返回修改
-          </a>
+        {/* Actions */}
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={() => window.print()}
-            className="px-6 py-3 rounded-lg bg-orange-600 text-white hover:bg-orange-700 transition-colors"
+            className="px-6 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium
+                     hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
           >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
             打印申请
+          </button>
+          
+          <button
+            onClick={() => (window.location.href = "/applications/provincial-nominee")}
+            className="px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-500 text-white rounded-lg font-medium
+                     hover:from-orange-700 hover:to-orange-600 transition-all shadow-lg shadow-orange-500/30 flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            修改申请
+          </button>
+          
+          <button
+            onClick={() => (window.location.href = "/applications")}
+            className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white rounded-lg font-medium
+                     hover:from-green-700 hover:to-green-600 transition-all shadow-lg shadow-green-500/30 flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            返回首页
           </button>
         </div>
       </div>
     </div>
-  );
-}
-
-export default function ProvincialNomineeReviewPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">加载中...</p>
-        </div>
-      </div>
-    }>
-      <ReviewContent />
-    </Suspense>
   );
 }

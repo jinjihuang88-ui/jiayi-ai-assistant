@@ -17,10 +17,7 @@ export interface Application {
   id: string;
   type: string;
   status: "draft" | "submitted" | "needs_revision" | "approved";
-  fields?: ApplicationField[];
-  formData?: Record<string, any>;
-  createdAt?: string;
-  updatedAt?: string;
+  fields: ApplicationField[];
   rcicConclusion?: {
     result: string;
     comment: string;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface Application {
@@ -30,7 +30,7 @@ interface Message {
   attachments: Attachment[];
 }
 
-function MessagesContent() {
+export default function MessagesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const applicationId = searchParams.get("applicationId");
@@ -504,17 +504,5 @@ function MessagesContent() {
         </div>
       </div>
     </main>
-  );
-}
-
-export default function MessagesPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
-      <MessagesContent />
-    </Suspense>
   );
 }

@@ -13,6 +13,11 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [devCode, setDevCode] = useState(""); // 开发模式显示验证码
 
+  // 页面加载时初始化数据库
+  useEffect(() => {
+    fetch("/api/init").catch(() => {});
+  }, []);
+
   // 倒计时
   useEffect(() => {
     if (countdown > 0) {
@@ -30,6 +35,7 @@ export default function LoginPage() {
 
     setLoading(true);
     setError("");
+    setDevCode("");
 
     try {
       const res = await fetch("/api/auth/send-code", {
@@ -43,15 +49,19 @@ export default function LoginPage() {
       if (data.success) {
         setStep("code");
         setCountdown(60);
-        // 开发模式显示验证码
+        // 显示验证码（临时方案）
         if (data.devCode) {
           setDevCode(data.devCode);
         }
       } else {
-        setError(data.message);
+        setError(data.message || "发送验证码失败");
+        if (data.debug) {
+          console.error("Debug info:", data.debug);
+        }
       }
     } catch (err) {
-      setError("发送失败，请稍后重试");
+      console.error("Send code error:", err);
+      setError("发送失败，请检查网络连接");
     } finally {
       setLoading(false);
     }
@@ -80,10 +90,14 @@ export default function LoginPage() {
         // 登录成功，跳转到会员中心
         router.push("/member");
       } else {
-        setError(data.message);
+        setError(data.message || "验证失败");
+        if (data.debug) {
+          console.error("Debug info:", data.debug);
+        }
       }
     } catch (err) {
-      setError("验证失败，请稍后重试");
+      console.error("Verify error:", err);
+      setError("验证失败，请检查网络连接");
     } finally {
       setLoading(false);
     }
@@ -123,8 +137,10 @@ export default function LoginPage() {
 
           {/* Dev Code Display */}
           {devCode && step === "code" && (
-            <div className="mb-4 p-3 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-700 text-sm">
-              <span className="font-medium">开发模式：</span> 验证码是 <span className="font-mono font-bold">{devCode}</span>
+            <div className="mb-4 p-3 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm">
+              <span className="font-medium">验证码：</span> 
+              <span className="font-mono font-bold ml-2">{devCode}</span>
+              <span className="text-xs ml-2 text-slate-500">（邮件服务配置前临时显示）</span>
             </div>
           )}
 

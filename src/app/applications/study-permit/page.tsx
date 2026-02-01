@@ -246,12 +246,12 @@ export default function StudyPermitPage() {
     { title: "代理人", icon: "🤝" },
   ];
 
-  const currentFields = (application.fields || []).filter(f => f.section === currentStep);
+  const currentFields = application.fields.filter(f => f.section === currentStep);
 
   function updateField(key: string, value: string) {
     setApplication((prev) => ({
       ...prev,
-      fields: (prev.fields || []).map((f) =>
+      fields: prev.fields.map((f) =>
         f.key === key ? { ...f, value } : f
       ),
     }));
@@ -519,7 +519,7 @@ export default function StudyPermitPage() {
         {/* Title */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900">学签申请 Study Permit (IMM 1294)</h1>
-          <p className="text-slate-600 mt-2">基于 IRCC 官方表格 · 完整版 · 共 {(application.fields || []).length} 个字段</p>
+          <p className="text-slate-600 mt-2">基于 IRCC 官方表格 · 完整版 · 共 {application.fields.length} 个字段</p>
         </div>
 
         {/* Progress Steps */}

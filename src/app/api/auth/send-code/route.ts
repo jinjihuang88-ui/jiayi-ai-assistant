@@ -14,6 +14,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 检查数据库连接
+    try {
+      await prisma.$connect();
+    } catch (dbError) {
+      console.error('Database connection error:', dbError);
+      return NextResponse.json(
+        { success: false, message: '服务暂时不可用，请稍后重试' },
+        { status: 503 }
+      );
+    }
+
     // 检查是否在1分钟内已发送过验证码
     const recentCode = await prisma.verificationCode.findFirst({
       where: {
@@ -55,16 +66,23 @@ export async function POST(request: NextRequest) {
     // 目前返回验证码用于测试（生产环境应移除）
     console.log(`[DEV] 验证码: ${code} 发送到 ${email}`);
 
+    // 在生产环境也返回验证码（临时方案，正式上线前应配置邮件服务）
     return NextResponse.json({
       success: true,
       message: '验证码已发送到您的邮箱',
-      // 开发模式下返回验证码，生产环境应移除
-      devCode: process.env.NODE_ENV === 'development' ? code : undefined,
+      // 临时：在所有环境返回验证码，直到邮件服务配置完成
+      devCode: code,
     });
   } catch (error) {
     console.error('Send code error:', error);
+    // 返回更详细的错误信息用于调试
+    const errorMessage = error instanceof Error ? error.message : '未知错误';
     return NextResponse.json(
-      { success: false, message: '发送验证码失败，请稍后重试' },
+      { 
+        success: false, 
+        message: '发送验证码失败，请稍后重试',
+        debug: process.env.NODE_ENV !== 'production' ? errorMessage : undefined
+      },
       { status: 500 }
     );
   }
