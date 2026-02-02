@@ -24,7 +24,7 @@ export default function RcicCaseDetail() {
 
     const updated: Application = {
       ...application,
-      fields: application.fields.map((f) =>
+      fields: application.fields?.map((f) =>
         f.key === key
           ? {
               ...f,
@@ -78,7 +78,7 @@ export default function RcicCaseDetail() {
       </header>
 
       {/* 字段审核 */}
-      {application.fields.map((field: ApplicationField) => (
+      {application.fields?.map((field: ApplicationField) => (
         <div
           key={field.key}
           className="border rounded-lg p-4 bg-white space-y-3"
