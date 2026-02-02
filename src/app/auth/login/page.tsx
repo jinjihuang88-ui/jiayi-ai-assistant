@@ -7,19 +7,31 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [modal, setModal] = useState<{ show: boolean; message: string; type: "success" | "error" }>({
+    show: false,
+    message: "",
+    type: "success",
+  });
+
+  const showModal = (message: string, type: "success" | "error") => {
+    setModal({ show: true, message, type });
+  };
+
+  const closeModal = () => {
+    setModal({ show: false, message: "", type: "success" });
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email) {
-      alert("请输入邮箱");
+      showModal("请输入邮箱", "error");
       return;
     }
 
     setLoading(true);
 
     try {
-      // 免登录模式：直接创建临时会话
       const response = await fetch("/api/auth/test-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -29,14 +41,16 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (data.success) {
-        alert("登录成功！（测试模式）");
-        router.push("/member");
+        showModal("登录成功！（测试模式）", "success");
+        setTimeout(() => {
+          router.push("/member");
+        }, 1500);
       } else {
-        alert(data.message || "登录失败");
+        showModal(data.message || "登录失败，请重试", "error");
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("登录失败，请重试");
+      showModal("登录失败，请重试", "error");
     } finally {
       setLoading(false);
     }
@@ -44,6 +58,46 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
+      {/* 弹窗提示 */}
+      {modal.show && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
+          <div className="fixed inset-0 bg-black bg-opacity-30" onClick={closeModal}></div>
+          <div className="relative bg-white rounded-lg shadow-2xl max-w-md w-full animate-slide-down">
+            <div className="p-6">
+              <div className="flex items-start mb-4">
+                {modal.type === "success" ? (
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                )}
+                <div className="ml-4 flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {modal.type === "success" ? "成功" : "错误"}
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-600">{modal.message}</p>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  onClick={closeModal}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">用户登录</h1>
@@ -87,6 +141,22 @@ export default function LoginPage() {
           </ul>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes slide-down {
+          from {
+            opacity: 0;
+            transform: translateY(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-slide-down {
+          animation: slide-down 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
