@@ -1,0 +1,20 @@
+.
+├── DEPLOYMENT_GUIDE.md
+├── STRUCTURE.txt
+└── src
+    ├── app
+    │   ├── api
+    │   │   ├── auth
+    │   │   │   └── test-login
+    │   │   └── rcic
+    │   │       └── auth
+    │   ├── auth
+    │   │   └── login
+    │   │       └── page.tsx
+    │   └── rcic
+    │       └── login
+    │           └── page.tsx
+    └── lib
+        └── prisma.ts
+
+12 directories, 5 files
