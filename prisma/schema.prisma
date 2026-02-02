@@ -1,5 +1,5 @@
-// Prisma Schema for Immigration Assistant Member System
-// 使用 MySQL/TiDB 作为生产数据库
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -10,309 +10,90 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 用户表
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String?   // 新增：密码（bcrypt加密）
-  name          String?
-  phone         String?
-  avatar        String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  lastLoginAt   DateTime?
-  
-  // 个人资料
-  profile       UserProfile?
-  
-  // 关联
-  applications  Application[]
-  messages      Message[]
-  notifications Notification[]
-  sessions      Session[]
-  verificationCodes VerificationCode[]
-  
-  // 常用信息（避免重复填写）
-  savedInfo     SavedInfo?
+  id          String    @id @default(cuid())
+  email       String    @unique
+  name        String
+  password    String    // 密码哈希
+  phone       String?
+  avatar      String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
 }
 
-// 用户详细资料
-model UserProfile {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model RCIC {
+  id          String    @id @default(cuid())
+  email       String    @unique
   
-  // 基本信息
-  familyName      String?
-  givenName       String?
-  gender          String?
-  dateOfBirth     String?
-  countryOfBirth  String?
-  nationality     String?
+  // 基础信息
+  name        String    // 中文姓名
+  nameEn      String    // 英文姓名
+  password    String    // 密码哈希
+  phone       String
+  avatar      String?
   
-  // 联系地址
-  address         String?
-  city            String?
-  province        String?
-  postalCode      String?
-  country         String?
+  // 身份验证
+  idDocumentUrl String  // 身份证件照片
+  country     String    // 居住国家
+  city        String    // 居住城市
   
-  // 护照信息
-  passportNumber  String?
-  passportCountry String?
-  passportExpiry  String?
+  // 顾问等级
+  level       String    // A/B/C
   
-  // 通知设置
-  emailNotifications Boolean @default(true)
-  smsNotifications   Boolean @default(false)
+  // A类顾问字段（持牌顾问/律师）
+  licenseNo   String?   // RCIC执照号
+  organization String?  // 执业机构
+  verificationLink String? // 执照查询链接
+  licenseCertificateUrl String? // 执照证书照片
   
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
-// 常用信息（用于快速填表）
-model SavedInfo {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // B类顾问字段（留学/签证顾问）
+  yearsOfExperience String? // 从业年限
+  serviceScope String?      // 服务范围
+  pastCases    String?      // 过往案例
   
-  // JSON 格式存储常用信息
-  personalInfo    String?  @db.Text // JSON
-  contactInfo     String?  @db.Text // JSON
-  educationInfo   String?  @db.Text // JSON
-  workInfo        String?  @db.Text // JSON
-  familyInfo      String?  @db.Text // JSON
+  // C类顾问字段（文案/辅助）
+  specialties  String?      // 擅长领域
+  workExperience String?    // 工作经验
   
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
-// 验证码表
-model VerificationCode {
-  id        String   @id @default(cuid())
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  email     String
-  code      String
-  type      String   @default("login") // login, register, reset
-  expiresAt DateTime
-  used      Boolean  @default(false)
-  createdAt DateTime @default(now())
-  
-  @@index([email])
-  @@index([expiresAt])
-}
-
-// 会话表
-model Session {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  userAgent String?  @db.Text
-  ipAddress String?
-  
-  @@index([userId])
-  @@index([expiresAt])
-}
-
-// 申请表
-model Application {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // 申请类型
-  type            String   // study-permit, visitor-visa, express-entry, provincial-nominee, work-permit
-  typeName        String   // 中文名称
-  
-  // 申请状态
-  status          String   @default("draft") // draft, submitted, under_review, needs_revision, approved, rejected
-  
-  // 表单数据（JSON格式）
-  formData        String   @db.LongText // JSON
-  
-  // RCIC 审核
-  rcicId          String?
-  rcicName        String?
-  rcicComment     String?  @db.Text
-  rcicReviewedAt  DateTime?
+  // 审核状态
+  verificationStatus String @default("pending") // pending/approved/rejected
+  rejectionReason String?   // 审核拒绝原因
+  isActive    Boolean  @default(false) // 是否激活（审核通过后才能激活）
   
   // 时间戳
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  submittedAt     DateTime?
-  
-  // 关联
-  messages        Message[]
-  documents       Document[]
-  statusHistory   StatusHistory[]
-  
-  @@index([userId])
-  @@index([status])
-  @@index([rcicId])
-}
-
-// 申请状态历史
-model StatusHistory {
-  id            String      @id @default(cuid())
-  applicationId String
-  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  
-  fromStatus    String?
-  toStatus      String
-  comment       String?     @db.Text
-  changedBy     String?     // user, rcic, system
-  changedAt     DateTime    @default(now())
-  
-  @@index([applicationId])
-}
-
-// 文档表
-model Document {
-  id            String      @id @default(cuid())
-  applicationId String
-  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  
-  name          String
-  type          String      // passport, photo, letter, etc.
-  url           String      @db.Text
-  size          Int
-  mimeType      String
-  
-  uploadedAt    DateTime    @default(now())
-  
-  @@index([applicationId])
-}
-
-// 消息表（用户与顾问沟通）
-model Message {
-  id            String       @id @default(cuid())
-  applicationId String?
-  application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
-  
-  userId        String
-  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // 消息内容
-  content       String       @db.Text
-  senderType    String       // user, rcic, system
-  senderName    String?
-  senderId      String?      // 顾问 ID（如果是顾问发送）
-  
-  // 附件支持
-  messageType   String       @default("text") // text, image, file
-  attachments   MessageAttachment[]
-  
-  // 已读状态
-  isRead        Boolean      @default(false)
-  readAt        DateTime?
-  
-  createdAt     DateTime     @default(now())
-  
-  @@index([userId])
-  @@index([applicationId])
-  @@index([senderType])
-}
-
-// 消息附件表
-model MessageAttachment {
-  id          String   @id @default(cuid())
-  messageId   String
-  message     Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  
-  fileName    String
-  fileType    String   // image, document, pdf, etc.
-  fileSize    Int
-  mimeType    String
-  url         String   @db.Text
-  
   createdAt   DateTime @default(now())
-  
-  @@index([messageId])
-}
-
-// 通知表
-model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // 通知内容
-  type      String   // status_change, message, reminder, system
-  title     String
-  content   String   @db.Text
-  link      String?  @db.Text
-  
-  // 已读状态
-  isRead    Boolean  @default(false)
-  readAt    DateTime?
-  
-  createdAt DateTime @default(now())
-  
-  @@index([userId])
-  @@index([isRead])
-}
-
-// RCIC 顾问表
-model RCIC {
-  id                 String   @id @default(cuid())
-  email              String   @unique
-  password           String?  // 新增：密码（bcrypt加密）
-  name               String   // 中文姓名
-  nameEn             String?  // 新增：英文姓名
-  phone              String?  // 联系电话
-  country            String?  // 新增：居住国家
-  city               String?  // 新增：城市
-  level              String?  // 新增：顾问等级 A/B/C
-  licenseNo          String?  // RCIC执照编号（A类必填）
-  organization       String?  // 新增：执业机构（A类选填）
-  verificationLink   String?  @db.Text // 新增：执照验证链接（A类必填）
-  yearsOfExperience  String?  // 新增：从业年限（B类必填）
-  serviceScope       String?  @db.Text // 新增：服务范围说明（B类必填）
-  idDocumentUrl      String?  @db.Text // 新增：身份证件URL
-  avatar             String?  @db.Text
-  isActive           Boolean  @default(false) // 修改：默认false，需审核通过
-  isOnline           Boolean  @default(false)
-  lastActiveAt       DateTime?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  updatedAt   DateTime @updatedAt
+  lastLoginAt DateTime?
   
   // 关联
-  sessions           RCICSession[]
-  
-  @@index([email])
-  @@index([isActive])
-  @@index([level])
+  cases       Case[]
+  messages    Message[]
 }
 
-// RCIC 顾问会话表
-model RCICSession {
-  id        String   @id @default(cuid())
-  rcicId    String
-  rcic      RCIC     @relation(fields: [rcicId], references: [id], onDelete: Cascade)
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-  userAgent String?  @db.Text
-  ipAddress String?
+model Case {
+  id          String   @id @default(cuid())
+  userId      String
+  rcicId      String?
+  type        String
+  status      String
+  formData    Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  submittedAt DateTime?
   
-  @@index([rcicId])
-  @@index([expiresAt])
+  rcic        RCIC?    @relation(fields: [rcicId], references: [id])
+  messages    Message[]
 }
 
-// RCIC 验证码表
-model RCICVerificationCode {
+model Message {
   id        String   @id @default(cuid())
-  rcicId    String?
-  email     String
-  code      String
-  expiresAt DateTime
-  used      Boolean  @default(false)
+  caseId    String
+  senderId  String
+  senderType String  // user/rcic
+  content   String   @db.Text
   createdAt DateTime @default(now())
   
-  @@index([email])
-  @@index([expiresAt])
+  case      Case     @relation(fields: [caseId], references: [id])
+  rcic      RCIC?    @relation(fields: [senderId], references: [id])
 }

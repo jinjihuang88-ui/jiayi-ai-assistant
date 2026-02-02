@@ -1,120 +1,138 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
 
 export async function POST(request: NextRequest) {
   try {
+    const body = await request.json();
     const {
       email,
       password,
-      code,
-      consultantLevel,
       nameCn,
       nameEn,
-      phone,
+      idDocumentUrl,
       country,
       city,
-      rcicNumber,
+      phone,
+      level,
+      licenseNo,
       organization,
       verificationLink,
+      licenseCertificateUrl,
       yearsOfExperience,
       serviceScope,
-      idDocumentUrl,
-    } = await request.json();
+      pastCases,
+      specialties,
+      workExperience,
+    } = body;
 
-    // 基础验证
-    if (!email || !password || !code || !consultantLevel || !nameCn || !nameEn || !phone || !country || !city) {
+    console.log("[RCIC Register] Received:", { email, nameCn, nameEn, level });
+
+    // 基础字段验证
+    if (!email || !password || !nameCn || !nameEn || !idDocumentUrl || !country || !city || !phone || !level) {
       return NextResponse.json(
         { success: false, message: "请填写所有必填字段" },
         { status: 400 }
       );
     }
 
-    // 验证验证码
-    const verificationCode = await prisma.verificationCode.findFirst({
-      where: {
-        email: email.toLowerCase(),
-        code,
-        expiresAt: {
-          gt: new Date(),
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
-    if (!verificationCode) {
-      return NextResponse.json(
-        { success: false, message: "验证码无效或已过期" },
-        { status: 400 }
-      );
-    }
-
-    // 检查邮箱是否已注册
-    const existingConsultant = await prisma.rCIC.findUnique({
-      where: { email: email.toLowerCase() },
-    });
-
-    if (existingConsultant) {
-      return NextResponse.json(
-        { success: false, message: "该邮箱已注册" },
-        { status: 400 }
-      );
-    }
-
     // A类顾问验证
-    if (consultantLevel === "A" && (!rcicNumber || !verificationLink)) {
-      return NextResponse.json(
-        { success: false, message: "A类顾问必须提供RCIC编号和验证链接" },
-        { status: 400 }
-      );
+    if (level === "A") {
+      if (!licenseNo || !verificationLink || !licenseCertificateUrl) {
+        return NextResponse.json(
+          { success: false, message: "A类顾问必须填写执照号、查询链接并上传执照证书" },
+          { status: 400 }
+        );
+      }
     }
 
     // B类顾问验证
-    if (consultantLevel === "B" && (!yearsOfExperience || !serviceScope)) {
-      return NextResponse.json(
-        { success: false, message: "B类顾问必须提供从业年限和服务范围说明" },
-        { status: 400 }
-      );
+    if (level === "B") {
+      if (!yearsOfExperience || !serviceScope || !pastCases) {
+        return NextResponse.json(
+          { success: false, message: "B类顾问必须填写从业年限、服务范围和过往案例" },
+          { status: 400 }
+        );
+      }
     }
 
-    // 加密密码
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // C类顾问验证
+    if (level === "C") {
+      if (!specialties || !workExperience) {
+        return NextResponse.json(
+          { success: false, message: "C类顾问必须填写擅长领域和工作经验" },
+          { status: 400 }
+        );
+      }
+    }
 
-    // 创建顾问账号（待审核状态）
-    const consultant = await prisma.rCIC.create({
-      data: {
-        email: email.toLowerCase(),
-        password: hashedPassword,
-        name: nameCn,
-        nameEn,
-        phone,
-        country,
-        city,
-        level: consultantLevel,
-        licenseNo: consultantLevel === "A" ? rcicNumber : undefined,
-        organization: consultantLevel === "A" ? organization : undefined,
-        verificationLink: consultantLevel === "A" ? verificationLink : undefined,
-        yearsOfExperience: consultantLevel === "B" ? yearsOfExperience : undefined,
-        serviceScope: consultantLevel === "B" ? serviceScope : undefined,
-        idDocumentUrl,
-        isActive: false, // 待审核，默认不激活
-      },
-    });
+    // 动态导入 Prisma 和 bcrypt
+    const { PrismaClient } = await import("@prisma/client");
+    const bcrypt = await import("bcryptjs");
+    const prisma = new PrismaClient();
 
-    // 删除已使用的验证码
-    await prisma.verificationCode.delete({
-      where: { id: verificationCode.id },
-    });
+    try {
+      // 检查邮箱是否已存在
+      const existingRCIC = await prisma.rCIC.findUnique({
+        where: { email },
+      });
 
-    return NextResponse.json({
-      success: true,
-      message: "注册申请已提交，请等待审核",
-      consultantId: consultant.id,
-    });
+      if (existingRCIC) {
+        return NextResponse.json(
+          { success: false, message: "该邮箱已被注册" },
+          { status: 400 }
+        );
+      }
+
+      // 加密密码
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // 创建顾问账号（待审核状态）
+      const rcic = await prisma.rCIC.create({
+        data: {
+          email,
+          password: hashedPassword,
+          name: nameCn, // 主要显示中文名
+          nameEn,
+          idDocumentUrl,
+          country,
+          city,
+          phone,
+          level,
+          // A类字段
+          licenseNo: level === "A" ? licenseNo : null,
+          organization: level === "A" ? organization : null,
+          verificationLink: level === "A" ? verificationLink : null,
+          licenseCertificateUrl: level === "A" ? licenseCertificateUrl : null,
+          // B类字段
+          yearsOfExperience: level === "B" ? yearsOfExperience : null,
+          serviceScope: level === "B" ? serviceScope : null,
+          pastCases: level === "B" ? pastCases : null,
+          // C类字段
+          specialties: level === "C" ? specialties : null,
+          workExperience: level === "C" ? workExperience : null,
+          // 审核状态
+          verificationStatus: "pending", // 待审核
+          isActive: false, // 未激活，需要审核通过
+        },
+      });
+
+      console.log("[RCIC Register] RCIC created (pending verification):", rcic.id);
+
+      return NextResponse.json({
+        success: true,
+        message: "注册成功，请等待管理员审核",
+        rcic: {
+          id: rcic.id,
+          email: rcic.email,
+          name: rcic.name,
+          level: rcic.level,
+          verificationStatus: rcic.verificationStatus,
+        },
+      });
+    } finally {
+      await prisma.$disconnect();
+    }
   } catch (error) {
-    console.error("RCIC register error:", error);
+    console.error("[RCIC Register] Error:", error);
     return NextResponse.json(
       { success: false, message: "注册失败，请稍后重试" },
       { status: 500 }
