@@ -13,11 +13,10 @@ export async function GET() {
       );
     }
 
-    // 获取在线顾问列表
+    // 获取活跃顾问列表
     const onlineRcics = await prisma.rCIC.findMany({
       where: {
         isActive: true,
-        isOnline: true,
       },
       select: {
         id: true,

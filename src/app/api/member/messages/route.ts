@@ -53,9 +53,9 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // 获取在线顾问数量
+    // 获取活跃顾问数量
     const onlineRcicCount = await prisma.rCIC.count({
-      where: { isOnline: true, isActive: true },
+      where: { isActive: true },
     });
 
     return NextResponse.json({
