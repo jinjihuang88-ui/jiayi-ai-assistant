@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Application } from "@/types/application";
+import { Application, ApplicationField } from "@/types/application";
 
 export default function VisitorVisaReviewPage() {
   const [application, setApplication] = useState<Application | null>(null);
@@ -41,8 +41,8 @@ export default function VisitorVisaReviewPage() {
   }
 
   // 按 section 分组字段
-  const groupedFields: { [key: number]: typeof application.fields } = {};
-  application.fields.forEach((field) => {
+  const groupedFields: { [key: number]: ApplicationField[] } = {};
+  application.fields?.forEach((field) => {
     const section = field.section ?? 0;
     if (!groupedFields[section]) {
       groupedFields[section] = [];
