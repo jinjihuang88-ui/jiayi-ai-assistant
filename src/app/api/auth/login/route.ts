@@ -18,28 +18,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 查找顾问（使用RCIC表）
-    const consultant = await prisma.rCIC.findUnique({
-      where: { email: email.toLowerCase() },
+    // 查找用户
+    const user = await prisma.user.findUnique({
+      where: { email },
     });
 
-    if (!consultant || !consultant.password) {
+    if (!user || !user.password) {
       return NextResponse.json(
         { success: false, message: "邮箱或密码错误" },
         { status: 401 }
       );
     }
 
-    // 检查是否激活
-    if (!consultant.isActive) {
-      return NextResponse.json(
-        { success: false, message: "您的账号正在审核中或已被禁用" },
-        { status: 403 }
-      );
-    }
-
     // 验证密码
-    const isPasswordValid = await bcrypt.compare(password, consultant.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       return NextResponse.json(
@@ -49,11 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 生成 JWT
-    const token = await new SignJWT({
-      consultantId: consultant.id,
-      email: consultant.email,
-      level: consultant.level,
-    })
+    const token = await new SignJWT({ userId: user.id, email: user.email })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("7d")
       .sign(JWT_SECRET);
@@ -64,7 +52,7 @@ export async function POST(request: NextRequest) {
       message: "登录成功",
     });
 
-    response.cookies.set("rcic-token", token, {
+    response.cookies.set("auth-token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -74,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("RCIC login error:", error);
+    console.error("Login error:", error);
     return NextResponse.json(
       { success: false, message: "登录失败，请稍后重试" },
       { status: 500 }
