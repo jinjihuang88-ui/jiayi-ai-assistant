@@ -9,25 +9,14 @@ interface Application {
   typeName: string;
 }
 
-interface Attachment {
-  id: string;
-  fileName: string;
-  fileType: string;
-  fileSize: number;
-  mimeType: string;
-  url: string;
-}
-
 interface Message {
   id: string;
   content: string;
-  messageType: string;
   senderType: string;
   senderName: string | null;
   isRead: boolean;
   createdAt: string;
   application: Application | null;
-  attachments: Attachment[];
 }
 
 export default function MessagesPage() {
@@ -41,25 +30,11 @@ export default function MessagesPage() {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [onlineRcicCount, setOnlineRcicCount] = useState(0);
-  const [showUploadMenu, setShowUploadMenu] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const imageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchApplications();
     fetchMessages();
-    fetchRcicStatus();
-
-    // 定时刷新消息和顾问状态
-    const interval = setInterval(() => {
-      fetchMessages();
-      fetchRcicStatus();
-    }, 10000);
-
-    return () => clearInterval(interval);
   }, [selectedApp]);
 
   useEffect(() => {
@@ -110,18 +85,6 @@ export default function MessagesPage() {
     }
   };
 
-  const fetchRcicStatus = async () => {
-    try {
-      const res = await fetch("/api/member/rcic-status");
-      const data = await res.json();
-      if (data.success) {
-        setOnlineRcicCount(data.onlineCount);
-      }
-    } catch (error) {
-      console.error("Error fetching RCIC status:", error);
-    }
-  };
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -137,7 +100,6 @@ export default function MessagesPage() {
         body: JSON.stringify({
           applicationId: selectedApp,
           content: newMessage.trim(),
-          messageType: "text",
         }),
       });
 
@@ -155,102 +117,12 @@ export default function MessagesPage() {
     }
   };
 
-  const handleFileUpload = async (file: File, type: "image" | "file") => {
-    if (!file) return;
-
-    setUploading(true);
-    setShowUploadMenu(false);
-
-    try {
-      // 上传文件
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const uploadData = await uploadRes.json();
-
-      if (!uploadData.success) {
-        alert(uploadData.message);
-        return;
-      }
-
-      // 发送带附件的消息
-      const res = await fetch("/api/member/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          applicationId: selectedApp,
-          content: type === "image" ? "发送了一张图片" : `发送了文件: ${file.name}`,
-          messageType: type,
-          attachments: [uploadData.file],
-        }),
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        setMessages([...messages, data.message]);
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      alert("上传失败");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-  };
-
   const typeIconMap: Record<string, string> = {
     "study-permit": "🎓",
     "visitor-visa": "✈️",
     "work-permit": "💼",
     "express-entry": "🚀",
     "provincial-nominee": "🏛️",
-  };
-
-  const renderAttachment = (attachment: Attachment) => {
-    if (attachment.fileType === "image") {
-      return (
-        <a
-          href={attachment.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block mt-2"
-        >
-          <img
-            src={attachment.url}
-            alt={attachment.fileName}
-            className="max-w-[200px] max-h-[200px] rounded-lg object-cover"
-          />
-        </a>
-      );
-    }
-
-    return (
-      <a
-        href={attachment.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-2 mt-2 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
-      >
-        <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-          {attachment.mimeType.includes("pdf") ? "📄" : "📎"}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium truncate">{attachment.fileName}</div>
-          <div className="text-xs opacity-70">{formatFileSize(attachment.fileSize)}</div>
-        </div>
-      </a>
-    );
   };
 
   return (
@@ -285,13 +157,6 @@ export default function MessagesPage() {
             <div className="p-4 border-b border-slate-100">
               <h2 className="font-semibold text-slate-900">消息</h2>
               <p className="text-sm text-slate-500">与移民顾问沟通</p>
-              {/* 顾问在线状态 */}
-              <div className="mt-2 flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${onlineRcicCount > 0 ? "bg-green-500 animate-pulse" : "bg-slate-300"}`} />
-                <span className="text-xs text-slate-500">
-                  {onlineRcicCount > 0 ? `${onlineRcicCount} 位顾问在线` : "顾问暂时离线"}
-                </span>
-              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto">
@@ -391,16 +256,7 @@ export default function MessagesPage() {
                             {msg.senderName || "顾问"}
                           </div>
                         )}
-                        {msg.messageType === "text" && (
-                          <p className="whitespace-pre-wrap">{msg.content}</p>
-                        )}
-                        {msg.attachments && msg.attachments.length > 0 && (
-                          <div>
-                            {msg.attachments.map((att) => (
-                              <div key={att.id}>{renderAttachment(att)}</div>
-                            ))}
-                          </div>
-                        )}
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
                         <div
                           className={`text-xs mt-1 ${
                             msg.senderType === "user" ? "text-white/70" : "text-slate-400"
@@ -418,68 +274,7 @@ export default function MessagesPage() {
 
             {/* Input Area */}
             <div className="p-4 border-t border-slate-100">
-              <div className="flex gap-3 items-end">
-                {/* Upload Button */}
-                <div className="relative">
-                  <button
-                    onClick={() => setShowUploadMenu(!showUploadMenu)}
-                    disabled={uploading}
-                    className="p-3 rounded-xl border border-slate-300 hover:bg-slate-50 transition-colors disabled:opacity-50"
-                  >
-                    {uploading ? (
-                      <div className="w-5 h-5 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                      </svg>
-                    )}
-                  </button>
-
-                  {/* Upload Menu */}
-                  {showUploadMenu && (
-                    <div className="absolute bottom-full left-0 mb-2 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-                      <button
-                        onClick={() => imageInputRef.current?.click()}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 w-full text-left"
-                      >
-                        <span className="text-lg">🖼️</span>
-                        <span className="text-sm">发送图片</span>
-                      </button>
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 w-full text-left"
-                      >
-                        <span className="text-lg">📎</span>
-                        <span className="text-sm">发送文件</span>
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Hidden File Inputs */}
-                  <input
-                    ref={imageInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileUpload(file, "image");
-                      e.target.value = "";
-                    }}
-                  />
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".pdf,.doc,.docx,.xls,.xlsx"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileUpload(file, "file");
-                      e.target.value = "";
-                    }}
-                  />
-                </div>
-
+              <div className="flex gap-3">
                 <input
                   type="text"
                   value={newMessage}
@@ -497,7 +292,7 @@ export default function MessagesPage() {
                 </button>
               </div>
               <p className="text-xs text-slate-400 mt-2">
-                支持发送图片（JPG、PNG、GIF）和文档（PDF、Word、Excel），单个文件最大 10MB
+                我们的移民顾问会尽快回复您的消息
               </p>
             </div>
           </div>
