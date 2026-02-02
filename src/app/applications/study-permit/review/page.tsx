@@ -20,9 +20,9 @@ export default function StudyPermitReviewPage() {
   const { status, fields, rcicConclusion } = application;
 
   // 只找出被 RCIC 标记为需要修改的字段
-  const fieldsNeedFix = fields?.filter(
+  const fieldsNeedFix = fields.filter(
     (f) => f.review?.status === "fix"
-  ) || [];
+  );
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 space-y-8">
