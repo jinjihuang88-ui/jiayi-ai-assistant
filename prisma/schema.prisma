@@ -14,6 +14,7 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
+  password      String?   // 新增：密码（bcrypt加密）
   name          String?
   phone         String?
   avatar        String?
@@ -257,23 +258,34 @@ model Notification {
 
 // RCIC 顾问表
 model RCIC {
-  id          String   @id @default(cuid())
-  email       String   @unique
-  name        String
-  licenseNo   String
-  phone       String?
-  avatar      String?  @db.Text
-  isActive    Boolean  @default(true)
-  isOnline    Boolean  @default(false)
-  lastActiveAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  email              String   @unique
+  password           String?  // 新增：密码（bcrypt加密）
+  name               String   // 中文姓名
+  nameEn             String?  // 新增：英文姓名
+  phone              String?  // 联系电话
+  country            String?  // 新增：居住国家
+  city               String?  // 新增：城市
+  level              String?  // 新增：顾问等级 A/B/C
+  licenseNo          String?  // RCIC执照编号（A类必填）
+  organization       String?  // 新增：执业机构（A类选填）
+  verificationLink   String?  @db.Text // 新增：执照验证链接（A类必填）
+  yearsOfExperience  String?  // 新增：从业年限（B类必填）
+  serviceScope       String?  @db.Text // 新增：服务范围说明（B类必填）
+  idDocumentUrl      String?  @db.Text // 新增：身份证件URL
+  avatar             String?  @db.Text
+  isActive           Boolean  @default(false) // 修改：默认false，需审核通过
+  isOnline           Boolean  @default(false)
+  lastActiveAt       DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
   
   // 关联
-  sessions    RCICSession[]
+  sessions           RCICSession[]
   
   @@index([email])
   @@index([isActive])
+  @@index([level])
 }
 
 // RCIC 顾问会话表
