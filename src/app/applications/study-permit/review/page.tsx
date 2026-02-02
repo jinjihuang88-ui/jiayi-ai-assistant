@@ -22,7 +22,7 @@ export default function StudyPermitReviewPage() {
   // 只找出被 RCIC 标记为需要修改的字段
   const fieldsNeedFix = fields?.filter(
     (f) => f.review?.status === "fix"
-  );
+  ) || [];
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 space-y-8">
