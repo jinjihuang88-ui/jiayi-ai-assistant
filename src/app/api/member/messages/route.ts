@@ -2,14 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 
-interface AttachmentInput {
-  fileName: string;
-  fileType: string;
-  fileSize: number;
-  mimeType: string;
-  url: string;
-}
-
 // 获取消息列表
 export async function GET(request: NextRequest) {
   try {
@@ -22,46 +14,47 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const applicationId = searchParams.get('applicationId');
+    const caseId = searchParams.get('caseId');
     const limit = parseInt(searchParams.get('limit') || '50');
 
-    const where: any = { userId: user.id };
-    if (applicationId) where.applicationId = applicationId;
+    const where: any = {};
+    if (caseId) {
+      where.caseId = caseId;
+      // 验证case所有权
+      const caseItem = await prisma.case.findFirst({
+        where: { id: caseId, userId: user.id }
+      });
+      if (!caseItem) {
+        return NextResponse.json(
+          { success: false, message: 'Case不存在' },
+          { status: 404 }
+        );
+      }
+    }
 
     const messages = await prisma.message.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       take: limit,
       include: {
-        application: {
+        case: {
           select: {
             id: true,
             type: true,
-            typeName: true,
+            status: true,
           },
         },
-        attachments: true,
       },
     });
 
-    // 获取未读消息数
-    const unreadCount = await prisma.message.count({
-      where: {
-        userId: user.id,
-        isRead: false,
-        senderType: { not: 'user' },
-      },
-    });
-
-    // 获取在线顾问数量
+    // 获取活跃顾问数量
     const onlineRcicCount = await prisma.rCIC.count({
-      where: { isOnline: true, isActive: true },
+      where: { isActive: true },
     });
 
     return NextResponse.json({
       success: true,
       messages,
-      unreadCount,
       onlineRcicCount,
     });
   } catch (error) {
@@ -73,7 +66,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// 发送消息（支持附件）
+// 发送消息
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -84,62 +77,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { applicationId, content, messageType = 'text', attachments = [] } = await request.json();
+    const { caseId, content } = await request.json();
 
     // 验证消息内容
-    if (messageType === 'text' && (!content || !content.trim())) {
+    if (!content || !content.trim()) {
       return NextResponse.json(
         { success: false, message: '消息内容不能为空' },
         { status: 400 }
       );
     }
 
-    // 如果是文件/图片消息，必须有附件
-    if ((messageType === 'image' || messageType === 'file') && attachments.length === 0) {
+    // 验证case所有权
+    const caseItem = await prisma.case.findFirst({
+      where: {
+        id: caseId,
+        userId: user.id,
+      },
+    });
+
+    if (!caseItem) {
       return NextResponse.json(
-        { success: false, message: '请上传文件' },
-        { status: 400 }
+        { success: false, message: 'Case不存在' },
+        { status: 404 }
       );
     }
 
-    // 如果指定了申请，验证所有权
-    if (applicationId) {
-      const application = await prisma.application.findFirst({
-        where: {
-          id: applicationId,
-          userId: user.id,
-        },
-      });
-
-      if (!application) {
-        return NextResponse.json(
-          { success: false, message: '申请不存在' },
-          { status: 404 }
-        );
-      }
-    }
-
-    // 创建消息和附件
+    // 创建消息
     const message = await prisma.message.create({
       data: {
-        userId: user.id,
-        applicationId,
-        content: content?.trim() || '',
-        messageType,
+        caseId,
+        senderId: user.id,
         senderType: 'user',
-        senderName: user.name || user.email,
-        attachments: {
-          create: attachments.map((att: AttachmentInput) => ({
-            fileName: att.fileName,
-            fileType: att.fileType,
-            fileSize: att.fileSize,
-            mimeType: att.mimeType,
-            url: att.url,
-          })),
-        },
-      },
-      include: {
-        attachments: true,
+        content: content.trim(),
       },
     });
 
