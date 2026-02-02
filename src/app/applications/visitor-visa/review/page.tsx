@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Application } from "@/types/application";
+import { Application, ApplicationField } from "@/types/application";
 
 export default function VisitorVisaReviewPage() {
   const [application, setApplication] = useState<Application | null>(null);
