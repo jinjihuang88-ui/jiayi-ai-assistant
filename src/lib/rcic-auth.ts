@@ -12,7 +12,7 @@ export interface RCICUser {
   phone: string | null;
   avatar: string | null;
   isActive: boolean;
-
+  isOnline: boolean;
   level?: string | null; // 新增：顾问等级
 }
 
@@ -36,7 +36,7 @@ export async function getCurrentRCIC(): Promise<RCICUser | null> {
     // 更新最后活跃时间
     await prisma.rCIC.update({
       where: { id: session.rcic.id },
-      data: { lastActiveAt: new Date() },
+      data: { lastActiveAt: new Date(), isOnline: true },
     });
 
     return {
@@ -47,7 +47,7 @@ export async function getCurrentRCIC(): Promise<RCICUser | null> {
       phone: session.rcic.phone,
       avatar: session.rcic.avatar,
       isActive: session.rcic.isActive,
-
+      isOnline: session.rcic.isOnline,
       level: session.rcic.level, // 新增：返回顾问等级
     };
   } catch (error) {
@@ -72,10 +72,10 @@ export async function createRCICSession(rcicId: string, userAgent?: string, ipAd
     },
   });
 
-  // 更新最后活跃时间
+  // 更新顾问在线状态
   await prisma.rCIC.update({
     where: { id: rcicId },
-    data: { lastActiveAt: new Date() },
+    data: { isOnline: true, lastActiveAt: new Date() },
   });
 
   return { token, expiresAt };
@@ -90,7 +90,17 @@ export async function destroyRCICSession(token: string) {
   if (session) {
     await prisma.rCICSession.delete({ where: { token } });
 
+    // 检查是否还有其他活跃会话
+    const otherSessions = await prisma.rCICSession.count({
+      where: { rcicId: session.rcicId },
+    });
 
+    if (otherSessions === 0) {
+      await prisma.rCIC.update({
+        where: { id: session.rcicId },
+        data: { isOnline: false },
+      });
+    }
   }
 }
 
