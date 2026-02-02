@@ -2,12 +2,42 @@
 
 import { useEffect, useState } from "react";
 
+interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  avatar: string | null;
+  profile: {
+    familyName: string | null;
+    givenName: string | null;
+  } | null;
+}
+
 export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     setIsLoaded(true);
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      const data = await res.json();
+      if (data.success) {
+        setUser(data.user);
+      }
+    } catch (error) {
+      console.error("Auth check error:", error);
+    } finally {
+      setIsCheckingAuth(false);
+    }
+  };
+
+  const displayName = user?.profile?.givenName || user?.name || user?.email?.split("@")[0] || "";
 
   return (
     <main className="bg-slate-50 text-slate-900">
@@ -63,16 +93,47 @@ export default function Home() {
             </a>
           </nav>
 
-          {/* CTA */}
-          <a
-            href="/applications"
-            className="ml-4 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-500 text-white text-sm font-medium 
-                       hover:from-red-700 hover:to-red-600 transition-all duration-300 
-                       shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 
-                       hover:-translate-y-0.5 active:translate-y-0"
-          >
-            开始办理申请
-          </a>
+          {/* Member Entry / CTA */}
+          <div className="flex items-center gap-3">
+            {isCheckingAuth ? (
+              <div className="w-8 h-8 rounded-full bg-slate-200 animate-pulse" />
+            ) : user ? (
+              /* 已登录状态 */
+              <a
+                href="/member"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition-all duration-300 group"
+              >
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-orange-500 flex items-center justify-center text-white text-sm font-medium shadow-md group-hover:shadow-lg transition-shadow">
+                  {displayName.charAt(0).toUpperCase()}
+                </div>
+                <span className="text-sm font-medium text-slate-700 hidden sm:inline">
+                  会员中心
+                </span>
+              </a>
+            ) : (
+              /* 未登录状态 */
+              <a
+                href="/auth/login"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-slate-200 hover:border-red-500 hover:bg-red-50 transition-all duration-300 group"
+              >
+                <svg className="w-5 h-5 text-slate-500 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span className="text-sm font-medium text-slate-600 group-hover:text-red-600 transition-colors">
+                  登录 / 注册
+                </span>
+              </a>
+            )}
+            <a
+              href="/applications"
+              className="ml-1 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-500 text-white text-sm font-medium 
+                         hover:from-red-700 hover:to-red-600 transition-all duration-300 
+                         shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 
+                         hover:-translate-y-0.5 active:translate-y-0"
+            >
+              开始办理申请
+            </a>
+          </div>
         </div>
       </header>
 

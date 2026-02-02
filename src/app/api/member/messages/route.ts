@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 
+interface AttachmentInput {
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  mimeType: string;
+  url: string;
+}
+
 // 获取消息列表
 export async function GET(request: NextRequest) {
   try {
@@ -32,6 +40,7 @@ export async function GET(request: NextRequest) {
             typeName: true,
           },
         },
+        attachments: true,
       },
     });
 
@@ -44,10 +53,16 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // 获取在线顾问数量
+    const onlineRcicCount = await prisma.rCIC.count({
+      where: { isOnline: true, isActive: true },
+    });
+
     return NextResponse.json({
       success: true,
       messages,
       unreadCount,
+      onlineRcicCount,
     });
   } catch (error) {
     console.error('Get messages error:', error);
@@ -58,7 +73,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// 发送消息
+// 发送消息（支持附件）
 export async function POST(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -69,11 +84,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { applicationId, content } = await request.json();
+    const { applicationId, content, messageType = 'text', attachments = [] } = await request.json();
 
-    if (!content || !content.trim()) {
+    // 验证消息内容
+    if (messageType === 'text' && (!content || !content.trim())) {
       return NextResponse.json(
         { success: false, message: '消息内容不能为空' },
+        { status: 400 }
+      );
+    }
+
+    // 如果是文件/图片消息，必须有附件
+    if ((messageType === 'image' || messageType === 'file') && attachments.length === 0) {
+      return NextResponse.json(
+        { success: false, message: '请上传文件' },
         { status: 400 }
       );
     }
@@ -95,13 +119,27 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // 创建消息和附件
     const message = await prisma.message.create({
       data: {
         userId: user.id,
         applicationId,
-        content: content.trim(),
+        content: content?.trim() || '',
+        messageType,
         senderType: 'user',
         senderName: user.name || user.email,
+        attachments: {
+          create: attachments.map((att: AttachmentInput) => ({
+            fileName: att.fileName,
+            fileType: att.fileType,
+            fileSize: att.fileSize,
+            mimeType: att.mimeType,
+            url: att.url,
+          })),
+        },
+      },
+      include: {
+        attachments: true,
       },
     });
 

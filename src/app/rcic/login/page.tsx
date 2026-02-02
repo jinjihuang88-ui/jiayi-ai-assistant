@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function RCICLoginPage() {
@@ -11,12 +11,6 @@ export default function RCICLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [countdown, setCountdown] = useState(0);
-  const [devCode, setDevCode] = useState("");
-
-  // 页面加载时初始化数据库
-  useEffect(() => {
-    fetch("/api/init").catch(() => {});
-  }, []);
 
   const handleSendCode = async () => {
     if (!email.trim()) {
@@ -26,7 +20,6 @@ export default function RCICLoginPage() {
 
     setLoading(true);
     setError("");
-    setDevCode("");
 
     try {
       const res = await fetch("/api/rcic/auth/login", {
@@ -39,9 +32,8 @@ export default function RCICLoginPage() {
 
       if (data.success) {
         setStep("code");
-        // 显示验证码（临时方案）
+        // 开发环境显示验证码
         if (data.devCode) {
-          setDevCode(data.devCode);
           setCode(data.devCode);
         }
         // 开始倒计时
@@ -56,14 +48,10 @@ export default function RCICLoginPage() {
           });
         }, 1000);
       } else {
-        setError(data.message || "发送验证码失败");
-        if (data.debug) {
-          console.error("Debug info:", data.debug);
-        }
+        setError(data.message);
       }
     } catch (err) {
-      console.error("Send code error:", err);
-      setError("发送验证码失败，请检查网络连接");
+      setError("发送验证码失败");
     } finally {
       setLoading(false);
     }
@@ -90,14 +78,10 @@ export default function RCICLoginPage() {
       if (data.success) {
         router.push("/rcic/dashboard");
       } else {
-        setError(data.message || "登录失败");
-        if (data.debug) {
-          console.error("Debug info:", data.debug);
-        }
+        setError(data.message);
       }
     } catch (err) {
-      console.error("Login error:", err);
-      setError("登录失败，请检查网络连接");
+      setError("登录失败");
     } finally {
       setLoading(false);
     }
@@ -127,15 +111,6 @@ export default function RCICLoginPage() {
             </div>
           )}
 
-          {/* 验证码提示 */}
-          {devCode && step === "code" && (
-            <div className="mb-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
-              <span className="font-medium">验证码：</span>
-              <span className="font-mono font-bold ml-2">{devCode}</span>
-              <span className="text-xs ml-2 text-slate-400">（已自动填入）</span>
-            </div>
-          )}
-
           {step === "email" ? (
             <>
               <div className="mb-6">
@@ -148,17 +123,7 @@ export default function RCICLoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="请输入注册邮箱"
                   className="w-full px-4 py-3 rounded-xl bg-slate-700/50 border border-slate-600 text-white placeholder-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
-                  onKeyDown={(e) => e.key === "Enter" && handleSendCode()}
                 />
-              </div>
-
-              {/* 测试账号提示 */}
-              <div className="mb-4 p-3 rounded-lg bg-slate-700/50 border border-slate-600 text-sm">
-                <div className="text-slate-400 mb-2">测试账号：</div>
-                <div className="space-y-1 text-slate-300">
-                  <div>• rcic@example.com（张顾问）</div>
-                  <div>• consultant@example.com（李移民）</div>
-                </div>
               </div>
 
               <button
@@ -182,17 +147,16 @@ export default function RCICLoginPage() {
                 <input
                   type="text"
                   value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  onChange={(e) => setCode(e.target.value)}
                   placeholder="请输入6位验证码"
                   maxLength={6}
                   className="w-full px-4 py-3 rounded-xl bg-slate-700/50 border border-slate-600 text-white placeholder-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all text-center text-2xl tracking-widest"
-                  onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                 />
               </div>
 
               <button
                 onClick={handleLogin}
-                disabled={loading || code.length !== 6}
+                disabled={loading}
                 className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-medium hover:from-emerald-700 hover:to-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all mb-4"
               >
                 {loading ? "登录中..." : "登录"}
@@ -200,11 +164,7 @@ export default function RCICLoginPage() {
 
               <div className="flex items-center justify-between text-sm">
                 <button
-                  onClick={() => {
-                    setStep("email");
-                    setCode("");
-                    setDevCode("");
-                  }}
+                  onClick={() => setStep("email")}
                   className="text-slate-400 hover:text-white transition-colors"
                 >
                   ← 返回修改邮箱
