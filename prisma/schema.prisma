@@ -1,12 +1,12 @@
 // Prisma Schema for Immigration Assistant Member System
-// 使用 SQLite 作为开发数据库，可轻松迁移到 MySQL/PostgreSQL
+// 使用 MySQL/TiDB 作为生产数据库
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -76,11 +76,11 @@ model SavedInfo {
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   // JSON 格式存储常用信息
-  personalInfo    String?  // JSON
-  contactInfo     String?  // JSON
-  educationInfo   String?  // JSON
-  workInfo        String?  // JSON
-  familyInfo      String?  // JSON
+  personalInfo    String?  @db.Text // JSON
+  contactInfo     String?  @db.Text // JSON
+  educationInfo   String?  @db.Text // JSON
+  workInfo        String?  @db.Text // JSON
+  familyInfo      String?  @db.Text // JSON
   
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -97,6 +97,9 @@ model VerificationCode {
   expiresAt DateTime
   used      Boolean  @default(false)
   createdAt DateTime @default(now())
+  
+  @@index([email])
+  @@index([expiresAt])
 }
 
 // 会话表
@@ -107,8 +110,11 @@ model Session {
   token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
-  userAgent String?
+  userAgent String?  @db.Text
   ipAddress String?
+  
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 // 申请表
@@ -125,12 +131,12 @@ model Application {
   status          String   @default("draft") // draft, submitted, under_review, needs_revision, approved, rejected
   
   // 表单数据（JSON格式）
-  formData        String   // JSON
+  formData        String   @db.LongText // JSON
   
   // RCIC 审核
   rcicId          String?
   rcicName        String?
-  rcicComment     String?
+  rcicComment     String?  @db.Text
   rcicReviewedAt  DateTime?
   
   // 时间戳
@@ -142,6 +148,10 @@ model Application {
   messages        Message[]
   documents       Document[]
   statusHistory   StatusHistory[]
+  
+  @@index([userId])
+  @@index([status])
+  @@index([rcicId])
 }
 
 // 申请状态历史
@@ -152,9 +162,11 @@ model StatusHistory {
   
   fromStatus    String?
   toStatus      String
-  comment       String?
+  comment       String?     @db.Text
   changedBy     String?     // user, rcic, system
   changedAt     DateTime    @default(now())
+  
+  @@index([applicationId])
 }
 
 // 文档表
@@ -165,11 +177,13 @@ model Document {
   
   name          String
   type          String      // passport, photo, letter, etc.
-  url           String
+  url           String      @db.Text
   size          Int
   mimeType      String
   
   uploadedAt    DateTime    @default(now())
+  
+  @@index([applicationId])
 }
 
 // 消息表（用户与顾问沟通）
@@ -182,7 +196,7 @@ model Message {
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   // 消息内容
-  content       String
+  content       String       @db.Text
   senderType    String       // user, rcic, system
   senderName    String?
   senderId      String?      // 顾问 ID（如果是顾问发送）
@@ -196,6 +210,10 @@ model Message {
   readAt        DateTime?
   
   createdAt     DateTime     @default(now())
+  
+  @@index([userId])
+  @@index([applicationId])
+  @@index([senderType])
 }
 
 // 消息附件表
@@ -208,9 +226,11 @@ model MessageAttachment {
   fileType    String   // image, document, pdf, etc.
   fileSize    Int
   mimeType    String
-  url         String
+  url         String   @db.Text
   
   createdAt   DateTime @default(now())
+  
+  @@index([messageId])
 }
 
 // 通知表
@@ -222,14 +242,17 @@ model Notification {
   // 通知内容
   type      String   // status_change, message, reminder, system
   title     String
-  content   String
-  link      String?
+  content   String   @db.Text
+  link      String?  @db.Text
   
   // 已读状态
   isRead    Boolean  @default(false)
   readAt    DateTime?
   
   createdAt DateTime @default(now())
+  
+  @@index([userId])
+  @@index([isRead])
 }
 
 // RCIC 顾问表
@@ -239,7 +262,7 @@ model RCIC {
   name        String
   licenseNo   String
   phone       String?
-  avatar      String?
+  avatar      String?  @db.Text
   isActive    Boolean  @default(true)
   isOnline    Boolean  @default(false)
   lastActiveAt DateTime?
@@ -248,6 +271,9 @@ model RCIC {
   
   // 关联
   sessions    RCICSession[]
+  
+  @@index([email])
+  @@index([isActive])
 }
 
 // RCIC 顾问会话表
@@ -258,8 +284,11 @@ model RCICSession {
   token     String   @unique
   expiresAt DateTime
   createdAt DateTime @default(now())
-  userAgent String?
+  userAgent String?  @db.Text
   ipAddress String?
+  
+  @@index([rcicId])
+  @@index([expiresAt])
 }
 
 // RCIC 验证码表
@@ -271,4 +300,7 @@ model RCICVerificationCode {
   expiresAt DateTime
   used      Boolean  @default(false)
   createdAt DateTime @default(now())
+  
+  @@index([email])
+  @@index([expiresAt])
 }
