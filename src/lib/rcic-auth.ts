@@ -8,11 +8,12 @@ export interface RCICUser {
   id: string;
   email: string;
   name: string;
-  licenseNo: string;
+  licenseNo: string | null; // 修改：改为可选，因为B类和C类顾问可能没有RCIC执照
   phone: string | null;
   avatar: string | null;
   isActive: boolean;
   isOnline: boolean;
+  level?: string | null; // 新增：顾问等级
 }
 
 // 获取当前登录的顾问
@@ -42,11 +43,12 @@ export async function getCurrentRCIC(): Promise<RCICUser | null> {
       id: session.rcic.id,
       email: session.rcic.email,
       name: session.rcic.name,
-      licenseNo: session.rcic.licenseNo,
+      licenseNo: session.rcic.licenseNo, // 现在可以是 null
       phone: session.rcic.phone,
       avatar: session.rcic.avatar,
       isActive: session.rcic.isActive,
       isOnline: session.rcic.isOnline,
+      level: session.rcic.level, // 新增：返回顾问等级
     };
   } catch (error) {
     console.error('Get current RCIC error:', error);
