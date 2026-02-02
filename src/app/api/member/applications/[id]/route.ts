@@ -5,9 +5,10 @@ import { getCurrentUser } from '@/lib/auth';
 // 获取单个申请详情
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json(
@@ -18,7 +19,7 @@ export async function GET(
 
     const application = await prisma.application.findFirst({
       where: {
-        id: params.id,
+        id: id,
         userId: user.id,
       },
       include: {
