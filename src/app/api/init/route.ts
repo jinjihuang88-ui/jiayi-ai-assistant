@@ -1,19 +1,37 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import * as bcrypt from 'bcryptjs';
 
 // 默认测试顾问列表
 const DEFAULT_RCICS = [
   {
     email: 'rcic@example.com',
+    password: 'password123',
     name: '张顾问',
+    nameEn: 'Zhang Consultant',
     licenseNo: 'R123456',
     phone: '+1 604-123-4567',
+    idDocumentUrl: '/uploads/default-id.jpg',
+    country: 'Canada',
+    city: 'Vancouver',
+    level: 'A',
+    organization: 'ABC Immigration Services',
+    verificationLink: 'https://college-ic.ca/protecting-the-public/find-an-immigration-consultant',
+    licenseCertificateUrl: '/uploads/default-license.jpg',
   },
   {
     email: 'consultant@example.com',
+    password: 'password123',
     name: '李移民',
-    licenseNo: 'R789012',
+    nameEn: 'Li Immigration',
     phone: '+1 416-987-6543',
+    idDocumentUrl: '/uploads/default-id.jpg',
+    country: 'Canada',
+    city: 'Toronto',
+    level: 'B',
+    yearsOfExperience: '5-10年',
+    serviceScope: '留学申请、学签续签、工签申请',
+    pastCases: '成功办理超过500个留学案例',
   },
 ];
 
@@ -26,13 +44,17 @@ export async function GET() {
     const results = [];
     for (const rcicData of DEFAULT_RCICS) {
       try {
+        // 加密密码
+        const hashedPassword = await bcrypt.hash(rcicData.password, 10);
+        
         const rcic = await prisma.rCIC.upsert({
           where: { email: rcicData.email },
           update: {},
           create: {
             ...rcicData,
+            password: hashedPassword,
+            verificationStatus: 'approved',
             isActive: true,
-            isOnline: false,
           },
         });
         results.push({ email: rcic.email, status: 'created/exists' });
@@ -44,7 +66,6 @@ export async function GET() {
     // 统计数据
     const userCount = await prisma.user.count();
     const rcicCount = await prisma.rCIC.count();
-    const applicationCount = await prisma.application.count();
 
     return NextResponse.json({
       success: true,
@@ -52,7 +73,6 @@ export async function GET() {
       stats: {
         users: userCount,
         rcics: rcicCount,
-        applications: applicationCount,
       },
       rcicResults: results,
     });
