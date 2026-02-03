@@ -1,0 +1,13 @@
+构建错误信息：
+
+ERR_PNPM_OUTDATED_LOCKFILE  Cannot install with "frozen-lockfile" because pnpm-lock.yaml is not up to date with package.json
+
+问题原因：
+- 我在本地使用npm安装了cloudinary包
+- 但项目使用的是pnpm
+- package.json更新了，但pnpm-lock.yaml没有更新
+- Vercel部署时使用pnpm，发现lockfile过期
+
+解决方案：
+1. 在本地使用pnpm安装cloudinary
+2. 提交更新后的pnpm-lock.yaml
