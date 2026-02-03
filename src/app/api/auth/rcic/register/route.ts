@@ -1,4 +1,4 @@
-// src/app/api/auth/register/route.ts
+// src/app/api/auth/rcic/register/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
@@ -8,12 +8,40 @@ import { sendVerificationEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, name, password, phone } = await request.json();
+    const {
+      email,
+      name,
+      password,
+      phone,
+      consultantType, // A, B, or C
+      licenseNumber,
+      yearsOfExperience,
+      country,
+      city,
+      organization,
+      bio,
+    } = await request.json();
 
     // 验证必填字段
-    if (!email || !name || !password) {
+    if (!email || !name || !password || !consultantType) {
       return NextResponse.json(
-        { error: '邮箱、姓名和密码不能为空' },
+        { error: '邮箱、姓名、密码和顾问类型不能为空' },
+        { status: 400 }
+      );
+    }
+
+    // 验证顾问类型
+    if (!['A', 'B', 'C'].includes(consultantType)) {
+      return NextResponse.json(
+        { error: '顾问类型必须为 A、B 或 C' },
+        { status: 400 }
+      );
+    }
+
+    // A类顾问必须提供执照编号
+    if (consultantType === 'A' && !licenseNumber) {
+      return NextResponse.json(
+        { error: 'A类顾问必须提供 RCIC 执照编号' },
         { status: 400 }
       );
     }
@@ -27,7 +55,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 验证密码强度（至少8位）
+    // 验证密码强度
     if (password.length < 8) {
       return NextResponse.json(
         { error: '密码长度至少为8位' },
@@ -36,11 +64,11 @@ export async function POST(request: NextRequest) {
     }
 
     // 检查邮箱是否已存在
-    const existingUser = await prisma.user.findUnique({
+    const existingRCIC = await prisma.rCIC.findUnique({
       where: { email },
     });
 
-    if (existingUser) {
+    if (existingRCIC) {
       return NextResponse.json(
         { error: '该邮箱已被注册' },
         { status: 400 }
@@ -50,14 +78,22 @@ export async function POST(request: NextRequest) {
     // 加密密码
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 创建用户
-    const user = await prisma.user.create({
+    // 创建顾问账户
+    const rcic = await prisma.rCIC.create({
       data: {
         email,
         name,
         password: hashedPassword,
         phone: phone || null,
+        consultantType,
+        licenseNumber: licenseNumber || null,
+        yearsOfExperience: yearsOfExperience || null,
+        country: country || null,
+        city: city || null,
+        organization: organization || null,
+        bio: bio || null,
         emailVerified: false,
+        approvalStatus: 'pending', // 待审核
       },
     });
 
@@ -80,19 +116,20 @@ export async function POST(request: NextRequest) {
 
     if (!emailResult.success) {
       console.error('Failed to send verification email:', emailResult.error);
-      // 即使邮件发送失败，用户也已创建成功
     }
 
     return NextResponse.json({
-      message: '注册成功！请查收验证邮件以激活账户',
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
+      message: '注册成功！请查收验证邮件，验证后需等待平台审核',
+      rcic: {
+        id: rcic.id,
+        email: rcic.email,
+        name: rcic.name,
+        consultantType: rcic.consultantType,
+        approvalStatus: rcic.approvalStatus,
       },
     });
   } catch (error) {
-    console.error('User registration error:', error);
+    console.error('RCIC registration error:', error);
     return NextResponse.json(
       { error: '注册失败，请稍后重试' },
       { status: 500 }

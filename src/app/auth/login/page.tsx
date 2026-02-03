@@ -1,174 +1,174 @@
-"use client";
+// src/app/auth/login/page.tsx
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import Link from "next/link";
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [modal, setModal] = useState<{ show: boolean; message: string; type: "success" | "error" }>({
-    show: false,
-    message: "",
-    type: "success",
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    userType: 'user', // user or rcic
   });
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [message, setMessage] = useState('');
 
-  const showModal = (message: string, type: "success" | "error") => {
-    setModal({ show: true, message, type });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const closeModal = () => {
-    setModal({ show: false, message: "", type: "success" });
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email) {
-      showModal("请输入邮箱", "error");
-      return;
-    }
-
-    setLoading(true);
+    setStatus('loading');
+    setMessage('');
 
     try {
-      const response = await fetch("/api/auth/test-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (data.success) {
-        showModal("登录成功！", "success");
-        setTimeout(() => {
-          router.push("/member");
-        }, 1500);
+      if (res.ok) {
+        // 登录成功，跳转到对应的仪表板
+        if (formData.userType === 'user') {
+          router.push('/member/dashboard');
+        } else {
+          router.push('/rcic/dashboard');
+        }
       } else {
-        showModal(data.message || "登录失败，请重试", "error");
+        setStatus('error');
+        setMessage(data.error || '登录失败');
       }
     } catch (error) {
-      console.error("Login error:", error);
-      showModal("登录失败，请重试", "error");
-    } finally {
-      setLoading(false);
+      console.error('Login error:', error);
+      setStatus('error');
+      setMessage('登录过程中发生错误');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      {/* 返回首页按钮 */}
-      <Link 
-        href="/"
-        className="fixed top-6 left-6 flex items-center gap-2 px-4 py-2 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow text-gray-700 hover:text-blue-600"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        <span className="font-medium">返回首页</span>
-      </Link>
-
-      {/* 弹窗提示 */}
-      {modal.show && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">
-          <div className="fixed inset-0 bg-black bg-opacity-30" onClick={closeModal}></div>
-          <div className="relative bg-white rounded-lg shadow-2xl max-w-md w-full animate-slide-down">
-            <div className="p-6">
-              <div className="flex items-start mb-4">
-                {modal.type === "success" ? (
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                ) : (
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </div>
-                )}
-                <div className="ml-4 flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {modal.type === "success" ? "成功" : "错误"}
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-600">{modal.message}</p>
-                </div>
-              </div>
-              <div className="flex justify-end">
-                <button
-                  onClick={closeModal}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                >
-                  OK
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">用户登录</h1>
-          <p className="text-gray-600">测试模式 - 免登录</p>
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">登录</h2>
+          <p className="text-gray-600">欢迎回到嘉怡移民助手</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="userType" className="block text-sm font-medium text-gray-700 mb-2">
+              账户类型
+            </label>
+            <select
+              id="userType"
+              name="userType"
+              value={formData.userType}
+              onChange={handleChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              disabled={status === 'loading'}
+            >
+              <option value="user">普通用户</option>
+              <option value="rcic">移民顾问</option>
+            </select>
+          </div>
+
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               邮箱地址
             </label>
             <input
-              id="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="输入任意邮箱即可登录"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="your@email.com"
+              disabled={status === 'loading'}
             />
-            <p className="mt-2 text-sm text-gray-500">
-              测试模式：输入任意邮箱即可直接登录，无需验证
-            </p>
           </div>
+
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              密码
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="请输入密码"
+              disabled={status === 'loading'}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                id="remember"
+                type="checkbox"
+                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+              />
+              <label htmlFor="remember" className="ml-2 block text-sm text-gray-700">
+                记住我
+              </label>
+            </div>
+            <Link
+              href="/auth/forgot-password"
+              className="text-sm text-purple-600 hover:text-purple-700"
+            >
+              忘记密码？
+            </Link>
+          </div>
+
+          {status === 'error' && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-sm text-red-600">{message}</p>
+            </div>
+          )}
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            disabled={status === 'loading'}
+            className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "登录中..." : "立即登录（测试）"}
+            {status === 'loading' ? '登录中...' : '登录'}
           </button>
+
+          <div className="text-center space-y-2">
+            <p className="text-sm text-gray-600">
+              还没有账户？{' '}
+              <Link href="/auth/register" className="text-purple-600 hover:text-purple-700 font-medium">
+                用户注册
+              </Link>
+              {' / '}
+              <Link href="/auth/rcic/register" className="text-purple-600 hover:text-purple-700 font-medium">
+                顾问注册
+              </Link>
+            </p>
+            <p className="text-sm text-gray-600">
+              <Link href="/auth/resend-verification" className="text-purple-600 hover:text-purple-700 font-medium">
+                重新发送验证邮件
+              </Link>
+            </p>
+          </div>
         </form>
-
-        <div className="mt-6 text-center text-sm text-gray-600">
-          <p>测试模式说明：</p>
-          <ul className="mt-2 text-left space-y-1">
-            <li>• 无需注册，输入任意邮箱即可登录</li>
-            <li>• 系统会自动创建测试账号</li>
-            <li>• 仅用于功能测试</li>
-          </ul>
-        </div>
       </div>
-
-      <style jsx>{`
-        @keyframes slide-down {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-slide-down {
-          animation: slide-down 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

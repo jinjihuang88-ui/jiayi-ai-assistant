@@ -24,7 +24,7 @@ model User {
 
   // 关系
   cases    Case[]
-  messages Message[] @relation("UserMessages")
+  messages Message[]
 
   @@map("users")
 }
@@ -75,7 +75,7 @@ model RCIC {
 
   // 关系
   cases    Case[]
-  messages Message[] @relation("RCICMessages")
+  messages Message[]
 
   @@map("rcics")
 }
@@ -104,18 +104,18 @@ model Case {
 
 // 消息表
 model Message {
-  id         String   @id @default(cuid())
-  caseId     String
-  senderId   String
+  id        String   @id @default(cuid())
+  caseId    String
+  senderId  String
   senderType String // user or rcic
-  content    String
-  read       Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  content   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
 
-  // 关系 - 使用命名关系和自定义外键名称
+  // 关系
   case Case  @relation(fields: [caseId], references: [id], onDelete: Cascade)
-  user User? @relation("UserMessages", fields: [senderId], references: [id], onDelete: Cascade, map: "messages_user_fkey")
-  rcic RCIC? @relation("RCICMessages", fields: [senderId], references: [id], onDelete: Cascade, map: "messages_rcic_fkey")
+  user User? @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  rcic RCIC? @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([caseId])
   @@index([senderId])
