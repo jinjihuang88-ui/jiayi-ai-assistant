@@ -195,10 +195,7 @@ export default function RCICRegisterPage() {
       const licenseCertificateUrl = formData.licenseCertificate ? await uploadFile(formData.licenseCertificate) : "";
 
       // 提交注册
-      const response = await fetch("/api/rcic/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const requestData = {
           email: formData.email,
           password: formData.password,
           name: `${formData.nameCn} / ${formData.nameEn}`, // 合并中英文姓名
@@ -216,7 +213,14 @@ export default function RCICRegisterPage() {
           experienceProof: formData.pastCases || null, // pastCases -> experienceProof
           // C类顾问字段
           bio: formData.workExperience || formData.specialties || null, // workExperience/specialties -> bio
-        }),
+        };
+      
+      console.log("[DEBUG] Sending registration data:", requestData);
+      
+      const response = await fetch("/api/rcic/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData),
       });
 
       const data = await response.json();
