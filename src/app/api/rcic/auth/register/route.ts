@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import * as bcrypt from "bcryptjs";
+import { sendRCICVerificationEmail } from "@/lib/email";
+import * as crypto from "crypto";
 
 export async function POST(request: NextRequest) {
   try {
@@ -105,7 +107,24 @@ export async function POST(request: NextRequest) {
 
     console.log("[RCIC Register] RCIC created (pending verification):", rcic.id);
 
-    // TODO: 发送邮箱验证邮件
+    // 生成验证token
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const tokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24小时后过期
+
+    // 保存验证token
+    await prisma.rCIC.update({
+      where: { id: rcic.id },
+      data: {
+        verificationToken,
+        verificationTokenExpiry: tokenExpiry,
+      },
+    });
+
+    // 发送邮箱验证邮件
+    const emailResult = await sendRCICVerificationEmail(email, verificationToken, name);
+    if (!emailResult.success) {
+      console.error('[RCIC Register] Failed to send verification email:', emailResult.error);
+    }
 
     return NextResponse.json({
       success: true,
