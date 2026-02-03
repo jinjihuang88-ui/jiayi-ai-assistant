@@ -46,12 +46,47 @@ export async function GET(request: NextRequest) {
             userId: true,
           },
         },
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            avatar: true,
+          },
+        },
       },
+    });
+
+    // 解析attachments字段
+    const messagesWithAttachments = messages.map(msg => {
+      let attachments = [];
+      if (msg.attachments) {
+        try {
+          const parsed = JSON.parse(msg.attachments);
+          attachments = parsed.map((file: any, idx: number) => ({
+            id: `${msg.id}-${idx}`,
+            fileName: file.name,
+            fileType: file.type?.startsWith('image/') ? 'image' : 'document',
+            fileSize: file.size || 0,
+            mimeType: file.type || 'application/octet-stream',
+            url: file.url,
+          }));
+        } catch (e) {
+          console.error('Failed to parse attachments:', e);
+        }
+      }
+      return {
+        ...msg,
+        attachments,
+        messageType: 'text',
+        senderName: msg.senderType === 'user' ? msg.user?.name : null,
+        application: null,
+      };
     });
 
     return NextResponse.json({
       success: true,
-      messages: messages.reverse(),
+      messages: messagesWithAttachments.reverse(),
     });
   } catch (error) {
     console.error('Get RCIC messages error:', error);

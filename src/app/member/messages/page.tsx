@@ -17,6 +17,7 @@ interface Message {
   isRead: boolean;
   createdAt: string;
   application: Application | null;
+  attachments?: string | null;
 }
 
 function MessagesContent() {
@@ -30,7 +31,10 @@ function MessagesContent() {
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchApplications();
@@ -89,17 +93,62 @@ function MessagesContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      setSelectedFiles(Array.from(files));
+    }
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
+  };
+
   const handleSend = async () => {
-    if (!newMessage.trim() || sending) return;
+    if ((!newMessage.trim() && selectedFiles.length === 0) || sending) return;
 
     setSending(true);
+    setUploading(true);
+    
     try {
+      let attachments = null;
+
+      // 如果有文件，先上传
+      if (selectedFiles.length > 0) {
+        const uploadedFiles = [];
+        
+        for (const file of selectedFiles) {
+          const formData = new FormData();
+          formData.append("file", file);
+
+          const uploadRes = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          const uploadData = await uploadRes.json();
+          if (uploadData.success) {
+            uploadedFiles.push({
+              name: file.name,
+              url: uploadData.url,
+              type: file.type,
+              size: file.size,
+            });
+          }
+        }
+
+        if (uploadedFiles.length > 0) {
+          attachments = JSON.stringify(uploadedFiles);
+        }
+      }
+
       const res = await fetch("/api/member/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           applicationId: selectedApp,
-          content: newMessage.trim(),
+          content: newMessage.trim() || "发送了文件",
+          attachments,
         }),
       });
 
@@ -107,6 +156,10 @@ function MessagesContent() {
       if (data.success) {
         setMessages([...messages, data.message]);
         setNewMessage("");
+        setSelectedFiles([]);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
       } else {
         alert(data.message);
       }
@@ -114,6 +167,7 @@ function MessagesContent() {
       alert("发送失败");
     } finally {
       setSending(false);
+      setUploading(false);
     }
   };
 
@@ -257,6 +311,39 @@ function MessagesContent() {
                           </div>
                         )}
                         <p className="whitespace-pre-wrap">{msg.content}</p>
+                        
+                        {/* 附件显示 */}
+                        {msg.attachments && (() => {
+                          try {
+                            const attachments = JSON.parse(msg.attachments);
+                            return (
+                              <div className="mt-2 space-y-2">
+                                {attachments.map((file: any, idx: number) => (
+                                  <a
+                                    key={idx}
+                                    href={file.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={`flex items-center gap-2 p-2 rounded-lg ${
+                                      msg.senderType === "user"
+                                        ? "bg-white/20 hover:bg-white/30"
+                                        : "bg-white hover:bg-slate-50"
+                                    }`}
+                                  >
+                                    <span className="text-lg">
+                                      {file.type?.startsWith("image/") ? "🖼️" : "📄"}
+                                    </span>
+                                    <span className="text-sm truncate flex-1">{file.name}</span>
+                                    <span className="text-xs opacity-70">⬇️</span>
+                                  </a>
+                                ))}
+                              </div>
+                            );
+                          } catch (e) {
+                            return null;
+                          }
+                        })()}
+                        
                         <div
                           className={`text-xs mt-1 ${
                             msg.senderType === "user" ? "text-white/70" : "text-slate-400"
@@ -274,7 +361,46 @@ function MessagesContent() {
 
             {/* Input Area */}
             <div className="p-4 border-t border-slate-100">
+              {/* 文件预览 */}
+              {selectedFiles.length > 0 && (
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {selectedFiles.map((file, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg text-sm"
+                    >
+                      <span>{file.type.startsWith("image/") ? "🖼️" : "📄"}</span>
+                      <span className="truncate max-w-[150px]">{file.name}</span>
+                      <button
+                        onClick={() => handleRemoveFile(idx)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        ✖️
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
               <div className="flex gap-3">
+                {/* 文件上传按钮 */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="px-4 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                  title="上传文件"
+                >
+                  📎
+                </button>
+                
                 <input
                   type="text"
                   value={newMessage}
@@ -285,10 +411,10 @@ function MessagesContent() {
                 />
                 <button
                   onClick={handleSend}
-                  disabled={!newMessage.trim() || sending}
+                  disabled={(!newMessage.trim() && selectedFiles.length === 0) || sending}
                   className="px-6 py-3 rounded-xl bg-gradient-to-r from-red-600 to-red-500 text-white font-medium hover:from-red-700 hover:to-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {sending ? "发送中..." : "发送"}
+                  {uploading ? "上传中..." : sending ? "发送中..." : "发送"}
                 </button>
               </div>
               <p className="text-xs text-slate-400 mt-2">

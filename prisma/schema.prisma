@@ -141,6 +141,7 @@ model Message {
   senderId   String
   senderType String // user or rcic
   content    String
+  attachments String? // JSON array of file URLs
   read       Boolean  @default(false)
   createdAt  DateTime @default(now())
 

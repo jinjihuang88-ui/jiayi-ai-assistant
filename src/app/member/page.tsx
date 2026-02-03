@@ -351,6 +351,20 @@ export default function MemberDashboard() {
                 去完善 →
               </a>
             </div>
+
+            {/* Document Management */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+              <h3 className="font-semibold text-slate-900 mb-3">📁 文档管理</h3>
+              <p className="text-sm text-slate-500 mb-4">
+                上传申请相关的文档和图片，移民顾问可以查看和下载
+              </p>
+              <a
+                href="/member/documents"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium hover:from-blue-600 hover:to-blue-700 w-full justify-center"
+              >
+                📄 管理文档
+              </a>
+            </div>
           </div>
         </div>
       </div>

@@ -77,10 +77,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { caseId, content } = await request.json();
+    const { caseId, content, attachments } = await request.json();
 
-    // 验证消息内容
-    if (!content || !content.trim()) {
+    // 验证消息内容（如果有附件，内容可以为空）
+    if ((!content || !content.trim()) && !attachments) {
       return NextResponse.json(
         { success: false, message: '消息内容不能为空' },
         { status: 400 }
@@ -108,7 +108,8 @@ export async function POST(request: NextRequest) {
         caseId,
         senderId: user.id,
         senderType: 'user',
-        content: content.trim(),
+        content: content?.trim() || '',
+        attachments: attachments || null,
       },
     });
 
