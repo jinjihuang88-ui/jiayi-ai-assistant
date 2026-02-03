@@ -69,7 +69,8 @@ model RCIC {
   lastReviewDate DateTime? // 最后审核日期
   nextReviewDate DateTime? // 下次审核日期（持牌顾问6-12个月复核）
   
-  // 在线状态（新增）
+  // 账号和在线状态（新增）
+  isActive      Boolean   @default(true)  // 账号是否激活（是否被禁用/封号）
   isOnline      Boolean   @default(false) // 是否在线
   lastActiveAt  DateTime? // 最后活跃时间
   
