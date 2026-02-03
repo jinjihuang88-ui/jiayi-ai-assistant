@@ -1,0 +1,19 @@
+RCIC注册失败问题分析
+
+1. 日志中没有找到 /api/rcic/auth/register 的调用记录
+   - 这说明前端可能没有正确调用API
+   - 或者API路由配置有问题
+
+2. 发现的其他错误：
+   - /api/upload 返回500错误：EROFS: read-only file system
+     原因：Vercel是只读文件系统，不能直接写入文件
+     需要使用云存储（如S3, Cloudinary等）
+
+   - /api/rcic/auth/login 返回500错误：
+     错误：The column `rcics.verificationToken` does not exist in the current database
+     原因：数据库schema没有同步，需要运行prisma migrate
+
+3. 需要检查的地方：
+   - RCIC注册页面的表单提交逻辑
+   - API路由是否正确配置
+   - 数据库schema是否已同步
