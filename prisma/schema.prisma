@@ -17,8 +17,10 @@ model User {
   name            String
   password        String
   phone           String?
+  avatar          String?   // 新增：用户头像
   emailVerified   Boolean   @default(false)
   emailVerifiedAt DateTime?
+  lastLoginAt     DateTime? // 新增：最后登录时间
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -36,6 +38,7 @@ model RCIC {
   name      String
   password  String
   phone     String?
+  avatar    String?   // 新增：顾问头像
   
   // 邮箱验证
   emailVerified   Boolean   @default(false)
@@ -44,6 +47,8 @@ model RCIC {
   // 顾问类型和资质
   consultantType    String    @default("A") // A: 持牌顾问, B: 留学顾问, C: 文案辅助
   licenseNumber     String?   // RCIC 执照编号（A类必填）
+  licenseNo         String?   // 新增：兼容旧代码的字段名
+  level             String?   // 新增：顾问等级（兼容旧代码）
   licenseVerified   Boolean   @default(false)
   licenseExpiryDate DateTime? // 执照过期日期
   yearsOfExperience Int?      // 从业年限
@@ -64,6 +69,10 @@ model RCIC {
   lastReviewDate DateTime? // 最后审核日期
   nextReviewDate DateTime? // 下次审核日期（持牌顾问6-12个月复核）
   
+  // 在线状态（新增）
+  isOnline      Boolean   @default(false) // 是否在线
+  lastActiveAt  DateTime? // 最后活跃时间
+  
   // 基本信息
   country      String?
   city         String?
@@ -76,8 +85,27 @@ model RCIC {
   // 关系
   cases    Case[]
   messages Message[] @relation("RCICMessages")
+  sessions RCICSession[] // 新增：会话关系
 
   @@map("rcics")
+}
+
+// RCIC 会话表（新增）
+model RCICSession {
+  id        String   @id @default(cuid())
+  rcicId    String
+  token     String   @unique
+  expiresAt DateTime
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  // 关系
+  rcic RCIC @relation(fields: [rcicId], references: [id], onDelete: Cascade)
+
+  @@index([rcicId])
+  @@index([token])
+  @@map("rcic_sessions")
 }
 
 // 案件表
