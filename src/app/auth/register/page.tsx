@@ -58,12 +58,12 @@ export default function UserRegisterPage() {
         setMessage(data.message || '注册成功！请查收验证邮件');
       } else {
         setStatus('error');
-        setMessage(data.error || '注册失败');
+        setMessage(data.error || '注册失败，请稍后重试');
       }
     } catch (error) {
       console.error('Registration error:', error);
       setStatus('error');
-      setMessage('注册过程中发生错误');
+      setMessage('注册失败，请稍后重试');
     }
   };
 
@@ -104,6 +104,12 @@ export default function UserRegisterPage() {
                 className="block w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium"
               >
                 重新发送验证邮件
+              </Link>
+              <Link
+                href="/"
+                className="block w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              >
+                返回首页
               </Link>
             </div>
           </div>
@@ -232,6 +238,11 @@ export default function UserRegisterPage() {
               是移民顾问？{' '}
               <Link href="/auth/rcic/register" className="text-purple-600 hover:text-purple-700 font-medium">
                 顾问注册
+              </Link>
+            </p>
+            <p className="text-sm text-gray-600">
+              <Link href="/" className="text-gray-500 hover:text-gray-700 font-medium">
+                返回首页
               </Link>
             </p>
           </div>

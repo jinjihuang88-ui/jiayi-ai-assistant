@@ -11,12 +11,11 @@ export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    userType: 'user', // user or rcic
   });
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -34,18 +33,17 @@ export default function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          userType: 'user', // 默认为普通用户
+        }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        // 登录成功，跳转到对应的仪表板
-        if (formData.userType === 'user') {
-          router.push('/member/dashboard');
-        } else {
-          router.push('/rcic/dashboard');
-        }
+        // 登录成功，跳转到会员中心
+        router.push('/member');
       } else {
         setStatus('error');
         setMessage(data.error || '登录失败');
@@ -66,23 +64,6 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="userType" className="block text-sm font-medium text-gray-700 mb-2">
-              账户类型
-            </label>
-            <select
-              id="userType"
-              name="userType"
-              value={formData.userType}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              disabled={status === 'loading'}
-            >
-              <option value="user">普通用户</option>
-              <option value="rcic">移民顾问</option>
-            </select>
-          </div>
-
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               邮箱地址
@@ -164,6 +145,11 @@ export default function LoginPage() {
             <p className="text-sm text-gray-600">
               <Link href="/auth/resend-verification" className="text-purple-600 hover:text-purple-700 font-medium">
                 重新发送验证邮件
+              </Link>
+            </p>
+            <p className="text-sm text-gray-600">
+              <Link href="/" className="text-gray-500 hover:text-gray-700 font-medium">
+                返回首页
               </Link>
             </p>
           </div>
