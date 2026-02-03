@@ -20,7 +20,7 @@ export async function GET() {
         name: user.name,
         phone: user.phone,
         avatar: user.avatar,
-        profile: user.profile,
+
         createdAt: user.createdAt,
         lastLoginAt: user.lastLoginAt,
       },

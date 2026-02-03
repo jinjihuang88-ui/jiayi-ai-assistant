@@ -22,76 +22,48 @@ export function isValidEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
-// 获取当前登录用户
+// 获取当前登录用户（简化版，直接从cookie获取userId）
 export async function getCurrentUser() {
   try {
     const cookieStore = await cookies();
-    const sessionToken = cookieStore.get('session_token')?.value;
+    const userId = cookieStore.get('user_id')?.value;
     
-    if (!sessionToken) {
+    if (!userId) {
       return null;
     }
 
-    const session = await prisma.session.findUnique({
-      where: { token: sessionToken },
-      include: {
-        user: {
-          include: {
-            profile: true,
-          },
-        },
-      },
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
     });
 
-    if (!session || session.expiresAt < new Date()) {
-      return null;
-    }
-
-    return session.user;
+    return user;
   } catch (error) {
     console.error('Error getting current user:', error);
     return null;
   }
 }
 
-// 创建会话
-export async function createSession(userId: string, userAgent?: string, ipAddress?: string) {
-  const token = generateSessionToken();
-  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30天
-
-  const session = await prisma.session.create({
-    data: {
-      userId,
-      token,
-      expiresAt,
-      userAgent,
-      ipAddress,
-    },
+// 创建会话（简化版，直接设置cookie）
+export async function createSession(userId: string) {
+  const cookieStore = await cookies();
+  cookieStore.set('user_id', userId, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 30 * 24 * 60 * 60, // 30天
   });
-
-  return session;
+  
+  return { userId };
 }
 
 // 删除会话
-export async function deleteSession(token: string) {
+export async function deleteSession() {
   try {
-    await prisma.session.delete({
-      where: { token },
-    });
+    const cookieStore = await cookies();
+    cookieStore.delete('user_id');
   } catch (error) {
     console.error('Error deleting session:', error);
   }
-}
-
-// 清理过期会话
-export async function cleanExpiredSessions() {
-  await prisma.session.deleteMany({
-    where: {
-      expiresAt: {
-        lt: new Date(),
-      },
-    },
-  });
 }
 
 // 申请状态映射

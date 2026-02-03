@@ -5,15 +5,11 @@ import { deleteSession } from '@/lib/auth';
 export async function POST() {
   try {
     const cookieStore = await cookies();
-    const sessionToken = cookieStore.get('session_token')?.value;
-
-    if (sessionToken) {
-      // 删除数据库中的会话
-      await deleteSession(sessionToken);
-    }
+    // 删除会话
+    await deleteSession();
 
     // 清除Cookie
-    cookieStore.delete('session_token');
+    cookieStore.delete('user_id');
 
     return NextResponse.json({
       success: true,

@@ -17,13 +17,12 @@ export async function GET() {
     const onlineRcics = await prisma.rCIC.findMany({
       where: {
         isActive: true,
-        isOnline: true,
       },
       select: {
         id: true,
         name: true,
         avatar: true,
-        lastActiveAt: true,
+        lastLoginAt: true,
       },
     });
 
