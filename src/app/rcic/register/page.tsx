@@ -201,22 +201,21 @@ export default function RCICRegisterPage() {
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          nameCn: formData.nameCn,
-          nameEn: formData.nameEn,
-          idDocumentUrl,
+          name: `${formData.nameCn} / ${formData.nameEn}`, // 合并中英文姓名
+          phone: formData.phone,
+          consultantType: formData.level, // level -> consultantType
           country: formData.country,
           city: formData.city,
-          phone: formData.phone,
-          level: formData.level,
-          licenseNo: formData.licenseNo || null,
+          idDocument: idDocumentUrl, // idDocumentUrl -> idDocument
+          // A类顾问字段
+          licenseNumber: formData.licenseNo || null, // licenseNo -> licenseNumber
           organization: formData.organization || null,
-          verificationLink: formData.verificationLink || null,
-          licenseCertificateUrl: licenseCertificateUrl || null,
+          licenseDocument: licenseCertificateUrl || null, // licenseCertificateUrl -> licenseDocument
+          // B类顾问字段
           yearsOfExperience: formData.yearsOfExperience || null,
-          serviceScope: formData.serviceScope || null,
-          pastCases: formData.pastCases || null,
-          specialties: formData.specialties || null,
-          workExperience: formData.workExperience || null,
+          experienceProof: formData.pastCases || null, // pastCases -> experienceProof
+          // C类顾问字段
+          bio: formData.workExperience || formData.specialties || null, // workExperience/specialties -> bio
         }),
       });
 
