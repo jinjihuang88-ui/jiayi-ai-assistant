@@ -93,16 +93,41 @@ export default function RCICRegisterPage() {
   };
 
   const validateStep2 = () => {
+    console.log("[DEBUG] validateStep2 called");
+    console.log("[DEBUG] formData:", formData);
+    
     const missingFields = [];
-    if (!formData.nameCn) missingFields.push("中文姓名");
-    if (!formData.nameEn) missingFields.push("英文姓名");
-    if (!formData.idDocument) missingFields.push("身份证件");
-    if (!formData.country) missingFields.push("居住地");
-    if (!formData.city) missingFields.push("城市");
-    if (!formData.phone) missingFields.push("电话");
+    if (!formData.nameCn) {
+      console.log("[DEBUG] Missing: nameCn");
+      missingFields.push("中文姓名");
+    }
+    if (!formData.nameEn) {
+      console.log("[DEBUG] Missing: nameEn");
+      missingFields.push("英文姓名");
+    }
+    if (!formData.idDocument) {
+      console.log("[DEBUG] Missing: idDocument");
+      missingFields.push("身份证件");
+    }
+    if (!formData.country) {
+      console.log("[DEBUG] Missing: country");
+      missingFields.push("居住地");
+    }
+    if (!formData.city) {
+      console.log("[DEBUG] Missing: city");
+      missingFields.push("城市");
+    }
+    if (!formData.phone) {
+      console.log("[DEBUG] Missing: phone");
+      missingFields.push("电话");
+    }
+    
+    console.log("[DEBUG] missingFields:", missingFields);
     
     if (missingFields.length > 0) {
-      showModal(`请填写以下必填字段：${missingFields.join("、")}`, "error");
+      const errorMsg = `请填写以下必填字段：${missingFields.join("、")}`;
+      console.log("[DEBUG] Error message:", errorMsg);
+      showModal(errorMsg, "error");
       return false;
     }
     return true;
