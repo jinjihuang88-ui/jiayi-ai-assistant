@@ -93,8 +93,16 @@ export default function RCICRegisterPage() {
   };
 
   const validateStep2 = () => {
-    if (!formData.nameCn || !formData.nameEn || !formData.idDocument || !formData.country || !formData.city || !formData.phone) {
-      showModal("请填写所有必填字段并上传身份证件", "error");
+    const missingFields = [];
+    if (!formData.nameCn) missingFields.push("中文姓名");
+    if (!formData.nameEn) missingFields.push("英文姓名");
+    if (!formData.idDocument) missingFields.push("身份证件");
+    if (!formData.country) missingFields.push("居住地");
+    if (!formData.city) missingFields.push("城市");
+    if (!formData.phone) missingFields.push("电话");
+    
+    if (missingFields.length > 0) {
+      showModal(`请填写以下必填字段：${missingFields.join("、")}`, "error");
       return false;
     }
     return true;
