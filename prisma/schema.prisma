@@ -41,8 +41,10 @@ model RCIC {
   avatar    String?   // 新增：顾问头像
   
   // 邮箱验证
-  emailVerified   Boolean   @default(false)
-  emailVerifiedAt DateTime?
+  emailVerified          Boolean   @default(false)
+  emailVerifiedAt        DateTime?
+  verificationToken      String?   // 邮箱验证token
+  verificationTokenExpiry DateTime? // 验证token过期时间
   
   // 顾问类型和资质
   consultantType    String    @default("A") // A: 持牌顾问, B: 留学顾问, C: 文案辅助
