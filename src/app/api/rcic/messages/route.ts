@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { getCurrentRCIC } from '@/lib/rcic-auth';
 
 // 获取消息列表（顾问端）

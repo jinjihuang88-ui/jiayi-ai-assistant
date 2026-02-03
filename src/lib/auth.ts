@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import prisma from './prisma';
+import { prisma } from './prisma';
 
 // 生成6位数字验证码
 export function generateVerificationCode(): string {

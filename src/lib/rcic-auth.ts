@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import prisma from './prisma';
+import { prisma } from './prisma';
 
 const RCIC_SESSION_COOKIE = 'rcic_session_token';
 const SESSION_EXPIRY_DAYS = 7;

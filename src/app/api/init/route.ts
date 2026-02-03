@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import * as bcrypt from 'bcryptjs';
 
 // 默认测试顾问列表
