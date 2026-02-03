@@ -12,9 +12,11 @@ export async function GET() {
       );
     }
 
+    // dashboard页面期期consultant字段，所以同时返回两个
     return NextResponse.json({
       success: true,
       rcic,
+      consultant: rcic, // 兼容新dashboard
     });
   } catch (error) {
     console.error('Get current RCIC error:', error);

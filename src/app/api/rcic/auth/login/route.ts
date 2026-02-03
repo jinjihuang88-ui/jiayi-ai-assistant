@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { SignJWT } from "jose";
+import { createRCICSession } from "@/lib/rcic-auth";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "your-secret-key-change-in-production"
-);
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -70,15 +68,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 生成 JWT
-    const token = await new SignJWT({
-      consultantId: consultant.id,
-      email: consultant.email,
-      level: consultant.level,
-    })
-      .setProtectedHeader({ alg: "HS256" })
-      .setExpirationTime("7d")
-      .sign(JWT_SECRET);
+    // 创建session
+    const { token, expiresAt } = await createRCICSession(
+      consultant.id,
+      request.headers.get("user-agent") || undefined,
+      request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || undefined
+    );
 
     // 更新最后登录时间
     await prisma.rCIC.update({
@@ -96,28 +91,12 @@ export async function POST(request: NextRequest) {
       message: "登录成功",
     });
 
-    // 设置多个cookie以兼容不同的认证方式
-    response.cookies.set("rcic-token", token, {
+    // 设置session cookie
+    response.cookies.set("rcic_session_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
-    });
-
-    response.cookies.set("auth_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
-    });
-
-    response.cookies.set("rcic_id", consultant.id, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
+      expires: expiresAt,
       path: "/",
     });
 
