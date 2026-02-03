@@ -72,6 +72,7 @@ model RCIC {
   // 账号和在线状态（新增）
   isActive      Boolean   @default(true)  // 账号是否激活（是否被禁用/封号）
   isOnline      Boolean   @default(false) // 是否在线
+  lastLoginAt   DateTime? // 最后登录时间
   lastActiveAt  DateTime? // 最后活跃时间
   
   // 基本信息
