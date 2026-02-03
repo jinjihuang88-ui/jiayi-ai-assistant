@@ -135,8 +135,8 @@ export default function RCICRegisterPage() {
 
   const validateStep3 = () => {
     if (formData.level === "A") {
-      if (!formData.licenseNo || !formData.verificationLink || !formData.licenseCertificate) {
-        showModal("A类顾问必须填写执照号、查询链接并上传执照证书", "error");
+      if (!formData.licenseNo || !formData.verificationLink || !formData.licenseCertificate || !formData.organization) {
+        showModal("A类顾问必须填写执照号、查询链接、执业机构并上传执照证书", "error");
         return false;
       }
     } else if (formData.level === "B") {
@@ -555,8 +555,9 @@ export default function RCICRegisterPage() {
                     type="text"
                     value={formData.organization}
                     onChange={(e) => setFormData({ ...formData, organization: e.target.value })}
-                    placeholder="请输入所属机构（可选）"
+                    placeholder="请输入所属机构（必填）"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    required
                   />
                 </div>
               </>
