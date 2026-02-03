@@ -85,6 +85,15 @@ export async function POST(request: NextRequest) {
         path: '/',
       });
 
+      // 同时设置 user_id cookie 用于会员中心认证
+      response.cookies.set('user_id', user.id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60,
+        path: '/',
+      });
+
       return response;
     } else {
       const rcic = await prisma.rCIC.findUnique({
@@ -164,6 +173,15 @@ export async function POST(request: NextRequest) {
       });
 
       response.cookies.set('auth_token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60,
+        path: '/',
+      });
+
+      // 同时设置 rcic_id cookie 用于顾问后台认证
+      response.cookies.set('rcic_id', rcic.id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
