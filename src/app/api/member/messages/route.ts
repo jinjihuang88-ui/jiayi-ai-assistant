@@ -42,10 +42,46 @@ export async function GET(request: NextRequest) {
             id: true,
             type: true,
             status: true,
+            rcic: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                avatar: true,
+                profilePhoto: true,
+                consultantType: true,
+                organization: true,
+                isOnline: true,
+              },
+            },
           },
         },
       },
     });
+
+    // 如果指定了caseId，获取该案件的顾问信息
+    let consultant = null;
+    if (caseId) {
+      const caseItem = await prisma.case.findUnique({
+        where: { id: caseId },
+        include: {
+          rcic: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+              profilePhoto: true,
+              consultantType: true,
+              organization: true,
+              isOnline: true,
+              lastActiveAt: true,
+            },
+          },
+        },
+      });
+      consultant = caseItem?.rcic || null;
+    }
 
     // 获取已审核通过的顾问数量
     const onlineRcicCount = await prisma.rCIC.count({
@@ -55,6 +91,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       messages,
+      consultant, // 返回顾问信息
       onlineRcicCount,
     });
   } catch (error) {

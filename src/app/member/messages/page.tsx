@@ -9,6 +9,18 @@ interface Application {
   typeName: string;
 }
 
+interface Consultant {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  profilePhoto?: string;
+  consultantType: string;
+  organization?: string;
+  isOnline: boolean;
+  lastActiveAt?: string;
+}
+
 interface Message {
   id: string;
   content: string;
@@ -28,6 +40,7 @@ function MessagesContent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [applications, setApplications] = useState<Application[]>([]);
   const [selectedApp, setSelectedApp] = useState<string | null>(applicationId);
+  const [consultant, setConsultant] = useState<Consultant | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -79,6 +92,7 @@ function MessagesContent() {
       }
 
       setMessages(data.messages?.reverse() || []);
+      setConsultant(data.consultant || null); // 设置顾问信息
 
       // 标记为已读
       if (selectedApp) {
@@ -273,16 +287,52 @@ function MessagesContent() {
           <div className="flex-1 bg-white rounded-xl border border-slate-200 flex flex-col">
             {/* Chat Header */}
             <div className="p-4 border-b border-slate-100">
-              <h3 className="font-semibold text-slate-900">
-                {selectedApp
-                  ? applications.find((a) => a.id === selectedApp)?.typeName || "对话"
-                  : "全部消息"}
-              </h3>
-              <p className="text-sm text-slate-500">
-                {selectedApp
-                  ? `申请编号: ${selectedApp.slice(0, 8).toUpperCase()}`
-                  : "选择一个申请开始对话"}
-              </p>
+              {consultant ? (
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    {consultant.avatar || consultant.profilePhoto ? (
+                      <img
+                        src={consultant.avatar || consultant.profilePhoto}
+                        alt={consultant.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-medium text-lg">
+                        {consultant.name.charAt(0)}
+                      </div>
+                    )}
+                    {consultant.isOnline && (
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+                      {consultant.name}
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
+                        {consultant.consultantType === 'A' ? '持牌顾问' : 
+                         consultant.consultantType === 'B' ? '留学顾问' : '文案辅助'}
+                      </span>
+                    </h3>
+                    <p className="text-sm text-slate-500">
+                      {consultant.organization || consultant.email}
+                      {consultant.isOnline ? ' • 在线' : ' • 离线'}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <h3 className="font-semibold text-slate-900">
+                    {selectedApp
+                      ? applications.find((a) => a.id === selectedApp)?.typeName || "对话"
+                      : "全部消息"}
+                  </h3>
+                  <p className="text-sm text-slate-500">
+                    {selectedApp
+                      ? `申请编号: ${selectedApp.slice(0, 8).toUpperCase()}`
+                      : "选择一个申请开始对话"}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Messages */}

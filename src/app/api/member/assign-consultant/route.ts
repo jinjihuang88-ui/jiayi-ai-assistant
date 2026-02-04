@@ -34,23 +34,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (consultant.consultantType !== 'A') {
+    // 放宽限制，允许选择任何激活的顾问
+    if (!consultant.isActive) {
       return NextResponse.json(
-        { success: false, message: '只能选择持牌顾问' },
-        { status: 400 }
-      );
-    }
-
-    if (consultant.approvalStatus !== 'approved') {
-      return NextResponse.json(
-        { success: false, message: '该顾问未通过审核' },
-        { status: 400 }
-      );
-    }
-
-    if (!consultant.isAcceptingCases) {
-      return NextResponse.json(
-        { success: false, message: '该顾问暂不接收新案件' },
+        { success: false, message: '该顾问账号已停用' },
         { status: 400 }
       );
     }
@@ -82,6 +69,13 @@ export async function POST(request: NextRequest) {
         success: true,
         message: '顾问分配成功',
         case: existingCase,
+        consultant: {
+          id: consultant.id,
+          name: consultant.name,
+          email: consultant.email,
+          avatar: consultant.avatar || consultant.profilePhoto,
+          consultantType: consultant.consultantType,
+        },
       });
     } else {
       // 如果没有指定案件，将顾问分配给用户的所有未分配案件
@@ -112,6 +106,13 @@ export async function POST(request: NextRequest) {
         success: true,
         message: `已将 ${unassignedCases.length} 个案件分配给顾问`,
         assignedCount: unassignedCases.length,
+        consultant: {
+          id: consultant.id,
+          name: consultant.name,
+          email: consultant.email,
+          avatar: consultant.avatar || consultant.profilePhoto,
+          consultantType: consultant.consultantType,
+        },
       });
     }
   } catch (error) {
