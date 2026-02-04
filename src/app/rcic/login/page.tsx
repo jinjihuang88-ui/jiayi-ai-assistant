@@ -35,8 +35,9 @@ export default function RCICLoginPage() {
         return;
       }
 
-      // 登录成功，跳转到顾问后台
-      router.push('/rcic/dashboard');
+      // 登录成功，根据用户类型跳转
+      const redirectTo = data.redirectTo || '/rcic/dashboard';
+      router.push(redirectTo);
     } catch (err) {
       setError('登录失败，请稍后重试');
       setLoading(false);

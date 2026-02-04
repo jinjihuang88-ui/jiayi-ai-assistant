@@ -16,9 +16,74 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // 先尝试查找团队成员
+    const teamMember = await prisma.rCICTeamMember.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (teamMember) {
+      // 团队成员登录逻辑
+      if (!teamMember.isActive) {
+        return NextResponse.json(
+          { error: "账号已被禁用，请联系管理员" },
+          { status: 403 }
+        );
+      }
+
+      // 验证密码
+      const isPasswordValid = await bcrypt.compare(password, teamMember.password);
+      if (!isPasswordValid) {
+        return NextResponse.json(
+          { error: "邮箱或密码错误" },
+          { status: 401 }
+        );
+      }
+
+      // 创建团队成员session
+      const { randomBytes } = await import('crypto');
+      const token = randomBytes(32).toString('hex');
+      const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+      await prisma.rCICTeamMemberSession.create({
+        data: {
+          memberId: teamMember.id,
+          token,
+          expiresAt,
+          userAgent: request.headers.get('user-agent'),
+          ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip'),
+        },
+      });
+
+      // 更新最后登录时间
+      await prisma.rCICTeamMember.update({
+        where: { id: teamMember.id },
+        data: { lastLoginAt: new Date() },
+      });
+
+      // 设置cookie
+      const response = NextResponse.json({
+        success: true,
+        message: "登录成功",
+        userType: 'team_member',
+        redirectTo: '/team/dashboard',
+      });
+
+      response.cookies.set('team_session', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        expires: expiresAt,
+        path: '/',
+      });
+
+      return response;
+    }
+
     // 查找顾问（使用RCIC表）
     const consultant = await prisma.rCIC.findUnique({
-      where: { email: email.toLowerCase() },
+      where: { email: normalizedEmail },
     });
 
     if (!consultant || !consultant.password) {
@@ -89,6 +154,8 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({
       success: true,
       message: "登录成功",
+      userType: 'rcic',
+      redirectTo: '/rcic/dashboard',
     });
 
     // 设置session cookie
