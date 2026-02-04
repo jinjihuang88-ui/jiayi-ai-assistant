@@ -192,9 +192,14 @@ export async function POST(request: NextRequest) {
       return response;
     }
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('[Login] Error:', error);
+    console.error('[Login] Error stack:', error instanceof Error ? error.stack : 'No stack');
+    console.error('[Login] Error message:', error instanceof Error ? error.message : String(error));
     return NextResponse.json(
-      { error: '登录失败，请稍后重试' },
+      { 
+        error: '登录失败，请稍后重试',
+        details: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }
