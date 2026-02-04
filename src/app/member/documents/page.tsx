@@ -85,8 +85,8 @@ export default function DocumentsPage() {
           });
 
           const saveData = await saveRes.json();
-          if (saveData.success) {
-            setDocuments([...documents, saveData.document]);
+          if (!saveData.success) {
+            console.error('Save document failed:', saveData.message);
           }
         }
 
