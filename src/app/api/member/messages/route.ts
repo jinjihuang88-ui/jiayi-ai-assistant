@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const caseId = searchParams.get('caseId');
+    // 同时支持 caseId 和 applicationId 参数
+    const caseId = searchParams.get('caseId') || searchParams.get('applicationId');
     const limit = parseInt(searchParams.get('limit') || '50');
 
     const where: any = {};
