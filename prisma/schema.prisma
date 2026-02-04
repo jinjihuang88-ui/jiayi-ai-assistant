@@ -179,6 +179,21 @@ model RCICTeamMember {
   @@map("rcic_team_members")
 }
 
+// RCIC团队成员会话表
+model RCICTeamMemberSession {
+  id        String   @id @default(cuid())
+  memberId  String   // 团队成员ID（不使用外键，避免复杂关系）
+  token     String   @unique
+  expiresAt DateTime
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([memberId])
+  @@index([token])
+  @@map("rcic_team_member_sessions")
+}
+
 // 邮箱验证令牌表
 model VerificationToken {
   id        String   @id @default(cuid())
