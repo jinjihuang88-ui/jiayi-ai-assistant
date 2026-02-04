@@ -157,23 +157,9 @@ export default function InternalChatPage() {
 
     setUploading(true);
     try {
-      // 先上传文件
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const uploadData = await uploadRes.json();
-
-      if (!uploadData.success) {
-        alert(uploadData.message || "文件上传失败");
-        return;
-      }
-
-      // 发送消息
+      // TODO: 实现文件上传到云存储
+      // 这里暂时使用占位符
+      const fileUrl = URL.createObjectURL(file);
       const messageType = file.type.startsWith("image/") ? "image" : "file";
 
       const res = await fetch("/api/internal/messages", {
@@ -183,10 +169,10 @@ export default function InternalChatPage() {
           receiverId: receiver.id,
           receiverType: receiver.userType,
           messageType,
-          fileUrl: uploadData.file.url,
-          fileName: uploadData.file.name,
-          fileSize: uploadData.file.size,
-          fileMimeType: uploadData.file.type,
+          fileUrl,
+          fileName: file.name,
+          fileSize: file.size,
+          fileMimeType: file.type,
         }),
       });
 
@@ -221,19 +207,8 @@ export default function InternalChatPage() {
       {/* 左侧对话列表 */}
       <div className="w-80 bg-slate-800 border-r border-slate-700 flex flex-col">
         <div className="p-4 border-b border-slate-700">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h2 className="text-xl font-bold text-white">内部通讯</h2>
-              <p className="text-sm text-slate-400 mt-1">团队成员聊天</p>
-            </div>
-            <button
-              onClick={() => router.back()}
-              className="px-3 py-1.5 rounded-lg bg-slate-700 text-white text-sm hover:bg-slate-600 transition-colors"
-              title="返回控制台"
-            >
-              ← 返回
-            </button>
-          </div>
+          <h2 className="text-xl font-bold text-white">内部通讯</h2>
+          <p className="text-sm text-slate-400 mt-1">团队成员聊天</p>
           <button
             onClick={() => setShowMemberList(!showMemberList)}
             className="mt-3 w-full px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium hover:shadow-lg hover:shadow-emerald-500/50 transition-all"
