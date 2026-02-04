@@ -133,6 +133,7 @@ export default function Home() {
             )}
             <a
               href="/applications"
+              onClick={(e) => handleApplyClick(e, '/applications')}
               className="ml-1 px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-500 text-white text-sm font-medium 
                          hover:from-red-700 hover:to-red-600 transition-all duration-300 
                          shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 
@@ -181,6 +182,7 @@ export default function Home() {
             <div className="mt-10 flex flex-wrap gap-4">
               <a
                 href="/applications"
+                onClick={(e) => handleApplyClick(e, '/applications')}
                 className="group px-8 py-4 rounded-xl bg-white text-red-600 font-semibold 
                            hover:bg-white/95 transition-all duration-300 
                            shadow-2xl shadow-black/20 hover:shadow-3xl
