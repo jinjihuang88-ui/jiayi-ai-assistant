@@ -178,6 +178,7 @@ function MessagesContent() {
       });
 
       const data = await res.json();
+      console.log('[Send Message] Response:', data);
       if (data.success) {
         setMessages([...messages, data.message]);
         setNewMessage("");
@@ -186,9 +187,14 @@ function MessagesContent() {
           fileInputRef.current.value = "";
         }
       } else {
-        showToast(data.message, "error");
+        const errorMsg = data.details || data.error || data.message || '发送失败';
+        console.error('[Send Message] Error:', errorMsg);
+        alert('发送消息失败：' + errorMsg);
+        showToast(errorMsg, "error");
       }
     } catch (error) {
+      console.error('[Send Message] Exception:', error);
+      alert('发送消息异常：' + (error instanceof Error ? error.message : String(error)));
       showToast("发送失败", "error");
     } finally {
       setSending(false);
