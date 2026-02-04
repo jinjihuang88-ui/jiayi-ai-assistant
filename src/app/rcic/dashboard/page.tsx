@@ -126,6 +126,7 @@ export default function RCICDashboardPage() {
             <a href="/rcic/dashboard" className="text-emerald-400 font-medium">仪表板</a>
             <a href="/rcic/cases" className="text-slate-400 hover:text-white transition-colors">案件管理</a>
             <a href="/rcic/messages" className="text-slate-400 hover:text-white transition-colors">消息</a>
+            <a href="/rcic/team" className="text-slate-400 hover:text-white transition-colors">团队管理</a>
           </nav>
 
           <div className="flex items-center gap-4">
@@ -292,6 +293,21 @@ export default function RCICDashboardPage() {
             </h4>
             <p className="text-sm text-slate-400 mt-1">
               查看用户修改后重新提交的申请
+            </p>
+          </a>
+
+          <a
+            href="/rcic/team"
+            className="bg-slate-800/50 rounded-xl border border-slate-700 p-6 hover:border-emerald-500/50 transition-colors group"
+          >
+            <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-2xl mb-4">
+              👥
+            </div>
+            <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors">
+              团队管理
+            </h4>
+            <p className="text-sm text-slate-400 mt-1">
+              管理您的团队成员和权限
             </p>
           </a>
         </div>
