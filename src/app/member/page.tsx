@@ -253,6 +253,7 @@ export default function MemberDashboard() {
               <h2 className="font-semibold text-slate-900 mb-4">快速操作</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
+                  { label: "选择顾问", href: "/member/consultants", icon: "👨‍⚖️", color: "from-orange-500 to-red-500" },
                   { label: "学习签证", href: "/applications/study-permit", icon: "🎓", color: "from-blue-500 to-cyan-500" },
                   { label: "访客签证", href: "/applications/visitor-visa", icon: "✈️", color: "from-green-500 to-emerald-500" },
                   { label: "工作签证", href: "/applications/work-permit", icon: "💼", color: "from-purple-500 to-pink-500" },

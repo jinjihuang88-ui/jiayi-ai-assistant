@@ -83,6 +83,19 @@ model RCIC {
   organization String? // 执业机构
   bio          String? // 个人简介
   
+  // 顾问展示信息（用于用户选择）
+  profilePhoto      String?   // 职业照片URL
+  specialties       String?   // 专业领域（JSON数组），如: ["Express Entry", "Family Sponsorship"]
+  serviceRegions    String?   // 服务区域（JSON数组），如: ["Ontario", "British Columbia"]
+  successRate       Float?    @default(0) // 成功率（0-100）
+  totalCases        Int?      @default(0) // 总案件数
+  successfulCases   Int?      @default(0) // 成功案件数
+  averageRating     Float?    @default(0) // 平均评分（0-5）
+  totalReviews      Int?      @default(0) // 评价数量
+  languages         String?   // 语言能力（JSON数组），如: ["English", "Mandarin", "French"]
+  certifications    String?   // 证书和荣誉（JSON数组）
+  isAcceptingCases  Boolean   @default(true) // 是否接收新案件
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
