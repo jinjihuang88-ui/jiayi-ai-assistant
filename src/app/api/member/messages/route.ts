@@ -150,25 +150,53 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 验证case所有权
-    const caseItem = await prisma.case.findFirst({
-      where: {
-        id: caseId,
-        userId: user.id,
-      },
-    });
+    let actualCaseId = caseId;
 
-    if (!caseItem) {
-      return NextResponse.json(
-        { success: false, message: 'Case不存在' },
-        { status: 404 }
-      );
+    // 如果没有指定caseId，检查用户是否有分配的顾问
+    if (!actualCaseId) {
+      const userWithRcic = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { assignedRcicId: true },
+      });
+
+      if (!userWithRcic?.assignedRcicId) {
+        return NextResponse.json(
+          { success: false, message: '请先选择顾问' },
+          { status: 400 }
+        );
+      }
+
+      // 自动创建一个咨询案件
+      const consultationCase = await prisma.case.create({
+        data: {
+          userId: user.id,
+          rcicId: userWithRcic.assignedRcicId,
+          type: 'consultation', // 咨询类型
+          status: 'pending',
+        },
+      });
+      actualCaseId = consultationCase.id;
+    } else {
+      // 验证case所有权
+      const caseItem = await prisma.case.findFirst({
+        where: {
+          id: caseId,
+          userId: user.id,
+        },
+      });
+
+      if (!caseItem) {
+        return NextResponse.json(
+          { success: false, message: 'Case不存在' },
+          { status: 404 }
+        );
+      }
     }
 
     // 创建消息
     const message = await prisma.message.create({
       data: {
-        caseId,
+        caseId: actualCaseId,
         senderId: user.id,
         senderType: 'user',
         content: content?.trim() || '',
