@@ -132,7 +132,9 @@ export async function GET(request: NextRequest) {
 // 发送消息
 export async function POST(request: NextRequest) {
   try {
+    console.log('[Send Message] Starting...');
     const user = await getCurrentUser();
+    console.log('[Send Message] User:', user?.id, user?.email);
     if (!user) {
       return NextResponse.json(
         { success: false, message: '未登录' },
@@ -141,9 +143,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
+    console.log('[Send Message] Request body:', JSON.stringify(body));
     // 同时支持 caseId 和 applicationId 参数
     const caseId = body.caseId || body.applicationId;
     const { content, attachments } = body;
+    console.log('[Send Message] Parsed - caseId:', caseId, 'content:', content?.substring(0, 50));
 
     // 验证消息内容（如果有附件，内容可以为空）
     if ((!content || !content.trim()) && !attachments) {
@@ -157,12 +161,15 @@ export async function POST(request: NextRequest) {
 
     // 如果没有指定caseId，检查用户是否有分配的顾问
     if (!actualCaseId) {
+      console.log('[Send Message] No caseId provided, checking assigned RCIC...');
       const userWithRcic = await prisma.user.findUnique({
         where: { id: user.id },
         select: { assignedRcicId: true },
       });
 
+      console.log('[Send Message] User RCIC assignment:', userWithRcic?.assignedRcicId);
       if (!userWithRcic?.assignedRcicId) {
+        console.log('[Send Message] No assigned RCIC found');
         return NextResponse.json(
           { success: false, message: '请先选择顾问' },
           { status: 400 }
@@ -170,6 +177,7 @@ export async function POST(request: NextRequest) {
       }
 
       // 自动创建一个咨询案件
+      console.log('[Send Message] Creating consultation case...');
       const consultationCase = await prisma.case.create({
         data: {
           userId: user.id,
@@ -180,7 +188,9 @@ export async function POST(request: NextRequest) {
         },
       });
       actualCaseId = consultationCase.id;
+      console.log('[Send Message] Created case:', actualCaseId);
     } else {
+      console.log('[Send Message] Using existing caseId:', caseId);
       // 验证case所有权
       const caseItem = await prisma.case.findFirst({
         where: {
@@ -198,6 +208,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 创建消息
+    console.log('[Send Message] Creating message with caseId:', actualCaseId);
     const message = await prisma.message.create({
       data: {
         caseId: actualCaseId,
