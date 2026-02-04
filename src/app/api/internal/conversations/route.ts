@@ -15,7 +15,6 @@ export async function GET() {
     if (rcicSession) {
       const session = await prisma.rCICSession.findUnique({
         where: { token: rcicSession },
-        include: { rcic: true },
       });
 
       if (!session || session.expiresAt < new Date()) {
@@ -32,7 +31,6 @@ export async function GET() {
     else if (teamSession) {
       const session = await prisma.rCICTeamMemberSession.findUnique({
         where: { token: teamSession },
-        include: { member: true },
       });
 
       if (!session || session.expiresAt < new Date()) {
