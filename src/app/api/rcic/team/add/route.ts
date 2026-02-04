@@ -34,6 +34,9 @@ export async function POST(request: Request) {
     // 获取请求数据
     const body = await request.json();
     const { email, name, role } = body;
+    
+    // 统一邮箱格式为小写
+    const normalizedEmail = email.toLowerCase().trim();
 
     // 验证必填字段
     if (!email || !name) {
@@ -45,7 +48,7 @@ export async function POST(request: Request) {
 
     // 检查邮箱是否已存在
     const existingMember = await prisma.rCICTeamMember.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
     if (existingMember) {
@@ -63,7 +66,7 @@ export async function POST(request: Request) {
     const teamMember = await prisma.rCICTeamMember.create({
       data: {
         rcicId,
-        email,
+        email: normalizedEmail,
         name,
         password: hashedPassword,
         role: role || "operator",

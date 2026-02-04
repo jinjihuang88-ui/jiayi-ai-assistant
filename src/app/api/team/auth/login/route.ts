@@ -16,9 +16,12 @@ export async function POST(request: Request) {
       );
     }
 
+    // 统一邮箱格式为小写
+    const normalizedEmail = email.toLowerCase().trim();
+
     // 查找团队成员
     const member = await prisma.rCICTeamMember.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
     if (!member) {
