@@ -6,7 +6,7 @@ export async function GET() {
   try {
     // 验证RCIC登录
     const cookieStore = await cookies();
-    const sessionToken = cookieStore.get("rcic_session")?.value;
+    const sessionToken = cookieStore.get("rcic_session_token")?.value;
 
     if (!sessionToken) {
       return NextResponse.json(

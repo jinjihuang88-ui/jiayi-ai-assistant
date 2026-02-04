@@ -57,8 +57,10 @@ export default function TeamManagementPage() {
       }
 
       setRcic(data.rcic);
-      fetchTeamMembers();
+      await fetchTeamMembers();
     } catch (error) {
+      console.error("Auth check failed:", error);
+      setLoading(false);
       router.push("/rcic/login");
     }
   };
