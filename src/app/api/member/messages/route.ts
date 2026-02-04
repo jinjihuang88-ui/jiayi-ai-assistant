@@ -85,6 +85,7 @@ export async function GET(request: NextRequest) {
       consultant = caseItem?.rcic || null;
     } else {
       // 如果没有指定caseId，获取用户分配的顾问（用于咨询）
+      console.log('[Messages API] No caseId, fetching user assigned consultant...'); // 调试日志
       const userWithRcic = await prisma.user.findUnique({
         where: { id: user.id },
         include: {
@@ -103,7 +104,9 @@ export async function GET(request: NextRequest) {
           },
         },
       });
+      console.log('[Messages API] User with RCIC:', userWithRcic?.id, userWithRcic?.assignedRcicId); // 调试日志
       consultant = userWithRcic?.assignedRcic || null;
+      console.log('[Messages API] Consultant:', consultant?.id, consultant?.name); // 调试日志
     }
 
     // 获取已审核通过的顾问数量

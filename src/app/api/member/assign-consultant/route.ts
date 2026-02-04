@@ -4,8 +4,10 @@ import { getCurrentUser } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('[Assign Consultant] API called'); // 调试日志
     // 验证用户登录
     const user = await getCurrentUser();
+    console.log('[Assign Consultant] Current user:', user?.id, user?.email); // 调试日志
     if (!user) {
       return NextResponse.json(
         { success: false, message: '未登录' },
@@ -14,6 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { consultantId, caseId } = await request.json();
+    console.log('[Assign Consultant] Consultant ID:', consultantId, 'Case ID:', caseId); // 调试日志
 
     if (!consultantId) {
       return NextResponse.json(
@@ -79,10 +82,12 @@ export async function POST(request: NextRequest) {
       });
     } else {
       // 没有指定案件，直接将顾问分配给用户（用于咨询）
-      await prisma.user.update({
+      console.log('[Assign Consultant] Assigning consultant to user...'); // 调试日志
+      const updatedUser = await prisma.user.update({
         where: { id: user.id },
         data: { assignedRcicId: consultantId },
       });
+      console.log('[Assign Consultant] User updated:', updatedUser.id, updatedUser.assignedRcicId); // 调试日志
 
       // 同时更新用户的所有未分配案件
       await prisma.case.updateMany({
