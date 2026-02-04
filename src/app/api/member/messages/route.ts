@@ -210,9 +210,15 @@ export async function POST(request: NextRequest) {
       message,
     });
   } catch (error) {
-    console.error('Send message error:', error);
+    console.error('[Send Message] Error:', error);
+    console.error('[Send Message] Error stack:', error instanceof Error ? error.stack : 'No stack');
+    console.error('[Send Message] Error message:', error instanceof Error ? error.message : String(error));
     return NextResponse.json(
-      { success: false, message: '发送消息失败' },
+      { 
+        success: false, 
+        message: '发送消息失败',
+        error: error instanceof Error ? error.message : String(error)
+      },
       { status: 500 }
     );
   }
