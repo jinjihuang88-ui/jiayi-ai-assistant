@@ -84,6 +84,9 @@ function MessagesContent() {
       const res = await fetch(`/api/member/messages?${params}`);
       const data = await res.json();
 
+      console.log('[Messages] API Response:', data); // 调试日志
+      console.log('[Messages] Consultant:', data.consultant); // 调试日志
+
       if (!data.success) {
         if (res.status === 401) {
           router.push("/auth/login");
@@ -93,6 +96,8 @@ function MessagesContent() {
 
       setMessages(data.messages?.reverse() || []);
       setConsultant(data.consultant || null); // 设置顾问信息
+      
+      console.log('[Messages] Consultant state updated:', data.consultant); // 调试日志
 
       // 标记为已读
       if (selectedApp) {
