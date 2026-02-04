@@ -39,6 +39,13 @@ export default function Home() {
 
   const displayName = user?.profile?.givenName || user?.name || user?.email?.split("@")[0] || "";
 
+  const handleApplyClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!user) {
+      e.preventDefault();
+      window.location.href = `/auth/login?redirect=${encodeURIComponent(href)}`;
+    }
+  };
+
   return (
     <main className="bg-slate-50 text-slate-900">
       {/* Top Nav */}
@@ -245,7 +252,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* 学签 */}
-            <a href="/applications/study-permit" className="group">
+            <a href="/applications/study-permit" onClick={(e) => handleApplyClick(e, '/applications/study-permit')} className="group">
               <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-100 
                               hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
@@ -265,7 +272,7 @@ export default function Home() {
             </a>
 
             {/* 访客签证 */}
-            <a href="/applications/visitor-visa" className="group">
+            <a href="/applications/visitor-visa" onClick={(e) => handleApplyClick(e, '/applications/visitor-visa')} className="group">
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100 
                               hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden h-full">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
@@ -285,7 +292,7 @@ export default function Home() {
             </a>
 
             {/* 工签 - NEW */}
-            <a href="/applications/work-permit" className="group">
+            <a href="/applications/work-permit" onClick={(e) => handleApplyClick(e, '/applications/work-permit')} className="group">
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 
                               hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden h-full">
                 <div className="absolute top-4 right-4 px-2 py-1 bg-purple-500 text-white text-xs font-bold rounded-full">
@@ -308,7 +315,7 @@ export default function Home() {
             </a>
 
             {/* EE 技术移民 - NEW */}
-            <a href="/applications/express-entry" className="group">
+            <a href="/applications/express-entry" onClick={(e) => handleApplyClick(e, '/applications/express-entry')} className="group">
               <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl p-6 border border-indigo-100 
                               hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden h-full">
                 <div className="absolute top-4 right-4 px-2 py-1 bg-indigo-500 text-white text-xs font-bold rounded-full">
@@ -331,7 +338,7 @@ export default function Home() {
             </a>
 
             {/* 省提名 - NEW */}
-            <a href="/applications/provincial-nominee" className="group">
+            <a href="/applications/provincial-nominee" onClick={(e) => handleApplyClick(e, '/applications/provincial-nominee')} className="group">
               <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-6 border border-orange-100 
                               hover:shadow-xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden h-full">
                 <div className="absolute top-4 right-4 px-2 py-1 bg-orange-500 text-white text-xs font-bold rounded-full">
@@ -600,11 +607,11 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">申请服务</h4>
               <ul className="space-y-2 text-sm text-slate-400">
-                <li><a href="/applications/study-permit" className="hover:text-white transition-colors">学习签证</a></li>
-                <li><a href="/applications/visitor-visa" className="hover:text-white transition-colors">访客签证</a></li>
-                <li><a href="/applications/work-permit" className="hover:text-white transition-colors">工作签证</a></li>
-                <li><a href="/applications/express-entry" className="hover:text-white transition-colors">EE 技术移民</a></li>
-                <li><a href="/applications/provincial-nominee" className="hover:text-white transition-colors">省提名项目</a></li>
+                <li><a href="/applications/study-permit" onClick={(e) => handleApplyClick(e, '/applications/study-permit')} className="hover:text-white transition-colors">学习签证</a></li>
+                <li><a href="/applications/visitor-visa" onClick={(e) => handleApplyClick(e, '/applications/visitor-visa')} className="hover:text-white transition-colors">访客签证</a></li>
+                <li><a href="/applications/work-permit" onClick={(e) => handleApplyClick(e, '/applications/work-permit')} className="hover:text-white transition-colors">工作签证</a></li>
+                <li><a href="/applications/express-entry" onClick={(e) => handleApplyClick(e, '/applications/express-entry')} className="hover:text-white transition-colors">EE 技术移民</a></li>
+                <li><a href="/applications/provincial-nominee" onClick={(e) => handleApplyClick(e, '/applications/provincial-nominee')} className="hover:text-white transition-colors">省提名项目</a></li>
               </ul>
             </div>
           </div>
