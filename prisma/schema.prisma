@@ -21,12 +21,14 @@ model User {
   emailVerified   Boolean   @default(false)
   emailVerifiedAt DateTime?
   lastLoginAt     DateTime? // 新增：最后登录时间
+  assignedRcicId  String?   // 分配的顾问ID（用于咨询）
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
   // 关系
-  cases    Case[]
-  messages Message[] @relation("UserMessages")
+  cases          Case[]
+  messages       Message[] @relation("UserMessages")
+  assignedRcic   RCIC?     @relation("UserAssignedRcic", fields: [assignedRcicId], references: [id])
 
   @@map("users")
 }
@@ -100,9 +102,10 @@ model RCIC {
   updatedAt DateTime @updatedAt
 
   // 关系
-  cases    Case[]
-  messages Message[] @relation("RCICMessages")
-  sessions RCICSession[] // 新增：会话关系
+  cases          Case[]
+  messages       Message[] @relation("RCICMessages")
+  sessions       RCICSession[] // 新增：会话关系
+  assignedUsers  User[]    @relation("UserAssignedRcic") // 分配给该顾问的用户
 
   @@map("rcics")
 }

@@ -60,9 +60,10 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // 如果指定了caseId，获取该案件的顾问信息
+    // 获取顾问信息
     let consultant = null;
     if (caseId) {
+      // 如果指定了caseId，获取该案件的顾问信息
       const caseItem = await prisma.case.findUnique({
         where: { id: caseId },
         include: {
@@ -82,6 +83,27 @@ export async function GET(request: NextRequest) {
         },
       });
       consultant = caseItem?.rcic || null;
+    } else {
+      // 如果没有指定caseId，获取用户分配的顾问（用于咨询）
+      const userWithRcic = await prisma.user.findUnique({
+        where: { id: user.id },
+        include: {
+          assignedRcic: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+              profilePhoto: true,
+              consultantType: true,
+              organization: true,
+              isOnline: true,
+              lastActiveAt: true,
+            },
+          },
+        },
+      });
+      consultant = userWithRcic?.assignedRcic || null;
     }
 
     // 获取已审核通过的顾问数量

@@ -78,22 +78,13 @@ export async function POST(request: NextRequest) {
         },
       });
     } else {
-      // 如果没有指定案件，将顾问分配给用户的所有未分配案件
-      const unassignedCases = await prisma.case.findMany({
-        where: {
-          userId: user.id,
-          rcicId: null,
-        },
+      // 没有指定案件，直接将顾问分配给用户（用于咨询）
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { assignedRcicId: consultantId },
       });
 
-      if (unassignedCases.length === 0) {
-        return NextResponse.json(
-          { success: false, message: '没有需要分配的案件' },
-          { status: 400 }
-        );
-      }
-
-      // 批量更新
+      // 同时更新用户的所有未分配案件
       await prisma.case.updateMany({
         where: {
           userId: user.id,
@@ -104,14 +95,15 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: `已将 ${unassignedCases.length} 个案件分配给顾问`,
-        assignedCount: unassignedCases.length,
+        message: '顾问分配成功，现在可以开始咨询了',
         consultant: {
           id: consultant.id,
           name: consultant.name,
           email: consultant.email,
           avatar: consultant.avatar || consultant.profilePhoto,
           consultantType: consultant.consultantType,
+          organization: consultant.organization,
+          isOnline: consultant.isOnline,
         },
       });
     }
