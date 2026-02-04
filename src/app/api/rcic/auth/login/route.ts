@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
         redirectTo: '/team/dashboard',
       });
 
-      response.cookies.set('team_session', token, {
+      response.cookies.set('team_member_session_token', token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

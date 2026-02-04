@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 export async function POST() {
   try {
     const cookieStore = await cookies();
-    const sessionToken = cookieStore.get("team_session")?.value;
+    const sessionToken = cookieStore.get("team_member_session_token")?.value;
 
     if (sessionToken) {
       // 删除session
@@ -15,7 +15,7 @@ export async function POST() {
     }
 
     // 清除cookie
-    cookieStore.delete("team_session");
+    cookieStore.delete("team_member_session_token");
 
     return NextResponse.json({ success: true });
   } catch (error) {
