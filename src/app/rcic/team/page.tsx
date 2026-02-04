@@ -33,6 +33,8 @@ export default function TeamManagementPage() {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [toast, setToast] = useState<Toast | null>(null);
+  const [tempPassword, setTempPassword] = useState<string | null>(null);
+  const [newMemberEmail, setNewMemberEmail] = useState<string>("");
 
   // 表单状态
   const [formData, setFormData] = useState({
@@ -106,13 +108,15 @@ export default function TeamManagementPage() {
       if (data.success) {
         showToast("团队成员添加成功！", "success");
         setShowAddForm(false);
+        
+        // 显示临时密码模态框
+        if (data.tempPassword) {
+          setTempPassword(data.tempPassword);
+          setNewMemberEmail(formData.email);
+        }
+        
         setFormData({ email: "", name: "", role: "operator" });
         fetchTeamMembers();
-
-        // 显示临时密码（开发环境）
-        if (data.tempPassword) {
-          alert(`临时密码: ${data.tempPassword}\n请记录并发送给团队成员`);
-        }
       } else {
         showToast(data.error || "添加失败", "error");
       }
@@ -157,6 +161,70 @@ export default function TeamManagementPage() {
 
   return (
     <main className="min-h-screen bg-slate-900">
+      {/* 临时密码模态框 */}
+      {tempPassword && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-slate-800 rounded-2xl border border-slate-700 p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
+                <span className="text-3xl">🔑</span>
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-2">成员添加成功！</h3>
+              <p className="text-slate-400">请将以下临时密码发送给团队成员</p>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">邮箱地址</label>
+                <div className="px-4 py-3 bg-slate-900 border border-slate-700 rounded-lg text-white">
+                  {newMemberEmail}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">临时密码</label>
+                <div className="relative">
+                  <div className="px-4 py-3 bg-slate-900 border border-emerald-500/50 rounded-lg text-emerald-400 font-mono text-lg text-center select-all">
+                    {tempPassword}
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(tempPassword);
+                      showToast("已复制到剪贴板", "success");
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 text-sm transition-colors"
+                  >
+                    📋 复制
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mb-6">
+              <div className="flex items-start gap-3">
+                <span className="text-amber-500 text-xl">⚠️</span>
+                <div className="flex-1">
+                  <p className="text-amber-400 text-sm font-medium mb-1">重要提示</p>
+                  <p className="text-amber-300/80 text-xs">
+                    请立即记录此密码，关闭后将无法再次查看。建议通过安全渠道（如邮件或加密聊天）发送给团队成员。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setTempPassword(null);
+                setNewMemberEmail("");
+              }}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium hover:shadow-lg hover:shadow-emerald-500/50 transition-all"
+            >
+              我已记录，关闭
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Toast */}
       {toast && (
         <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
