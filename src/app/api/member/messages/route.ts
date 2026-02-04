@@ -140,7 +140,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { caseId, content, attachments } = await request.json();
+    const body = await request.json();
+    // 同时支持 caseId 和 applicationId 参数
+    const caseId = body.caseId || body.applicationId;
+    const { content, attachments } = body;
 
     // 验证消息内容（如果有附件，内容可以为空）
     if ((!content || !content.trim()) && !attachments) {
