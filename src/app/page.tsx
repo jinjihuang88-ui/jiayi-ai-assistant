@@ -63,7 +63,7 @@ export default function Home() {
             </div>
             <div className="flex flex-col">
               <div className="font-bold text-lg tracking-tight text-white">
-                加移<span className="text-white/70 text-base ml-1 font-normal">(Jiayi)</span>
+                加移
               </div>
               <div className="text-xs text-white/50 font-light">
                 Powered by MapleBridge
