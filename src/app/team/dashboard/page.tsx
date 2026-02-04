@@ -98,6 +98,7 @@ export default function TeamDashboardPage() {
             <a href="/team/dashboard" className="text-purple-400 font-medium">仪表板</a>
             <a href="/team/cases" className="text-slate-400 hover:text-white transition-colors">案件管理</a>
             <a href="/team/messages" className="text-slate-400 hover:text-white transition-colors">消息</a>
+            <a href="/internal/chat" className="text-slate-400 hover:text-white transition-colors">内部通讯</a>
           </nav>
 
           <div className="flex items-center gap-4">

@@ -207,3 +207,60 @@ model VerificationToken {
   @@index([token])
   @@map("verification_tokens")
 }
+
+// 内部对话表（RCIC和团队成员之间的一对一对话）
+model InternalConversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 对话参与者（两个人）
+  participant1Id   String
+  participant1Type String // "rcic" 或 "team_member"
+  participant2Id   String
+  participant2Type String // "rcic" 或 "team_member"
+
+  // 最后一条消息
+  lastMessageAt      DateTime?
+  lastMessageContent String?
+
+  // 关系
+  messages InternalMessage[]
+
+  @@unique([participant1Id, participant2Id])
+  @@map("internal_conversations")
+}
+
+// 内部消息表
+model InternalMessage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // 消息内容
+  content     String?
+  messageType String  @default("text") // "text", "file", "image"
+
+  // 文件信息（如果是文件或图片）
+  fileUrl      String?
+  fileName     String?
+  fileSize     Int?
+  fileMimeType String?
+
+  // 发送者
+  senderId   String
+  senderType String // "rcic" 或 "team_member"
+
+  // 接收者
+  receiverId   String
+  receiverType String // "rcic" 或 "team_member"
+
+  // 已读状态
+  isRead Boolean @default(false)
+  readAt DateTime?
+
+  // 关联对话
+  conversationId String
+  conversation   InternalConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@map("internal_messages")
+}

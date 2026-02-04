@@ -127,6 +127,7 @@ export default function RCICDashboardPage() {
             <a href="/rcic/cases" className="text-slate-400 hover:text-white transition-colors">案件管理</a>
             <a href="/rcic/messages" className="text-slate-400 hover:text-white transition-colors">消息</a>
             <a href="/rcic/team" className="text-slate-400 hover:text-white transition-colors">团队管理</a>
+            <a href="/internal/chat" className="text-slate-400 hover:text-white transition-colors">内部通讯</a>
           </nav>
 
           <div className="flex items-center gap-4">
