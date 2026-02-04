@@ -155,6 +155,30 @@ model Message {
   @@map("messages")
 }
 
+// RCIC团队成员表（阶段1：最简化版本）
+model RCICTeamMember {
+  id        String   @id @default(cuid())
+  rcicId    String   // 所属RCIC的ID（不使用外键，避免复杂关系）
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("operator") // operator: 文案/操作员
+  
+  // 邮箱验证
+  emailVerified   Boolean   @default(false)
+  emailVerifiedAt DateTime?
+  
+  // 状态
+  isActive    Boolean   @default(true)  // 是否启用
+  lastLoginAt DateTime? // 最后登录时间
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([rcicId])
+  @@map("rcic_team_members")
+}
+
 // 邮箱验证令牌表
 model VerificationToken {
   id        String   @id @default(cuid())
