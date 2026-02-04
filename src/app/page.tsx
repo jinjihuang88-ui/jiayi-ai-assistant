@@ -48,11 +48,11 @@ export default function Home() {
 
   return (
     <main className="bg-white text-slate-900">
-      {/* Top Nav - 使用Slate Blue背景 */}
+      {/* Top Nav - 专业导航栏 */}
       <header className="sticky top-0 z-50 bg-[#1E293B] border-b border-slate-700/50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-12 py-4 flex items-center justify-between">
           
-          {/* Logo + Brand - 新品牌名称 */}
+          {/* Logo + Brand */}
           <a href="/" className="flex items-center gap-3 group">
             <div className="relative">
               <img
@@ -62,26 +62,44 @@ export default function Home() {
               />
             </div>
             <div className="flex flex-col">
-              <div className="font-semibold text-lg tracking-tight text-white">
-                加移<span className="text-white/60 text-base ml-1">(Jiayi)</span>
+              <div className="font-bold text-lg tracking-tight text-white">
+                加移<span className="text-white/70 text-base ml-1 font-normal">(Jiayi)</span>
               </div>
-              <div className="text-xs text-white/50">
+              <div className="text-xs text-white/50 font-light">
                 Powered by MapleBridge
               </div>
             </div>
           </a>
 
-          {/* Nav */}
-          <nav className="hidden md:flex items-center gap-8 text-sm">
+          {/* Main Navigation */}
+          <nav className="hidden lg:flex items-center gap-8 text-[15px] font-medium">
             <a
-              href="/assessment"
-              className="text-white/80 hover:text-white transition-colors duration-200"
+              href="/"
+              className="text-white hover:text-white/80 transition-colors duration-200 py-2"
             >
-              帮助中心
+              首页
+            </a>
+            <a
+              href="/consultants"
+              className="text-white/80 hover:text-white transition-colors duration-200 py-2"
+            >
+              找顾问
+            </a>
+            <a
+              href="/services"
+              className="text-white/80 hover:text-white transition-colors duration-200 py-2"
+            >
+              服务
+            </a>
+            <a
+              href="/about"
+              className="text-white/80 hover:text-white transition-colors duration-200 py-2"
+            >
+              关于我们
             </a>
           </nav>
 
-          {/* Member Entry / CTA */}
+          {/* Right Side - Auth & CTA */}
           <div className="flex items-center gap-3">
             {isCheckingAuth ? (
               <div className="w-8 h-8 rounded-full bg-slate-700 animate-pulse" />
@@ -89,30 +107,29 @@ export default function Home() {
               /* 已登录状态 */
               <a
                 href="/member"
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 transition-all duration-300 group"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-slate-700/50 transition-all duration-200"
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-orange-500 flex items-center justify-center text-white text-sm font-medium shadow-md">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-white text-sm font-semibold shadow-md">
                   {displayName.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-sm font-medium text-white hidden sm:inline">
-                  会员中心
+                <span className="text-sm font-medium text-white hidden lg:inline">
+                  {displayName}
                 </span>
               </a>
             ) : (
               /* 未登录状态 */
               <a
                 href="/auth/login"
-                className="text-white/80 hover:text-white transition-colors text-sm font-medium"
+                className="px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition-all duration-200 text-sm font-medium"
               >
-                登录 / 注册
+                登录
               </a>
             )}
             <a
               href="/assessment"
-              className="px-5 py-2.5 rounded-xl bg-[#C62828] text-white text-sm font-medium 
-                         hover:bg-[#B71C1C] transition-all duration-300 
-                         shadow-lg shadow-red-900/30 hover:shadow-xl
-                         hover:-translate-y-0.5 active:translate-y-0"
+              className="px-5 py-2.5 rounded-lg bg-[#C62828] text-white text-sm font-semibold 
+                         hover:bg-[#B71C1C] transition-all duration-200 
+                         shadow-md hover:shadow-lg"
             >
               免费AI初评
             </a>
