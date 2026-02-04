@@ -18,6 +18,12 @@ export default function DocumentsPage() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     fetchDocuments();
@@ -87,11 +93,11 @@ export default function DocumentsPage() {
         setUploadProgress(((i + 1) / files.length) * 100);
       }
 
-      alert("文档上传成功！");
+      showToast("文档上传成功！", "success");
       fetchDocuments();
     } catch (error) {
       console.error("Upload error:", error);
-      alert("上传失败，请重试");
+      showToast("上传失败，请重试", "error");
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -110,13 +116,13 @@ export default function DocumentsPage() {
       const data = await res.json();
       if (data.success) {
         setDocuments(documents.filter((doc) => doc.id !== id));
-        alert("删除成功");
+        showToast("删除成功", "success");
       } else {
-        alert(data.message || "删除失败");
+        showToast(data.message || "删除失败", "error");
       }
     } catch (error) {
       console.error("Delete error:", error);
-      alert("删除失败，请重试");
+      showToast("删除失败，请重试", "error");
     }
   };
 
@@ -264,6 +270,24 @@ export default function DocumentsPage() {
           </ul>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed bottom-8 right-8 z-50 animate-slide-up">
+          <div
+            className={`px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 ${
+              toast.type === 'success'
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white'
+                : 'bg-gradient-to-r from-red-500 to-pink-500 text-white'
+            }`}
+          >
+            <span className="text-2xl">
+              {toast.type === 'success' ? '✅' : '❌'}
+            </span>
+            <span className="font-medium">{toast.message}</span>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -33,8 +33,14 @@ function MessagesContent() {
   const [sending, setSending] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     fetchApplications();
@@ -161,10 +167,10 @@ function MessagesContent() {
           fileInputRef.current.value = "";
         }
       } else {
-        alert(data.message);
+        showToast(data.message, "error");
       }
     } catch (error) {
-      alert("发送失败");
+      showToast("发送失败", "error");
     } finally {
       setSending(false);
       setUploading(false);
@@ -424,6 +430,24 @@ function MessagesContent() {
           </div>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed bottom-8 right-8 z-50 animate-slide-up">
+          <div
+            className={`px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 ${
+              toast.type === 'success'
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white'
+                : 'bg-gradient-to-r from-red-500 to-pink-500 text-white'
+            }`}
+          >
+            <span className="text-2xl">
+              {toast.type === 'success' ? '✅' : '❌'}
+            </span>
+            <span className="font-medium">{toast.message}</span>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
