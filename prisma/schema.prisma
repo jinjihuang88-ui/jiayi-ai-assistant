@@ -27,7 +27,6 @@ model User {
 
   // 关系
   cases          Case[]
-  messages       Message[] @relation("UserMessages")
   assignedRcic   RCIC?     @relation("UserAssignedRcic", fields: [assignedRcicId], references: [id])
 
   @@map("users")
@@ -103,7 +102,6 @@ model RCIC {
 
   // 关系
   cases          Case[]
-  messages       Message[] @relation("RCICMessages")
   sessions       RCICSession[] // 新增：会话关系
   assignedUsers  User[]    @relation("UserAssignedRcic") // 分配给该顾问的用户
 
@@ -161,10 +159,10 @@ model Message {
   read       Boolean  @default(false)
   createdAt  DateTime @default(now())
 
-  // 关系 - 使用命名关系和自定义外键名称
+  // 关系
   case Case  @relation(fields: [caseId], references: [id], onDelete: Cascade)
-  user User? @relation("UserMessages", fields: [senderId], references: [id], onDelete: Cascade, map: "messages_user_fkey")
-  rcic RCIC? @relation("RCICMessages", fields: [senderId], references: [id], onDelete: Cascade, map: "messages_rcic_fkey")
+  // 注意：senderId 可以是 User.id 或 RCIC.id，由 senderType 字段区分
+  // 不使用外键约束，因为 senderId 不能同时指向两个表
 
   @@index([caseId])
   @@index([senderId])
