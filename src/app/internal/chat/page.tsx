@@ -34,22 +34,36 @@ interface Message {
 export default function InternalChatPage() {
   const router = useRouter();
   const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [allMembers, setAllMembers] = useState<User[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
+  const [selectedMember, setSelectedMember] = useState<User | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [showMemberList, setShowMemberList] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchConversations();
+    fetchAllMembers();
   }, []);
 
   useEffect(() => {
     if (selectedConversation) {
       fetchMessages(selectedConversation.id);
+      setSelectedMember(null);
     }
   }, [selectedConversation]);
+
+  useEffect(() => {
+    if (selectedMember) {
+      setSelectedConversation(null);
+      setMessages([]);
+    }
+  }, [selectedMember]);
 
   useEffect(() => {
     scrollToBottom();
@@ -74,6 +88,19 @@ export default function InternalChatPage() {
     }
   };
 
+  const fetchAllMembers = async () => {
+    try {
+      const res = await fetch("/api/internal/members");
+      const data = await res.json();
+
+      if (data.success) {
+        setAllMembers(data.members);
+      }
+    } catch (error) {
+      console.error("获取成员列表失败:", error);
+    }
+  };
+
   const fetchMessages = async (conversationId: string) => {
     try {
       const res = await fetch(`/api/internal/messages?conversationId=${conversationId}`);
@@ -89,7 +116,10 @@ export default function InternalChatPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !selectedConversation || sending) return;
+    if (!newMessage.trim() || sending) return;
+
+    const receiver = selectedConversation?.otherUser || selectedMember;
+    if (!receiver) return;
 
     setSending(true);
     try {
@@ -97,8 +127,8 @@ export default function InternalChatPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          receiverId: selectedConversation.otherUser.id,
-          receiverType: selectedConversation.otherUser.userType,
+          receiverId: receiver.id,
+          receiverType: receiver.userType,
           content: newMessage,
           messageType: "text",
         }),
@@ -118,6 +148,52 @@ export default function InternalChatPage() {
     }
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const receiver = selectedConversation?.otherUser || selectedMember;
+    if (!receiver) return;
+
+    setUploading(true);
+    try {
+      // TODO: 实现文件上传到云存储
+      // 这里暂时使用占位符
+      const fileUrl = URL.createObjectURL(file);
+      const messageType = file.type.startsWith("image/") ? "image" : "file";
+
+      const res = await fetch("/api/internal/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          receiverId: receiver.id,
+          receiverType: receiver.userType,
+          messageType,
+          fileUrl,
+          fileName: file.name,
+          fileSize: file.size,
+          fileMimeType: file.type,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setMessages([...messages, data.message]);
+        fetchConversations();
+      }
+    } catch (error) {
+      console.error("上传文件失败:", error);
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const currentChatUser = selectedConversation?.otherUser || selectedMember;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -133,13 +209,46 @@ export default function InternalChatPage() {
         <div className="p-4 border-b border-slate-700">
           <h2 className="text-xl font-bold text-white">内部通讯</h2>
           <p className="text-sm text-slate-400 mt-1">团队成员聊天</p>
+          <button
+            onClick={() => setShowMemberList(!showMemberList)}
+            className="mt-3 w-full px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium hover:shadow-lg hover:shadow-emerald-500/50 transition-all"
+          >
+            + 新建对话
+          </button>
         </div>
+
+        {showMemberList && (
+          <div className="p-4 bg-slate-700/50 border-b border-slate-700">
+            <h3 className="text-sm font-medium text-white mb-2">选择成员</h3>
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {allMembers.map((member) => (
+                <div
+                  key={member.id}
+                  onClick={() => {
+                    setSelectedMember(member);
+                    setShowMemberList(false);
+                  }}
+                  className="flex items-center gap-2 p-2 rounded hover:bg-slate-600 cursor-pointer"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold">
+                    {member.name.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-white truncate">{member.name}</p>
+                    <p className="text-xs text-slate-400 truncate">{member.role}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex-1 overflow-y-auto">
           {conversations.length === 0 ? (
             <div className="p-8 text-center">
               <div className="text-4xl mb-4">💬</div>
               <p className="text-slate-400">暂无对话</p>
+              <p className="text-sm text-slate-500 mt-2">点击"新建对话"开始聊天</p>
             </div>
           ) : (
             conversations.map((conv) => (
@@ -180,24 +289,20 @@ export default function InternalChatPage() {
 
       {/* 右侧消息区域 */}
       <div className="flex-1 flex flex-col">
-        {selectedConversation ? (
+        {currentChatUser ? (
           <>
             {/* 消息头部 */}
             <div className="p-4 bg-slate-800 border-b border-slate-700">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
-                  {selectedConversation.otherUser.name.charAt(0)}
+                  {currentChatUser.name.charAt(0)}
                 </div>
                 <div>
                   <h3 className="font-medium text-white">
-                    {selectedConversation.otherUser.name}
+                    {currentChatUser.name}
                   </h3>
                   <p className="text-sm text-slate-400">
-                    {selectedConversation.otherUser.userType === "rcic"
-                      ? "持牌顾问"
-                      : selectedConversation.otherUser.role === "copywriter"
-                      ? "文案"
-                      : "操作员"}
+                    {currentChatUser.role}
                   </p>
                 </div>
               </div>
@@ -206,7 +311,7 @@ export default function InternalChatPage() {
             {/* 消息列表 */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((msg) => {
-                const isMine = msg.senderId !== selectedConversation.otherUser.id;
+                const isMine = msg.senderId !== currentChatUser.id;
                 return (
                   <div
                     key={msg.id}
@@ -255,6 +360,21 @@ export default function InternalChatPage() {
             <form onSubmit={handleSendMessage} className="p-4 bg-slate-800 border-t border-slate-700">
               <div className="flex gap-2">
                 <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="px-4 py-2 rounded-lg bg-slate-700 text-white hover:bg-slate-600 transition-colors disabled:opacity-50"
+                  title="上传文件或图片"
+                >
+                  {uploading ? "⏳" : "📎"}
+                </button>
+                <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
@@ -275,7 +395,7 @@ export default function InternalChatPage() {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <div className="text-6xl mb-4">💬</div>
-              <p className="text-slate-400">选择一个对话开始聊天</p>
+              <p className="text-slate-400">选择一个对话或成员开始聊天</p>
             </div>
           </div>
         )}
