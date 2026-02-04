@@ -13,13 +13,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 获取所有持牌顾问（consultantType = 'A'）且已审核通过的顾问
+    // 获取所有顾问，优先显示持牌顾问
     const consultants = await prisma.rCIC.findMany({
       where: {
-        consultantType: 'A', // 只显示持牌顾问
-        approvalStatus: 'approved', // 只显示已审核通过的
-        isActive: true, // 账号激活状态
-        licenseVerified: true, // 执照已验证
+        // 只要求账号激活，其他条件放宽
+        isActive: true,
       },
       select: {
         id: true,
@@ -27,6 +25,7 @@ export async function GET(request: NextRequest) {
         email: true,
         avatar: true,
         profilePhoto: true,
+        consultantType: true,
         licenseNumber: true,
         yearsOfExperience: true,
         country: true,
@@ -45,8 +44,11 @@ export async function GET(request: NextRequest) {
         isAcceptingCases: true,
         isOnline: true,
         lastActiveAt: true,
+        approvalStatus: true,
+        licenseVerified: true,
       },
       orderBy: [
+        { consultantType: 'asc' }, // A类（持牌顾问）排前面
         { isOnline: 'desc' }, // 在线的排前面
         { averageRating: 'desc' }, // 评分高的排前面
         { successRate: 'desc' }, // 成功率高的排前面
@@ -60,11 +62,19 @@ export async function GET(request: NextRequest) {
       serviceRegions: consultant.serviceRegions ? JSON.parse(consultant.serviceRegions) : [],
       languages: consultant.languages ? JSON.parse(consultant.languages) : [],
       certifications: consultant.certifications ? JSON.parse(consultant.certifications) : [],
+      // 添加类型标签
+      typeLabel: consultant.consultantType === 'A' ? '持牌顾问' : 
+                 consultant.consultantType === 'B' ? '留学顾问' : '文案辅助',
+      // 添加状态标签
+      statusLabel: consultant.approvalStatus === 'approved' ? '已认证' :
+                   consultant.approvalStatus === 'under_review' ? '审核中' :
+                   consultant.approvalStatus === 'pending' ? '待审核' : '未认证',
     }));
 
     return NextResponse.json({
       success: true,
       consultants: formattedConsultants,
+      total: formattedConsultants.length,
     });
   } catch (error) {
     console.error('[Member Consultants] Error:', error);
