@@ -172,6 +172,7 @@ export async function POST(request: NextRequest) {
           userId: user.id,
           rcicId: userWithRcic.assignedRcicId,
           type: 'consultation', // 咨询类型
+          title: '咨询会话', // 默认标题
           status: 'pending',
         },
       });
