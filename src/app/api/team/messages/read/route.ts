@@ -15,10 +15,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 查找session
+    // 查找session（使用token字段）
     const session = await prisma.rCICTeamMemberSession.findUnique({
-      where: { sessionToken },
-      include: { member: true },
+      where: { token: sessionToken },
     });
 
     if (!session || new Date(session.expiresAt) < new Date()) {
@@ -28,22 +27,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
-    const { applicationId } = body;
+    // 获取团队成员信息
+    const member = await prisma.rCICTeamMember.findUnique({
+      where: { id: session.memberId },
+    });
 
-    if (!applicationId) {
+    if (!member) {
       return NextResponse.json(
-        { success: false, message: "缺少applicationId参数" },
+        { success: false, message: "团队成员不存在" },
+        { status: 404 }
+      );
+    }
+
+    const body = await request.json();
+    const { caseId } = body;
+
+    if (!caseId) {
+      return NextResponse.json(
+        { success: false, message: "缺少caseId参数" },
         { status: 400 }
       );
     }
 
     // 验证案件是否属于该团队成员的RCIC
-    const application = await prisma.application.findUnique({
-      where: { id: applicationId },
+    const caseData = await prisma.case.findUnique({
+      where: { id: caseId },
     });
 
-    if (!application || application.rcicId !== session.member.rcicId) {
+    if (!caseData || caseData.rcicId !== member.rcicId) {
       return NextResponse.json(
         { success: false, message: "无权访问该案件" },
         { status: 403 }
@@ -53,12 +64,12 @@ export async function POST(request: NextRequest) {
     // 标记所有用户发送的消息为已读
     await prisma.message.updateMany({
       where: {
-        applicationId,
+        caseId,
         senderType: "user",
-        isRead: false,
+        read: false,
       },
       data: {
-        isRead: true,
+        read: true,
       },
     });
 

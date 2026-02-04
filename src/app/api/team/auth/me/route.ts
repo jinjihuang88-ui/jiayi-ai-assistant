@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const sessionToken = cookieStore.get("team_session")?.value;
+    const sessionToken = cookieStore.get("team_member_session_token")?.value;
 
     if (!sessionToken) {
       return NextResponse.json(

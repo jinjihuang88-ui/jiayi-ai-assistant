@@ -15,10 +15,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 查找session
+    // 查找session（使用token字段）
     const session = await prisma.rCICTeamMemberSession.findUnique({
-      where: { sessionToken },
-      include: { member: true },
+      where: { token: sessionToken },
     });
 
     if (!session || new Date(session.expiresAt) < new Date()) {
@@ -28,23 +27,35 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 获取applicationId
-    const { searchParams } = new URL(request.url);
-    const applicationId = searchParams.get("applicationId");
+    // 获取团队成员信息
+    const member = await prisma.rCICTeamMember.findUnique({
+      where: { id: session.memberId },
+    });
 
-    if (!applicationId) {
+    if (!member) {
       return NextResponse.json(
-        { success: false, message: "缺少applicationId参数" },
+        { success: false, message: "团队成员不存在" },
+        { status: 404 }
+      );
+    }
+
+    // 获取caseId
+    const { searchParams } = new URL(request.url);
+    const caseId = searchParams.get("caseId");
+
+    if (!caseId) {
+      return NextResponse.json(
+        { success: false, message: "缺少caseId参数" },
         { status: 400 }
       );
     }
 
     // 验证案件是否属于该团队成员的RCIC
-    const application = await prisma.application.findUnique({
-      where: { id: applicationId },
+    const caseData = await prisma.case.findUnique({
+      where: { id: caseId },
     });
 
-    if (!application || application.rcicId !== session.member.rcicId) {
+    if (!caseData || caseData.rcicId !== member.rcicId) {
       return NextResponse.json(
         { success: false, message: "无权访问该案件" },
         { status: 403 }
@@ -53,12 +64,7 @@ export async function GET(request: NextRequest) {
 
     // 获取消息列表
     const messages = await prisma.message.findMany({
-      where: { applicationId },
-      include: {
-        user: true,
-        application: true,
-        attachments: true,
-      },
+      where: { caseId },
       orderBy: { createdAt: "asc" },
     });
 
@@ -88,10 +94,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 查找session
+    // 查找session（使用token字段）
     const session = await prisma.rCICTeamMemberSession.findUnique({
-      where: { sessionToken },
-      include: { member: true },
+      where: { token: sessionToken },
     });
 
     if (!session || new Date(session.expiresAt) < new Date()) {
@@ -101,10 +106,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
-    const { applicationId, content, messageType = "text", attachments = [] } = body;
+    // 获取团队成员信息
+    const member = await prisma.rCICTeamMember.findUnique({
+      where: { id: session.memberId },
+    });
 
-    if (!applicationId || !content) {
+    if (!member) {
+      return NextResponse.json(
+        { success: false, message: "团队成员不存在" },
+        { status: 404 }
+      );
+    }
+
+    const body = await request.json();
+    const { caseId, content, fileUrl, fileName, fileType } = body;
+
+    if (!caseId || !content) {
       return NextResponse.json(
         { success: false, message: "缺少必要参数" },
         { status: 400 }
@@ -112,40 +129,38 @@ export async function POST(request: NextRequest) {
     }
 
     // 验证案件是否属于该团队成员的RCIC
-    const application = await prisma.application.findUnique({
-      where: { id: applicationId },
+    const caseData = await prisma.case.findUnique({
+      where: { id: caseId },
     });
 
-    if (!application || application.rcicId !== session.member.rcicId) {
+    if (!caseData || caseData.rcicId !== member.rcicId) {
       return NextResponse.json(
         { success: false, message: "无权访问该案件" },
         { status: 403 }
       );
     }
 
-    // 创建消息
+    // 准备附件数据
+    let attachments = null;
+    if (fileUrl) {
+      attachments = JSON.stringify([
+        {
+          url: fileUrl,
+          name: fileName || "未命名文件",
+          type: fileType || "file",
+        },
+      ]);
+    }
+
+    // 创建消息（使用rcicId作为senderId，senderType为rcic）
     const message = await prisma.message.create({
       data: {
-        applicationId,
+        caseId,
+        senderId: member.rcicId, // 使用RCIC的ID作为发送者
+        senderType: "rcic", // 团队成员代表RCIC发送
         content,
-        messageType,
-        senderType: "team_member",
-        senderName: session.member.name,
-        isRead: true,
-        attachments: {
-          create: attachments.map((file: any) => ({
-            fileName: file.filename || file.fileName || "未命名文件",
-            fileType: messageType,
-            fileSize: file.size || 0,
-            mimeType: file.mimeType || "application/octet-stream",
-            url: file.url,
-          })),
-        },
-      },
-      include: {
-        user: true,
-        application: true,
-        attachments: true,
+        attachments,
+        read: true, // 自己发送的消息标记为已读
       },
     });
 

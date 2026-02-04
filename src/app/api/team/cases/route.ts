@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   try {
     // 验证团队成员登录
     const cookieStore = await cookies();
-    const sessionToken = cookieStore.get("team_session")?.value;
+    const sessionToken = cookieStore.get("team_member_session_token")?.value;
 
     if (!sessionToken) {
       return NextResponse.json(

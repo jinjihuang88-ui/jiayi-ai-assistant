@@ -20,7 +20,7 @@ interface User {
 interface Application {
   id: string;
   type: string;
-  typeName: string;
+  title: string;
 }
 
 interface Attachment {
@@ -46,8 +46,8 @@ interface Message {
 }
 
 interface Conversation {
-  applicationId: string;
-  application: Application;
+  caseId: string;
+  case: Application;
   user: User;
   lastMessage: Message;
   unreadCount: number;
@@ -56,11 +56,11 @@ interface Conversation {
 function TeamMessagesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const applicationIdParam = searchParams.get("applicationId");
+  const caseIdParam = searchParams.get("caseId");
 
   const [member, setMember] = useState<TeamMember | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(applicationIdParam);
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(caseIdParam);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -122,9 +122,9 @@ function TeamMessagesContent() {
     }
   };
 
-  const fetchMessages = async (applicationId: string) => {
+  const fetchMessages = async (caseId: string) => {
     try {
-      const res = await fetch(`/api/team/messages?applicationId=${applicationId}`);
+      const res = await fetch(`/api/team/messages?caseId=${caseId}`);
       const data = await res.json();
 
       if (data.success) {
@@ -133,7 +133,7 @@ function TeamMessagesContent() {
         await fetch("/api/team/messages/read", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ applicationId }),
+          body: JSON.stringify({ caseId: caseId }),
         });
         // 刷新对话列表
         fetchConversations();
@@ -156,7 +156,7 @@ function TeamMessagesContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          applicationId: selectedConversation,
+          caseId: selectedConversation,
           content: newMessage,
           messageType: "text",
         }),
@@ -205,7 +205,7 @@ function TeamMessagesContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          applicationId: selectedConversation,
+          caseId: selectedConversation,
           content: type === "image" ? "发送了一张图片" : `发送了文件: ${file.name}`,
           messageType: type,
           attachments: [uploadData.file],
@@ -248,7 +248,7 @@ function TeamMessagesContent() {
     }
   };
 
-  const selectedConv = conversations.find((c) => c.applicationId === selectedConversation);
+  const selectedConv = conversations.find((c) => c.caseId === selectedConversation);
 
   if (loading) {
     return (
@@ -312,10 +312,10 @@ function TeamMessagesContent() {
             ) : (
               conversations.map((conv) => (
                 <div
-                  key={conv.applicationId}
-                  onClick={() => setSelectedConversation(conv.applicationId)}
+                  key={conv.caseId}
+                  onClick={() => setSelectedConversation(conv.caseId)}
                   className={`p-4 border-b border-slate-700 cursor-pointer transition-colors ${
-                    selectedConversation === conv.applicationId
+                    selectedConversation === conv.caseId
                       ? "bg-slate-700"
                       : "hover:bg-slate-700/50"
                   }`}
@@ -368,7 +368,7 @@ function TeamMessagesContent() {
                       {selectedConv.user.name || selectedConv.user.email}
                     </h3>
                     <p className="text-sm text-slate-400">
-                      {selectedConv.application.typeName}
+                      {selectedConv.case.title}
                     </p>
                   </div>
                 </div>

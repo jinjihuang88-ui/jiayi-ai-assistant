@@ -15,10 +15,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 查找session
+    // 查找session（使用token字段）
     const session = await prisma.rCICTeamMemberSession.findUnique({
-      where: { sessionToken },
-      include: { member: true },
+      where: { token: sessionToken },
     });
 
     if (!session || new Date(session.expiresAt) < new Date()) {
@@ -28,9 +27,21 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // 获取团队成员信息
+    const member = await prisma.rCICTeamMember.findUnique({
+      where: { id: session.memberId },
+    });
+
+    if (!member) {
+      return NextResponse.json(
+        { success: false, message: "团队成员不存在" },
+        { status: 404 }
+      );
+    }
+
     // 获取团队成员所属RCIC的所有案件对话
-    const applications = await prisma.application.findMany({
-      where: { rcicId: session.member.rcicId },
+    const cases = await prisma.case.findMany({
+      where: { rcicId: member.rcicId },
       include: {
         user: true,
         messages: {
@@ -42,31 +53,31 @@ export async function GET(request: NextRequest) {
 
     // 构建对话列表
     const conversations = await Promise.all(
-      applications
-        .filter((app) => app.messages.length > 0)
-        .map(async (app) => {
+      cases
+        .filter((c) => c.messages.length > 0)
+        .map(async (c) => {
           const unreadCount = await prisma.message.count({
             where: {
-              applicationId: app.id,
+              caseId: c.id,
               senderType: "user",
-              isRead: false,
+              read: false,
             },
           });
 
           return {
-            applicationId: app.id,
-            application: {
-              id: app.id,
-              type: app.type,
-              typeName: getTypeName(app.type),
+            caseId: c.id,
+            case: {
+              id: c.id,
+              type: c.type,
+              title: c.title,
             },
             user: {
-              id: app.user.id,
-              email: app.user.email,
-              name: app.user.name,
-              avatar: app.user.avatar,
+              id: c.user.id,
+              email: c.user.email,
+              name: c.user.name,
+              avatar: c.user.avatar,
             },
-            lastMessage: app.messages[0],
+            lastMessage: c.messages[0],
             unreadCount,
           };
         })
@@ -90,15 +101,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-function getTypeName(type: string): string {
-  const typeMap: Record<string, string> = {
-    ee: "快速通道",
-    pnp: "省提名",
-    study: "学签",
-    work: "工签",
-    visit: "访问签证",
-  };
-  return typeMap[type] || type;
 }
