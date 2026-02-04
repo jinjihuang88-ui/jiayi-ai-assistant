@@ -207,8 +207,19 @@ export default function InternalChatPage() {
       {/* 左侧对话列表 */}
       <div className="w-80 bg-slate-800 border-r border-slate-700 flex flex-col">
         <div className="p-4 border-b border-slate-700">
-          <h2 className="text-xl font-bold text-white">内部通讯</h2>
-          <p className="text-sm text-slate-400 mt-1">团队成员聊天</p>
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h2 className="text-xl font-bold text-white">内部通讯</h2>
+              <p className="text-sm text-slate-400 mt-1">团队成员聊天</p>
+            </div>
+            <button
+              onClick={() => router.back()}
+              className="px-3 py-1.5 rounded-lg bg-slate-700 text-white text-sm hover:bg-slate-600 transition-colors"
+              title="返回控制台"
+            >
+              ← 返回
+            </button>
+          </div>
           <button
             onClick={() => setShowMemberList(!showMemberList)}
             className="mt-3 w-full px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium hover:shadow-lg hover:shadow-emerald-500/50 transition-all"
