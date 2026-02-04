@@ -51,27 +51,44 @@ export async function POST(request: Request) {
       where: { email: normalizedEmail },
     });
 
-    if (existingMember) {
-      return NextResponse.json(
-        { success: false, error: "该邮箱已被使用" },
-        { status: 400 }
-      );
-    }
-
     // 生成随机密码（8位）
     const randomPassword = Math.random().toString(36).slice(-8);
     const hashedPassword = await bcrypt.hash(randomPassword, 10);
 
-    // 创建团队成员
-    const teamMember = await prisma.rCICTeamMember.create({
-      data: {
-        rcicId,
-        email: normalizedEmail,
-        name,
-        password: hashedPassword,
-        role: role || "operator",
-      },
-    });
+    let teamMember;
+
+    if (existingMember) {
+      // 如果邮箱已存在，检查是否被禁用
+      if (existingMember.isActive) {
+        return NextResponse.json(
+          { success: false, error: "该邮箱已被使用，请先禁用现有成员" },
+          { status: 400 }
+        );
+      }
+
+      // 如果已禁用，更新该成员的信息
+      teamMember = await prisma.rCICTeamMember.update({
+        where: { id: existingMember.id },
+        data: {
+          name,
+          password: hashedPassword,
+          role: role || "operator",
+          isActive: true, // 重新启用
+          lastLoginAt: null, // 重置登录时间
+        },
+      });
+    } else {
+      // 创建新的团队成员
+      teamMember = await prisma.rCICTeamMember.create({
+        data: {
+          rcicId,
+          email: normalizedEmail,
+          name,
+          password: hashedPassword,
+          role: role || "operator",
+        },
+      });
+    }
 
     // TODO: 发送邮件通知（包含登录信息和密码）
     // 这里暂时返回密码，实际应该通过邮件发送
