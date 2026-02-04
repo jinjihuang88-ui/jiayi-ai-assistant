@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const cookieStore = await cookies();
     const rcicSession = cookieStore.get("rcic_session_token")?.value;
-    const teamSession = cookieStore.get("team_session")?.value;
+    const teamSession = cookieStore.get("team_member_session_token")?.value;
 
     let currentUserId: string;
     let currentUserType: "rcic" | "team_member";
