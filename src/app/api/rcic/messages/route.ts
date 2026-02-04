@@ -46,14 +46,6 @@ export async function GET(request: NextRequest) {
             userId: true,
           },
         },
-        user: {
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            avatar: true,
-          },
-        },
       },
     });
 
@@ -79,7 +71,7 @@ export async function GET(request: NextRequest) {
         ...msg,
         attachments,
         messageType: 'text',
-        senderName: msg.senderType === 'user' ? msg.user?.name : null,
+        senderName: null, // 需要时可以通过senderId单独查询
         application: null,
       };
     });
