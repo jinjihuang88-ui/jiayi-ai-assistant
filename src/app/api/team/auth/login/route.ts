@@ -18,11 +18,14 @@ export async function POST(request: Request) {
 
     // 统一邮箱格式为小写
     const normalizedEmail = email.toLowerCase().trim();
+    console.log('[Team Login] Attempting login for:', normalizedEmail);
 
     // 查找团队成员
     const member = await prisma.rCICTeamMember.findUnique({
       where: { email: normalizedEmail },
     });
+
+    console.log('[Team Login] Member found:', member ? `Yes (ID: ${member.id}, Active: ${member.isActive})` : 'No');
 
     if (!member) {
       return NextResponse.json(
@@ -40,7 +43,9 @@ export async function POST(request: Request) {
     }
 
     // 验证密码
+    console.log('[Team Login] Checking password for:', member.email);
     const isPasswordValid = await bcrypt.compare(password, member.password);
+    console.log('[Team Login] Password valid:', isPasswordValid);
     if (!isPasswordValid) {
       return NextResponse.json(
         { success: false, error: "邮箱或密码错误" },
