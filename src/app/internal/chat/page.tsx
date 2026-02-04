@@ -157,9 +157,21 @@ export default function InternalChatPage() {
 
     setUploading(true);
     try {
-      // TODO: 实现文件上传到云存储
-      // 这里暂时使用占位符
-      const fileUrl = URL.createObjectURL(file);
+      // 上传文件到云存储
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const uploadRes = await fetch('/api/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      const uploadData = await uploadRes.json();
+      if (!uploadData.success) {
+        alert(uploadData.message || '文件上传失败');
+        return;
+      }
+
       const messageType = file.type.startsWith("image/") ? "image" : "file";
 
       const res = await fetch("/api/internal/messages", {
@@ -169,7 +181,7 @@ export default function InternalChatPage() {
           receiverId: receiver.id,
           receiverType: receiver.userType,
           messageType,
-          fileUrl,
+          fileUrl: uploadData.url,
           fileName: file.name,
           fileSize: file.size,
           fileMimeType: file.type,

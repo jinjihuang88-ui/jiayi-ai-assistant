@@ -208,7 +208,12 @@ function TeamMessagesContent() {
           caseId: selectedConversation,
           content: type === "image" ? "发送了一张图片" : `发送了文件: ${file.name}`,
           messageType: type,
-          attachments: [uploadData.file],
+          attachments: [{
+            fileName: uploadData.filename,
+            url: uploadData.url,
+            fileSize: uploadData.fileSize,
+            mimeType: uploadData.mimeType,
+          }],
         }),
       });
 
