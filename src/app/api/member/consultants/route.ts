@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
+import { getCurrentUser } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
     // 验证用户登录
-    const sessionToken = request.cookies.get('user_session_token')?.value;
-    if (!sessionToken) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json(
         { success: false, message: '未登录' },
         { status: 401 }

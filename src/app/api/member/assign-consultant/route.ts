@@ -1,28 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
+import { getCurrentUser } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
     // 验证用户登录
-    const sessionToken = request.cookies.get('user_session_token')?.value;
-    if (!sessionToken) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json(
         { success: false, message: '未登录' },
-        { status: 401 }
-      );
-    }
-
-    // 查找用户session
-    const session = await prisma.userSession.findUnique({
-      where: { token: sessionToken },
-      include: { user: true },
-    });
-
-    if (!session) {
-      return NextResponse.json(
-        { success: false, message: '会话无效' },
         { status: 401 }
       );
     }
@@ -75,7 +61,7 @@ export async function POST(request: NextRequest) {
       const existingCase = await prisma.case.findFirst({
         where: {
           id: caseId,
-          userId: session.user.id,
+          userId: user.id,
         },
       });
 
@@ -101,7 +87,7 @@ export async function POST(request: NextRequest) {
       // 如果没有指定案件，将顾问分配给用户的所有未分配案件
       const unassignedCases = await prisma.case.findMany({
         where: {
-          userId: session.user.id,
+          userId: user.id,
           rcicId: null,
         },
       });
@@ -116,7 +102,7 @@ export async function POST(request: NextRequest) {
       // 批量更新
       await prisma.case.updateMany({
         where: {
-          userId: session.user.id,
+          userId: user.id,
           rcicId: null,
         },
         data: { rcicId: consultantId },
