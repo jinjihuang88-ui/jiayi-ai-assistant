@@ -77,25 +77,25 @@ export default function Home() {
               href="/"
               className="text-white hover:text-white/80 transition-colors duration-200 py-2"
             >
-              首页 <span className="text-xs ml-1 opacity-60">Home</span>
+              首页
             </a>
             <a
               href="/consultants"
               className="text-white/80 hover:text-white transition-colors duration-200 py-2"
             >
-              找顾问 <span className="text-xs ml-1 opacity-60">Find Consultants</span>
+              找顾问
             </a>
             <a
               href="/services"
               className="text-white/80 hover:text-white transition-colors duration-200 py-2"
             >
-              服务 <span className="text-xs ml-1 opacity-60">Services</span>
+              服务
             </a>
             <a
               href="/about"
               className="text-white/80 hover:text-white transition-colors duration-200 py-2"
             >
-              关于我们 <span className="text-xs ml-1 opacity-60">About</span>
+              关于我们
             </a>
           </nav>
 
@@ -143,33 +143,19 @@ export default function Home() {
           <div className={`text-center transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
             
             {/* 主标题 */}
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight text-slate-900 mb-2">
+            <h1 className="text-4xl md:text-6xl font-bold leading-tight text-slate-900 mb-4">
               加移 · 加拿大移民顾问平台
             </h1>
-            <p className="text-xl md:text-2xl text-slate-600 mb-4">
-              Jiayi · Canadian Immigration Consultant Platform
-            </p>
-            
-            <h2 className="text-2xl md:text-3xl font-semibold text-slate-700 mb-2">
+            <h2 className="text-2xl md:text-3xl font-semibold text-slate-700 mb-6">
               让选择回到你手里
             </h2>
-            <p className="text-lg md:text-xl text-slate-500 mb-6">
-              Put the Choice Back in Your Hands
-            </p>
 
             {/* 副标题 - 红色强调 */}
-            <p className="text-lg md:text-xl text-[#C62828] font-semibold mb-1">
+            <p className="text-lg md:text-xl text-[#C62828] font-semibold mb-2">
               透明比价 · 顾问审核 · 平台担保
             </p>
-            <p className="text-sm md:text-base text-[#C62828]/70 mb-2">
-              Transparent Pricing · Verified Consultants · Platform Guarantee
-            </p>
-            
-            <p className="text-base md:text-lg text-slate-600 mb-1 max-w-3xl mx-auto">
+            <p className="text-base md:text-lg text-slate-600 mb-10 max-w-3xl mx-auto">
               连接中国用户与加拿大移民、留学、签证顾问
-            </p>
-            <p className="text-sm md:text-base text-slate-500 mb-10 max-w-3xl mx-auto">
-              Connecting Chinese Users with Canadian Immigration, Study, and Visa Consultants
             </p>
 
             {/* CTA按钮组 */}
@@ -193,33 +179,24 @@ export default function Home() {
             </div>
 
             {/* 信任补充 */}
-            <div className="flex flex-wrap justify-center gap-6 text-sm">
-              <div className="flex flex-col items-center gap-1">
-                <div className="flex items-center gap-1">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-slate-600">不承诺100%成功</span>
-                </div>
-                <span className="text-xs text-slate-400">No 100% Success Guarantee</span>
+            <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-500">
+              <div className="flex items-center gap-1">
+                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>不承诺100%成功</span>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <div className="flex items-center gap-1">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-slate-600">不强推方案</span>
-                </div>
-                <span className="text-xs text-slate-400">No Pushy Sales</span>
+              <div className="flex items-center gap-1">
+                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>不强推方案</span>
               </div>
-              <div className="flex flex-col items-center gap-1">
-                <div className="flex items-center gap-1">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-slate-600">所有顾问均经过平台审核</span>
-                </div>
-                <span className="text-xs text-slate-400">All Consultants Verified</span>
+              <div className="flex items-center gap-1">
+                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>所有顾问均经过平台审核</span>
               </div>
             </div>
           </div>
@@ -230,12 +207,9 @@ export default function Home() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
               为什么越来越多用户选择加移？
             </h2>
-            <p className="text-lg md:text-xl text-slate-600">
-              Why More Users Choose Jiayi?
-            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -244,12 +218,11 @@ export default function Home() {
               <div className="w-16 h-16 rounded-xl bg-[#C62828] flex items-center justify-center mb-6 text-white text-3xl">
                 🔍
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-1">透明</h3>
-              <p className="text-sm text-slate-500 mb-4">Transparent</p>
-              <ul className="text-slate-600 space-y-2 text-sm">
-                <li>• 顾问资质公开 <span className="text-xs text-slate-400">Public Consultant Credentials</span></li>
-                <li>• 服务价格清晰 <span className="text-xs text-slate-400">Clear Service Pricing</span></li>
-                <li>• 流程节点可追踪 <span className="text-xs text-slate-400">Trackable Process Milestones</span></li>
+              <h3 className="text-xl font-bold text-slate-900 mb-4">透明</h3>
+              <ul className="text-slate-600 space-y-2">
+                <li>• 顾问资质公开</li>
+                <li>• 服务价格清晰</li>
+                <li>• 流程节点可追踪</li>
               </ul>
             </div>
 
@@ -258,12 +231,11 @@ export default function Home() {
               <div className="w-16 h-16 rounded-xl bg-[#1E293B] flex items-center justify-center mb-6 text-white text-3xl">
                 🛡️
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-1">安全</h3>
-              <p className="text-sm text-slate-500 mb-4">Secure</p>
-              <ul className="text-slate-600 space-y-2 text-sm">
-                <li>• 平台担保支付 <span className="text-xs text-slate-400">Platform-Guaranteed Payment</span></li>
-                <li>• 分阶段放款 <span className="text-xs text-slate-400">Milestone-Based Release</span></li>
-                <li>• 全程记录可追溯 <span className="text-xs text-slate-400">Full Record Traceability</span></li>
+              <h3 className="text-xl font-bold text-slate-900 mb-4">安全</h3>
+              <ul className="text-slate-600 space-y-2">
+                <li>• 平台担保支付</li>
+                <li>• 分阶段放款</li>
+                <li>• 全程记录可追溯</li>
               </ul>
             </div>
 
@@ -272,12 +244,11 @@ export default function Home() {
               <div className="w-16 h-16 rounded-xl bg-[#C62828] flex items-center justify-center mb-6 text-white text-3xl">
                 🤖
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-1">智能</h3>
-              <p className="text-sm text-slate-500 mb-4">Intelligent</p>
-              <ul className="text-slate-600 space-y-2 text-sm">
-                <li>• AI初步评估可行性 <span className="text-xs text-slate-400">AI Feasibility Assessment</span></li>
-                <li>• 智能匹配顾问 <span className="text-xs text-slate-400">Smart Consultant Matching</span></li>
-                <li>• 文书与材料智能检查 <span className="text-xs text-slate-400">AI-Powered Document Review</span></li>
+              <h3 className="text-xl font-bold text-slate-900 mb-4">智能</h3>
+              <ul className="text-slate-600 space-y-2">
+                <li>• AI初步评估可行性</li>
+                <li>• 智能匹配顾问</li>
+                <li>• 文书与材料智能检查</li>
               </ul>
             </div>
           </div>
