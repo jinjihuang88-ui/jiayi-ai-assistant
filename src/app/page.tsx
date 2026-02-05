@@ -288,9 +288,12 @@ export default function Home() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
               从评估到递交，只需4步
             </h2>
+            <p className="text-lg md:text-xl text-slate-600">
+              From Assessment to Submission in 4 Steps
+            </p>
           </div>
 
           <div className="grid md:grid-cols-4 gap-6">
@@ -298,25 +301,33 @@ export default function Home() {
               {
                 step: "1",
                 title: "AI初评",
+                titleEn: "AI Assessment",
                 desc: "填写基本信息，快速了解你的可行性与路径",
+                descEn: "Fill in basic info for quick feasibility check",
                 icon: "📊",
               },
               {
                 step: "2",
                 title: "对比顾问",
+                titleEn: "Compare Consultants",
                 desc: "按经验、价格、评价，自主选择适合你的顾问",
+                descEn: "Choose by experience, price, and reviews",
                 icon: "👥",
               },
               {
                 step: "3",
                 title: "平台担保下单",
+                titleEn: "Guaranteed Payment",
                 desc: "分阶段付款，服务未完成，资金不放行",
+                descEn: "Milestone payments, funds held until completion",
                 icon: "🛡️",
               },
               {
                 step: "4",
                 title: "递交&跟进",
+                titleEn: "Submit & Track",
                 desc: "流程节点清晰，进度实时可查",
+                descEn: "Clear milestones, real-time progress tracking",
                 icon: "✅",
               },
             ].map((item, i) => (
@@ -325,8 +336,10 @@ export default function Home() {
                   {item.step}
                 </div>
                 <div className="text-3xl mb-3">{item.icon}</div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-sm text-slate-600 leading-relaxed">{item.desc}</p>
+                <h3 className="text-lg font-bold text-slate-900 mb-1">{item.title}</h3>
+                <p className="text-xs text-slate-500 mb-2">{item.titleEn}</p>
+                <p className="text-sm text-slate-600 leading-relaxed mb-1">{item.desc}</p>
+                <p className="text-xs text-slate-400 leading-relaxed">{item.descEn}</p>
               </div>
             ))}
           </div>
@@ -337,22 +350,29 @@ export default function Home() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
               核心功能
             </h2>
+            <p className="text-lg md:text-xl text-slate-600">
+              Core Features
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* AI移民初评 */}
             <div className="border border-slate-200 rounded-2xl p-8 hover:border-[#C62828] transition-all duration-300">
-              <h3 className="text-xl font-bold text-slate-900 mb-3">AI移民初评</h3>
-              <p className="text-slate-600 mb-4 text-sm leading-relaxed">
-                不是"成功率承诺"，而是理性评估
+              <h3 className="text-xl font-bold text-slate-900 mb-1">AI移民初评</h3>
+              <p className="text-sm text-slate-500 mb-3">AI Immigration Assessment</p>
+              <p className="text-slate-600 mb-1 text-sm leading-relaxed">
+                不是“成功率承诺”，而是理性评估
+              </p>
+              <p className="text-slate-400 mb-4 text-xs leading-relaxed">
+                Rational assessment, not success guarantee
               </p>
               <ul className="text-slate-600 space-y-2 text-sm mb-6">
-                <li>• 基于真实政策与历史案例</li>
-                <li>• 给出路径建议与风险提示</li>
-                <li>• 帮你判断"值不值得继续"</li>
+                <li>• 基于真实政策与历史案例 <span className="text-xs text-slate-400">Based on real policies</span></li>
+                <li>• 给出路径建议与风险提示 <span className="text-xs text-slate-400">Path suggestions & risks</span></li>
+                <li>• 帮你判断“值不值得继续” <span className="text-xs text-slate-400">Worth continuing?</span></li>
               </ul>
               <a href="/assessment" className="text-[#C62828] font-medium text-sm hover:underline">
                 立即评估 →
@@ -361,14 +381,18 @@ export default function Home() {
 
             {/* 顾问对比与选择 */}
             <div className="border border-slate-200 rounded-2xl p-8 hover:border-[#C62828] transition-all duration-300">
-              <h3 className="text-xl font-bold text-slate-900 mb-3">顾问对比与选择</h3>
-              <p className="text-slate-600 mb-4 text-sm leading-relaxed">
+              <h3 className="text-xl font-bold text-slate-900 mb-1">顾问对比与选择</h3>
+              <p className="text-sm text-slate-500 mb-3">Consultant Comparison</p>
+              <p className="text-slate-600 mb-1 text-sm leading-relaxed">
                 你决定找谁，而不是被推给谁
               </p>
+              <p className="text-slate-400 mb-4 text-xs leading-relaxed">
+                You choose, not assigned
+              </p>
               <ul className="text-slate-600 space-y-2 text-sm mb-6">
-                <li>• 顾问背景清晰展示</li>
-                <li>• 成功案例与评价可查</li>
-                <li>• 价格与服务范围透明</li>
+                <li>• 顾问背景清晰展示 <span className="text-xs text-slate-400">Clear backgrounds</span></li>
+                <li>• 成功案例与评价可查 <span className="text-xs text-slate-400">Cases & reviews</span></li>
+                <li>• 价格与服务范围透明 <span className="text-xs text-slate-400">Transparent pricing</span></li>
               </ul>
               <a href="/applications" className="text-[#C62828] font-medium text-sm hover:underline">
                 找顾问 →
@@ -377,14 +401,18 @@ export default function Home() {
 
             {/* 平台担保与流程管理 */}
             <div className="border border-slate-200 rounded-2xl p-8 hover:border-[#C62828] transition-all duration-300">
-              <h3 className="text-xl font-bold text-slate-900 mb-3">平台担保与流程管理</h3>
-              <p className="text-slate-600 mb-4 text-sm leading-relaxed">
+              <h3 className="text-xl font-bold text-slate-900 mb-1">平台担保与流程管理</h3>
+              <p className="text-sm text-slate-500 mb-3">Platform Guarantee & Process Management</p>
+              <p className="text-slate-600 mb-1 text-sm leading-relaxed">
                 钱和流程，都在你可控范围内
               </p>
+              <p className="text-slate-400 mb-4 text-xs leading-relaxed">
+                Money and process under your control
+              </p>
               <ul className="text-slate-600 space-y-2 text-sm mb-6">
-                <li>• 资金平台托管</li>
-                <li>• 关键节点确认后放款</li>
-                <li>• 所有沟通与文件留痕</li>
+                <li>• 资金平台托管 <span className="text-xs text-slate-400">Funds held by platform</span></li>
+                <li>• 关键节点确认后放款 <span className="text-xs text-slate-400">Release after milestones</span></li>
+                <li>• 所有沟通与文件留痕 <span className="text-xs text-slate-400">All records traceable</span></li>
               </ul>
               <a href="/applications" className="text-[#C62828] font-medium text-sm hover:underline">
                 了解更多 →
