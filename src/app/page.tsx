@@ -426,11 +426,17 @@ export default function Home() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
               我们的服务
             </h2>
-            <p className="text-slate-600 mt-4 max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-slate-600 mb-2">
+              Our Services
+            </p>
+            <p className="text-slate-600 max-w-2xl mx-auto">
               覆盖留学、旅游、工签、移民全方位签证申请服务
+            </p>
+            <p className="text-sm text-slate-500 max-w-2xl mx-auto">
+              Comprehensive visa services for study, travel, work, and immigration
             </p>
           </div>
 
@@ -560,20 +566,28 @@ export default function Home() {
             {/* 我是用户 */}
             <div className="border-2 border-slate-200 rounded-2xl p-12 hover:border-[#C62828] transition-all duration-300">
               <div className="text-6xl mb-6 text-center">👤</div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 text-center">我是用户</h3>
-              <p className="text-slate-600 mb-6 text-center">我想移民/留学/办理签证</p>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2 text-center">我是用户</h3>
+              <p className="text-sm text-slate-500 mb-4 text-center">I'm a User</p>
+              <p className="text-slate-600 mb-1 text-center">我想移民/留学/办理签证</p>
+              <p className="text-sm text-slate-400 mb-6 text-center">Immigration / Study / Visa</p>
               <ul className="text-slate-600 space-y-3 mb-8">
                 <li className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <span>免费AI评估</span>
+                  <div>
+                    <span>免费AI评估</span>
+                    <p className="text-xs text-slate-400">Free AI Assessment</p>
+                  </div>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <span>安全下单</span>
+                  <div>
+                    <span>安全下单</span>
+                    <p className="text-xs text-slate-400">Secure Payment</p>
+                  </div>
                 </li>
               </ul>
               <a
@@ -588,26 +602,37 @@ export default function Home() {
             {/* 我是顾问 */}
             <div className="border-2 border-slate-200 rounded-2xl p-12 hover:border-[#1E293B] transition-all duration-300">
               <div className="text-6xl mb-6 text-center">👨‍💼</div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-4 text-center">我是顾问</h3>
-              <p className="text-slate-600 mb-6 text-center">我提供移民/留学/签证服务</p>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2 text-center">我是顾问</h3>
+              <p className="text-sm text-slate-500 mb-4 text-center">I'm a Consultant</p>
+              <p className="text-slate-600 mb-1 text-center">我提供移民/留学/签证服务</p>
+              <p className="text-sm text-slate-400 mb-6 text-center">Immigration / Study / Visa Services</p>
               <ul className="text-slate-600 space-y-3 mb-8">
                 <li className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <span>获取中国客户</span>
+                  <div>
+                    <span>获取中国客户</span>
+                    <p className="text-xs text-slate-400">Access Chinese Clients</p>
+                  </div>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <span>建立个人专业主页</span>
+                  <div>
+                    <span>建立个人专业主页</span>
+                    <p className="text-xs text-slate-400">Build Professional Profile</p>
+                  </div>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  <span>使用平台工具提升效率</span>
+                  <div>
+                    <span>使用平台工具提升效率</span>
+                    <p className="text-xs text-slate-400">Use Platform Tools</p>
+                  </div>
                 </li>
               </ul>
               <a
@@ -626,9 +651,12 @@ export default function Home() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
               清晰的边界，是对用户最好的保护
             </h2>
+            <p className="text-lg md:text-xl text-slate-600">
+              Clear Boundaries, Best Protection
+            </p>
           </div>
 
           <div className="bg-white rounded-2xl p-8 border border-slate-200">
@@ -637,30 +665,43 @@ export default function Home() {
                 <svg className="w-6 h-6 text-[#C62828] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>平台仅提供信息撮合与流程支持</span>
+                <div>
+                  <span>平台仅提供信息撒合与流程支持</span>
+                  <p className="text-sm text-slate-400 mt-1">Platform provides matching & process support only</p>
+                </div>
               </li>
               <li className="flex items-start gap-3">
                 <svg className="w-6 h-6 text-[#C62828] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>具体移民建议由顾问提供并承担责任</span>
+                <div>
+                  <span>具体移民建议由顾问提供并承担责任</span>
+                  <p className="text-sm text-slate-400 mt-1">Consultants provide advice and bear responsibility</p>
+                </div>
               </li>
               <li className="flex items-start gap-3">
                 <svg className="w-6 h-6 text-[#C62828] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>不承诺结果，不参与材料造假</span>
+                <div>
+                  <span>不承诺结果，不参与材料造假</span>
+                  <p className="text-sm text-slate-400 mt-1">No result guarantee, no document fraud</p>
+                </div>
               </li>
               <li className="flex items-start gap-3">
                 <svg className="w-6 h-6 text-[#C62828] mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>顾问按资质与服务范围分级管理</span>
+                <div>
+                  <span>顾问按资质与服务范围分级管理</span>
+                  <p className="text-sm text-slate-400 mt-1">Consultants managed by qualification & scope</p>
+                </div>
               </li>
             </ul>
 
-            <div className="mt-8 pt-6 border-t border-slate-200 text-center text-sm text-slate-500">
-              加移由 MapleBridge 提供技术与平台支持
+            <div className="mt-8 pt-6 border-t border-slate-200 text-center">
+              <p className="text-sm text-slate-600">加移由 MapleBridge 提供技术与平台支持</p>
+              <p className="text-xs text-slate-400 mt-1">Jiayi powered by MapleBridge</p>
             </div>
           </div>
         </div>
@@ -669,11 +710,17 @@ export default function Home() {
       {/* Final CTA */}
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
             不确定要不要移民？
           </h2>
-          <p className="text-xl text-slate-600 mb-10">
+          <p className="text-lg md:text-xl text-slate-500 mb-4">
+            Not Sure About Immigration?
+          </p>
+          <p className="text-xl text-slate-600 mb-2">
             先做一次理性的评估。
+          </p>
+          <p className="text-lg text-slate-400 mb-10">
+            Start with a rational assessment.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
