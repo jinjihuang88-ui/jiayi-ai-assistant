@@ -93,15 +93,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 检查邮箱是否验证
-    if (!consultant.emailVerified) {
-      return NextResponse.json(
-        { error: "请先验证您的邮箱地址" },
-        { status: 403 }
-      );
-    }
-
-    // 检查审核状态
+    // 检查审核状态（审核通过即可登录；通过时后台已设 emailVerified，此处不再单独卡邮箱验证）
     if (consultant.approvalStatus !== 'approved') {
       const statusMessages: Record<string, string> = {
         pending: '您的账号正在等待审核',
