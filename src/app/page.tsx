@@ -99,12 +99,11 @@ export default function Home() {
             </a>
           </nav>
 
-          {/* Right Side - Auth & CTA */}
+          {/* Right Side - 仅保留会员登录、顾问登录 */}
           <div className="flex items-center gap-3">
             {isCheckingAuth ? (
               <div className="w-8 h-8 rounded-full bg-slate-700 animate-pulse" />
             ) : user ? (
-              /* 已登录状态 */
               <a
                 href="/member"
                 className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-slate-700/50 transition-all duration-200"
@@ -117,13 +116,12 @@ export default function Home() {
                 </span>
               </a>
             ) : (
-              /* 未登录状态：普通用户登录 + RCIC 顾问登录/注册 */
               <>
                 <a
                   href="/auth/login"
                   className="px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition-all duration-200 text-sm font-medium"
                 >
-                  登录
+                  会员登录
                 </a>
                 <a
                   href="/rcic/login"
@@ -133,26 +131,6 @@ export default function Home() {
                 </a>
               </>
             )}
-            <a
-              href="/assessment"
-              className="px-4 py-2.5 rounded-lg border border-white/30 text-white hover:bg-white/10 transition-all duration-200 text-sm font-medium"
-            >
-              AI移民评估报告
-            </a>
-            <a
-              href="/chat"
-              className="px-4 py-2.5 rounded-lg border border-white/30 text-white hover:bg-white/10 transition-all duration-200 text-sm font-medium"
-            >
-              咨询AI助理
-            </a>
-            <a
-              href="/applications"
-              className="px-5 py-2.5 rounded-lg bg-[#C62828] text-white text-sm font-semibold 
-                         hover:bg-[#B71C1C] transition-all duration-200 
-                         shadow-md hover:shadow-lg"
-            >
-              找顾问
-            </a>
           </div>
         </div>
       </header>
@@ -192,31 +170,23 @@ export default function Home() {
               Connecting Chinese Users with Canadian Immigration, Study, and Visa Consultants
             </p>
 
-            {/* CTA按钮组：1 评估报告 → 2 咨询AI助理 → 3 找顾问 */}
+            {/* CTA：会员登录、顾问登录 */}
             <div className="flex flex-wrap justify-center gap-4 mb-8">
               <a
-                href="/assessment"
+                href="/auth/login"
                 className="px-8 py-4 rounded-xl bg-[#C62828] text-white font-semibold text-lg
                            hover:bg-[#B71C1C] transition-all duration-300 
                            shadow-lg shadow-red-500/25 hover:shadow-xl
                            hover:-translate-y-1 active:translate-y-0"
               >
-                AI移民评估报告
+                会员登录
               </a>
               <a
-                href="/chat"
-                className="px-8 py-4 rounded-xl bg-slate-800 text-white font-semibold text-lg
-                           hover:bg-slate-700 transition-all duration-300 
-                           shadow-lg hover:shadow-xl hover:-translate-y-1 active:translate-y-0"
+                href="/rcic/login"
+                className="px-8 py-4 rounded-xl border-2 border-white/50 text-white font-semibold text-lg
+                           hover:bg-white/10 transition-all duration-300"
               >
-                咨询AI助理
-              </a>
-              <a
-                href="/applications"
-                className="px-8 py-4 rounded-xl border-2 border-slate-300 text-slate-700 font-semibold text-lg
-                           hover:border-[#C62828] hover:text-[#C62828] transition-all duration-300"
-              >
-                找顾问
+                顾问登录 / 注册
               </a>
             </div>
 
