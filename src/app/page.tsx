@@ -135,11 +135,23 @@ export default function Home() {
             )}
             <a
               href="/assessment"
+              className="px-4 py-2.5 rounded-lg border border-white/30 text-white hover:bg-white/10 transition-all duration-200 text-sm font-medium"
+            >
+              AI移民评估报告
+            </a>
+            <a
+              href="/chat"
+              className="px-4 py-2.5 rounded-lg border border-white/30 text-white hover:bg-white/10 transition-all duration-200 text-sm font-medium"
+            >
+              咨询AI助理
+            </a>
+            <a
+              href="/applications"
               className="px-5 py-2.5 rounded-lg bg-[#C62828] text-white text-sm font-semibold 
                          hover:bg-[#B71C1C] transition-all duration-200 
                          shadow-md hover:shadow-lg"
             >
-              免费AI初评
+              找顾问
             </a>
           </div>
         </div>
@@ -180,7 +192,7 @@ export default function Home() {
               Connecting Chinese Users with Canadian Immigration, Study, and Visa Consultants
             </p>
 
-            {/* CTA按钮组 */}
+            {/* CTA按钮组：1 评估报告 → 2 咨询AI助理 → 3 找顾问 */}
             <div className="flex flex-wrap justify-center gap-4 mb-8">
               <a
                 href="/assessment"
@@ -189,7 +201,15 @@ export default function Home() {
                            shadow-lg shadow-red-500/25 hover:shadow-xl
                            hover:-translate-y-1 active:translate-y-0"
               >
-                免费AI移民初评
+                AI移民评估报告
+              </a>
+              <a
+                href="/chat"
+                className="px-8 py-4 rounded-xl bg-slate-800 text-white font-semibold text-lg
+                           hover:bg-slate-700 transition-all duration-300 
+                           shadow-lg hover:shadow-xl hover:-translate-y-1 active:translate-y-0"
+              >
+                咨询AI助理
               </a>
               <a
                 href="/applications"
@@ -292,30 +312,38 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How It Works - 4步流程 */}
+      {/* How It Works - 5步流程 */}
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-              从评估到递交，只需4步
+              只需5步
             </h2>
             <p className="text-lg md:text-xl text-slate-600">
-              From Assessment to Submission in 4 Steps
+              从评估到递交 · From Assessment to Submission
             </p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-4 lg:grid-cols-5 gap-6">
             {[
               {
                 step: "1",
-                title: "AI初评",
-                titleEn: "AI Assessment",
-                desc: "填写基本信息，快速了解你的可行性与路径",
-                descEn: "Fill in basic info for quick feasibility check",
+                title: "AI移民评估报告",
+                titleEn: "AI Assessment Report",
+                desc: "填写基本信息，获取可行性评估报告",
+                descEn: "Fill in basic info for feasibility report",
                 icon: "📊",
               },
               {
                 step: "2",
+                title: "咨询AI助理",
+                titleEn: "AI Consultation",
+                desc: "与 AI 对话，进一步了解政策与路径",
+                descEn: "Chat with AI for policy and path guidance",
+                icon: "💬",
+              },
+              {
+                step: "3",
                 title: "对比顾问",
                 titleEn: "Compare Consultants",
                 desc: "按经验、价格、评价，自主选择适合你的顾问",
@@ -323,7 +351,7 @@ export default function Home() {
                 icon: "👥",
               },
               {
-                step: "3",
+                step: "4",
                 title: "平台担保下单",
                 titleEn: "Guaranteed Payment",
                 desc: "分阶段付款，服务未完成，资金不放行",
@@ -331,11 +359,11 @@ export default function Home() {
                 icon: "🛡️",
               },
               {
-                step: "4",
-                title: "递交&跟进",
+                step: "5",
+                title: "递交 & 跟进",
                 titleEn: "Submit & Track",
-                desc: "流程节点清晰，进度实时可查",
-                descEn: "Clear milestones, real-time progress tracking",
+                desc: "用户自己填表递交，流程节点清晰，进度实时可查",
+                descEn: "User submits by filling forms; clear milestones, real-time tracking",
                 icon: "✅",
               },
             ].map((item, i) => (
@@ -367,15 +395,15 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* AI移民初评 */}
+            {/* 1. AI移民评估报告 */}
             <div className="border border-slate-200 rounded-2xl p-8 hover:border-[#C62828] transition-all duration-300">
-              <h3 className="text-xl font-bold text-slate-900 mb-1">AI移民初评</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-1">AI移民评估报告</h3>
               <p className="text-sm text-slate-500 mb-3">AI Immigration Assessment</p>
               <p className="text-slate-600 mb-1 text-sm leading-relaxed">
-                不是“成功率承诺”，而是理性评估
+                第一步：理性评估，不是“成功率承诺”
               </p>
               <p className="text-slate-400 mb-4 text-xs leading-relaxed">
-                Rational assessment, not success guarantee
+                Step 1: Rational assessment
               </p>
               <ul className="text-slate-600 space-y-2 text-sm mb-6">
                 <li>• 基于真实政策与历史案例 <span className="text-xs text-slate-400">Based on real policies</span></li>
@@ -387,12 +415,32 @@ export default function Home() {
               </a>
             </div>
 
-            {/* 顾问对比与选择 */}
+            {/* 2. 咨询AI助理（扣子智能体） */}
+            <div className="border border-slate-200 rounded-2xl p-8 hover:border-[#C62828] transition-all duration-300">
+              <h3 className="text-xl font-bold text-slate-900 mb-1">咨询AI助理</h3>
+              <p className="text-sm text-slate-500 mb-3">AI Consultation (Coze)</p>
+              <p className="text-slate-600 mb-1 text-sm leading-relaxed">
+                第二步：与 AI 对话，进一步了解政策与路径
+              </p>
+              <p className="text-slate-400 mb-4 text-xs leading-relaxed">
+                Step 2: Chat with AI for guidance
+              </p>
+              <ul className="text-slate-600 space-y-2 text-sm mb-6">
+                <li>• 基于 IRCC 官方数据 <span className="text-xs text-slate-400">IRCC-based</span></li>
+                <li>• 即时问答、智能回复 <span className="text-xs text-slate-400">Instant Q&A</span></li>
+                <li>• 再咨询真正的顾问 <span className="text-xs text-slate-400">Then consult real consultants</span></li>
+              </ul>
+              <a href="/chat" className="text-[#C62828] font-medium text-sm hover:underline">
+                去咨询AI →
+              </a>
+            </div>
+
+            {/* 3. 顾问对比与选择（咨询真正的顾问） */}
             <div className="border border-slate-200 rounded-2xl p-8 hover:border-[#C62828] transition-all duration-300">
               <h3 className="text-xl font-bold text-slate-900 mb-1">顾问对比与选择</h3>
               <p className="text-sm text-slate-500 mb-3">Consultant Comparison</p>
               <p className="text-slate-600 mb-1 text-sm leading-relaxed">
-                你决定找谁，而不是被推给谁
+                第三步：咨询真正的顾问，你决定找谁
               </p>
               <p className="text-slate-400 mb-4 text-xs leading-relaxed">
                 You choose, not assigned
