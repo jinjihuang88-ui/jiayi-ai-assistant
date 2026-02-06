@@ -24,10 +24,11 @@ export async function POST(request: NextRequest) {
       yearsOfExperience,
     } = body;
 
-    console.log("[RCIC Register] Received:", { email, name, consultantType });
+    const normalizedEmail = (email || "").toString().toLowerCase().trim();
+    console.log("[RCIC Register] Received:", { email: normalizedEmail, name, consultantType });
 
     // 基础字段验证
-    if (!email || !password || !name || !phone || !consultantType || !idDocument || !country || !city) {
+    if (!normalizedEmail || !password || !name || !phone || !consultantType || !idDocument || !country || !city) {
       return NextResponse.json(
         { success: false, message: "请填写所有必填字段" },
         { status: 400 }
@@ -64,9 +65,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // 检查邮箱是否已存在
-    const existingRCIC = await prisma.rCIC.findUnique({
-      where: { email },
+    // 检查邮箱是否已存在（统一小写）
+    const existingRCIC = await prisma.rCIC.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
     });
 
     if (existingRCIC) {
@@ -79,10 +80,10 @@ export async function POST(request: NextRequest) {
     // 加密密码
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 创建顾问账号（待审核状态）
+    // 创建顾问账号（待审核状态，邮箱存小写）
     const rcic = await prisma.rCIC.create({
       data: {
-        email,
+        email: normalizedEmail,
         password: hashedPassword,
         name,
         phone,
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
     });
 
     // 发送邮箱验证邮件
-    const emailResult = await sendRCICVerificationEmail(email, verificationToken, name);
+    const emailResult = await sendRCICVerificationEmail(normalizedEmail, verificationToken, name);
     if (!emailResult.success) {
       console.error('[RCIC Register] Failed to send verification email:', emailResult.error);
     }

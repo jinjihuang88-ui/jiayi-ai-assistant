@@ -18,9 +18,9 @@ export async function POST(request: NextRequest) {
 
     const normalizedEmail = email.toLowerCase().trim();
 
-    // 先尝试查找团队成员
-    const teamMember = await prisma.rCICTeamMember.findUnique({
-      where: { email: normalizedEmail },
+    // 先尝试查找团队成员（邮箱不区分大小写）
+    const teamMember = await prisma.rCICTeamMember.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
     });
 
     if (teamMember) {
@@ -81,9 +81,9 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    // 查找顾问（使用RCIC表）
-    const consultant = await prisma.rCIC.findUnique({
-      where: { email: normalizedEmail },
+    // 查找顾问（邮箱不区分大小写，避免注册时大小写与登录不一致）
+    const consultant = await prisma.rCIC.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
     });
 
     if (!consultant || !consultant.password) {
