@@ -73,6 +73,36 @@ export default function InternalChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handleDownloadFile = (fileUrl: string | undefined, fileName: string | undefined) => {
+    if (!fileUrl) return;
+    const name = fileName || "下载文件";
+    if (fileUrl.startsWith("data:")) {
+      try {
+        const res = fetch(fileUrl);
+        res.then((r) => r.blob()).then((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = name;
+          a.click();
+          URL.revokeObjectURL(url);
+        });
+      } catch {
+        const a = document.createElement("a");
+        a.href = fileUrl;
+        a.download = name;
+        a.click();
+      }
+    } else {
+      const a = document.createElement("a");
+      a.href = fileUrl;
+      a.download = name;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.click();
+    }
+  };
+
   const fetchConversations = async () => {
     try {
       const res = await fetch("/api/internal/conversations");
@@ -346,22 +376,31 @@ export default function InternalChatPage() {
                     >
                       {msg.messageType === "text" && <p>{msg.content}</p>}
                       {msg.messageType === "file" && (
-                        <a
-                          href={msg.fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 underline"
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadFile(msg.fileUrl, msg.fileName)}
+                          className="flex items-center gap-2 underline text-left bg-transparent border-none cursor-pointer p-0"
                         >
                           <span>📎</span>
-                          <span>{msg.fileName}</span>
-                        </a>
+                          <span>{msg.fileName || "文件"}</span>
+                          <span className="text-xs opacity-80 ml-1">(点击下载)</span>
+                        </button>
                       )}
                       {msg.messageType === "image" && (
-                        <img
-                          src={msg.fileUrl}
-                          alt={msg.fileName}
-                          className="max-w-full rounded"
-                        />
+                        <div>
+                          <img
+                            src={msg.fileUrl}
+                            alt={msg.fileName}
+                            className="max-w-full rounded"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadFile(msg.fileUrl, msg.fileName)}
+                            className="mt-1 text-xs underline opacity-80"
+                          >
+                            下载图片
+                          </button>
+                        </div>
                       )}
                       <p className="text-xs opacity-70 mt-1">
                         {new Date(msg.createdAt).toLocaleTimeString("zh-CN", {
