@@ -2,14 +2,21 @@
 import Link from 'next/link';
 import { verifyRCICEmailToken } from '@/lib/verify-rcic-email';
 
-type SearchParams = Promise<{ token?: string }>;
+type SearchParams = Promise<{ token?: string | string[] }>;
 
 export default async function RCICVerifyPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  const { token } = await searchParams;
+  const params = await searchParams;
+  const tokenRaw = params.token;
+  const token =
+    typeof tokenRaw === "string"
+      ? tokenRaw.trim()
+      : Array.isArray(tokenRaw)
+        ? tokenRaw[0]?.trim()
+        : undefined;
 
   if (!token) {
     return (

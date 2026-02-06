@@ -355,12 +355,44 @@ export default function AdminReviewPage() {
               </div>
 
               {/* Review Status */}
-              {selectedConsultant.approvalStatus !== "pending" && (
+              {selectedConsultant.approvalStatus !== "pending" && selectedConsultant.approvalStatus !== "under_review" && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">审核信息</h3>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600">审核状态</div>
-                    <div className="mt-1">{getStatusBadge(selectedConsultant.approvalStatus)}</div>
+                  <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                    <div>
+                      <div className="text-sm text-gray-600">审核状态</div>
+                      <div className="mt-1">{getStatusBadge(selectedConsultant.approvalStatus)}</div>
+                    </div>
+                    <div>
+                      <div className="text-sm text-gray-600">邮箱已验证</div>
+                      <div className="mt-1">{selectedConsultant.emailVerified ? "是" : "否"}</div>
+                      {selectedConsultant.approvalStatus === "approved" && !selectedConsultant.emailVerified && (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (!confirm("确认将该顾问设为可登录？（补标邮箱已验证）")) return;
+                            try {
+                              const res = await fetch("/api/admin/rcic/set-loginable", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ rcicId: selectedConsultant.id }),
+                              });
+                              const data = await res.json();
+                              if (data.success) {
+                                alert("已设为可登录");
+                                fetchConsultants();
+                                setSelectedConsultant((c) => (c ? { ...c, emailVerified: true } : null));
+                              } else alert(data.message || "操作失败");
+                            } catch (e) {
+                              alert("操作失败");
+                            }
+                          }}
+                          className="mt-2 px-3 py-1.5 bg-amber-100 text-amber-800 rounded-lg text-sm font-medium hover:bg-amber-200"
+                        >
+                          设为可登录（补标邮箱已验证）
+                        </button>
+                      )}
+                    </div>
                     {selectedConsultant.approvalNotes && (
                       <>
                         <div className="text-sm text-gray-600 mt-3">审核备注</div>

@@ -6,9 +6,12 @@ export type VerifyRCICResult =
   | { success: false; error: string };
 
 export async function verifyRCICEmailToken(token: string): Promise<VerifyRCICResult> {
+  const trimmed = token?.trim();
+  if (!trimmed) return { success: false, error: "验证链接无效或已过期" };
+
   const rcic = await prisma.rCIC.findFirst({
     where: {
-      verificationToken: token,
+      verificationToken: trimmed,
       verificationTokenExpiry: { gte: new Date() },
     },
   });
