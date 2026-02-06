@@ -433,6 +433,23 @@ export default function Home() {
               </a>
             </div>
 
+            {/* 4. 自助填写官方表格 */}
+            <div className="border border-slate-200 rounded-2xl p-8 hover:border-[#C62828] transition-all duration-300">
+              <h3 className="text-xl font-bold text-slate-900 mb-1">自助填写官方表格</h3>
+              <p className="text-sm text-slate-500 mb-3">Self-Service Official Forms</p>
+              <p className="text-slate-600 mb-2 text-sm leading-relaxed">
+                基于加拿大 IRCC 官方提供的表格格式，定期更新最新的表格内容，自助和 AI 协助填写，材料只面向指定的顾问，数据加密安全可靠，节约 50% 的移民成本。
+              </p>
+              <ul className="text-slate-600 space-y-2 text-sm mb-6">
+                <li>• 基于 IRCC 官方表格、定期更新 <span className="text-xs text-slate-400">IRCC forms, regularly updated</span></li>
+                <li>• 自助 + AI 协助填写，材料仅对指定顾问可见 <span className="text-xs text-slate-400">Self + AI fill, consultant-only access</span></li>
+                <li>• 数据加密安全可靠，节约约 50% 成本 <span className="text-xs text-slate-400">Encrypted & secure, ~50% cost savings</span></li>
+              </ul>
+              <a href="/applications" className="text-[#C62828] font-medium text-sm hover:underline">
+                去填写 →
+              </a>
+            </div>
+
             {/* 平台担保与流程管理 */}
             <div className="border border-slate-200 rounded-2xl p-8 hover:border-[#C62828] transition-all duration-300">
               <h3 className="text-xl font-bold text-slate-900 mb-1">平台担保与流程管理</h3>
