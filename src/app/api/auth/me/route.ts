@@ -8,7 +8,7 @@ export async function GET() {
     if (!user) {
       return NextResponse.json(
         { success: false, message: '未登录' },
-        { status: 401 }
+        { status: 200 }
       );
     }
 
