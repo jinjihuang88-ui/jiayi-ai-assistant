@@ -155,8 +155,8 @@ model Message {
   caseId     String
   senderId   String
   senderType String // user or rcic
-  content    String
-  attachments String? // JSON array of file URLs
+  content    String   @db.LongText
+  attachments String? @db.LongText // JSON array of file URLs (可能包含 data URL/base64)
   read       Boolean  @default(false)
   createdAt  DateTime @default(now())
 
@@ -237,7 +237,7 @@ model InternalConversation {
 
   // 最后一条消息
   lastMessageAt      DateTime?
-  lastMessageContent String?
+  lastMessageContent String?  @db.LongText
 
   // 关系
   messages InternalMessage[]
@@ -252,14 +252,14 @@ model InternalMessage {
   createdAt DateTime @default(now())
 
   // 消息内容
-  content     String?
+  content     String? @db.LongText
   messageType String  @default("text") // "text", "file", "image"
 
   // 文件信息（如果是文件或图片）
-  fileUrl      String?
-  fileName     String?
+  fileUrl      String? @db.LongText
+  fileName     String? @db.Text
   fileSize     Int?
-  fileMimeType String?
+  fileMimeType String? @db.Text
 
   // 发送者
   senderId   String
