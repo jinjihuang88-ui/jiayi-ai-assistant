@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     });
     if (!consultant) {
       consultant = await prisma.rCIC.findFirst({
-        where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+        where: { email: normalizedEmail },
       });
     }
 
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
 
     // 2）再查文案/操作员（团队成员）
     const teamMember = await prisma.rCICTeamMember.findFirst({
-      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+      where: { email: normalizedEmail },
     });
     if (teamMember?.password) {
       if (teamMember.isActive && (await bcrypt.compare(trimmedPassword, teamMember.password))) {

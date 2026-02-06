@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     // 检查邮箱是否已存在（统一小写）
     const existingRCIC = await prisma.rCIC.findFirst({
-      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+      where: { email: normalizedEmail },
     });
 
     if (existingRCIC) {

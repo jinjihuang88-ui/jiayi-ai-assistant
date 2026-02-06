@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     }
 
     const rcic = await prisma.rCIC.findFirst({
-      where: { email: { equals: email.toLowerCase(), mode: "insensitive" } },
+      where: { email: email.toLowerCase() },
       select: {
         id: true,
         email: true,
