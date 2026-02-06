@@ -77,8 +77,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 加密密码
-    const hashedPassword = await bcrypt.hash(password, 10);
+    // 加密密码（与登录处统一 trim，避免首尾空格导致登录失败）
+    const trimmedPassword = typeof password === "string" ? password.trim() : "";
+    if (!trimmedPassword) {
+      return NextResponse.json(
+        { success: false, message: "密码不能为空" },
+        { status: 400 }
+      );
+    }
+    const hashedPassword = await bcrypt.hash(trimmedPassword, 10);
 
     // 创建顾问账号（待审核状态，邮箱存小写）
     const rcic = await prisma.rCIC.create({

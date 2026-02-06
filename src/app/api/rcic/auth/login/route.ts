@@ -8,8 +8,9 @@ import { createRCICSession } from "@/lib/rcic-auth";
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
+    const trimmedPassword = typeof password === "string" ? password.trim() : "";
 
-    if (!email || !password) {
+    if (!email || !trimmedPassword) {
       return NextResponse.json(
         { error: "邮箱和密码不能为空" },
         { status: 400 }
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
       }
 
       // 验证密码
-      const isPasswordValid = await bcrypt.compare(password, teamMember.password);
+      const isPasswordValid = await bcrypt.compare(trimmedPassword, teamMember.password);
       if (!isPasswordValid) {
         return NextResponse.json(
           { error: "邮箱或密码错误" },
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 验证密码
-    const isPasswordValid = await bcrypt.compare(password, consultant.password);
+    const isPasswordValid = await bcrypt.compare(trimmedPassword, consultant.password);
 
     if (!isPasswordValid) {
       return NextResponse.json(

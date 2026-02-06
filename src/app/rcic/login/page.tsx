@@ -30,7 +30,8 @@ export default function RCICLoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || '登录失败');
+        const msg = data.error || '登录失败';
+        setError(response.status === 401 ? `${msg}。请确认：1) 已注册顾问 2) 管理员已审核通过 3) 密码正确` : msg);
         setLoading(false);
         return;
       }
@@ -118,13 +119,8 @@ export default function RCICLoginPage() {
               />
             </div>
 
-            <div className="flex items-center justify-between text-sm">
-              <Link
-                href="/rcic/forgot-password"
-                className="text-purple-600 hover:text-purple-700 transition-colors"
-              >
-                忘记密码？
-              </Link>
+            <div className="text-sm text-gray-500">
+              忘记密码？请联系管理员或重新注册。
             </div>
 
             <button
