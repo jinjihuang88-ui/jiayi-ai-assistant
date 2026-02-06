@@ -158,13 +158,15 @@ export async function POST(request: NextRequest) {
       redirectTo: '/rcic/dashboard',
     });
 
-    // 设置session cookie
+    // 设置 session cookie（生产环境用 .jiayi.co 保证 www / 根域都能带上）
+    const isJiayi = process.env.NEXT_PUBLIC_APP_URL?.includes("jiayi.co");
     response.cookies.set("rcic_session_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       expires: expiresAt,
       path: "/",
+      ...(process.env.NODE_ENV === "production" && isJiayi ? { domain: ".jiayi.co" } : {}),
     });
 
     return response;

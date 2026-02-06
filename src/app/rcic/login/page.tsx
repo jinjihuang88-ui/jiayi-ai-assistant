@@ -35,9 +35,10 @@ export default function RCICLoginPage() {
         return;
       }
 
-      // 登录成功，根据用户类型跳转
+      // 登录成功，跳转前稍等确保 cookie 已写入
       const redirectTo = data.redirectTo || '/rcic/dashboard';
-      router.push(redirectTo);
+      setLoading(false);
+      window.location.href = redirectTo;
     } catch (err) {
       setError('登录失败，请稍后重试');
       setLoading(false);
