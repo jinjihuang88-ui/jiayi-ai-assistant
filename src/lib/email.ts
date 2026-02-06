@@ -6,7 +6,16 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@jiayi.co';
 const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || '嘉怡移民助手';
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+
+// 生产环境务必设为 https://www.jiayi.co，国内访问验证链接依赖此地址
+function getAppUrl(): string {
+  const url = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  if (url.startsWith('http://') && !url.includes('localhost')) {
+    return url.replace('http://', 'https://');
+  }
+  return url;
+}
+const APP_URL = getAppUrl();
 
 // 发送验证邮件
 export async function sendVerificationEmail(email: string, token: string) {
