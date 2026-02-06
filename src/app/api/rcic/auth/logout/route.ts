@@ -13,8 +13,8 @@ export async function POST() {
       await destroyRCICSession(token);
     }
 
-    // 删除 cookie
     cookieStore.delete(RCIC_SESSION_COOKIE);
+    cookieStore.delete('rcic_id');
 
     return NextResponse.json({
       success: true,

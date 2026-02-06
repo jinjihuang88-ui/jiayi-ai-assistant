@@ -156,7 +156,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // 设置 cookie
     const response = NextResponse.json({
       success: true,
       message: "登录成功",
@@ -164,16 +163,20 @@ export async function POST(request: NextRequest) {
       redirectTo: '/rcic/dashboard',
     });
 
-    // 设置 session cookie；生产且请求 host 为 jiayi.co 时设 domain 以便根域/www 都能带上
-    const host = request.headers.get("host") || "";
-    const isJiayi = host.includes("jiayi.co");
+    // 与会员一致：设置 rcic_id cookie（无 domain，与 user_id 相同）
+    response.cookies.set("rcic_id", consultant.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60,
+      path: "/",
+    });
     response.cookies.set("rcic_session_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       expires: expiresAt,
       path: "/",
-      ...(process.env.NODE_ENV === "production" && isJiayi ? { domain: ".jiayi.co" } : {}),
     });
 
     return response;

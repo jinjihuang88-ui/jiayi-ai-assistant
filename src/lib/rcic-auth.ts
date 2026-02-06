@@ -2,54 +2,64 @@ import { cookies } from 'next/headers';
 import { prisma } from './prisma';
 
 const RCIC_SESSION_COOKIE = 'rcic_session_token';
+const RCIC_ID_COOKIE = 'rcic_id'; // 与会员 user_id 一致，优先用 id cookie
 const SESSION_EXPIRY_DAYS = 7;
 
 export interface RCICUser {
   id: string;
   email: string;
   name: string;
-  licenseNo: string | null; // 修改：改为可选，因为B类和C类顾问可能没有RCIC执照
+  licenseNo: string | null;
   phone: string | null;
   avatar: string | null;
   isActive: boolean;
   isOnline: boolean;
-  level?: string | null; // 新增：顾问等级
+  level?: string | null;
 }
 
-// 获取当前登录的顾问
+function toRCICUser(rcic: { id: string; email: string; name: string; licenseNo: string | null; phone: string | null; avatar: string | null; isActive: boolean; isOnline: boolean; level: string | null }) {
+  return {
+    id: rcic.id,
+    email: rcic.email,
+    name: rcic.name,
+    licenseNo: rcic.licenseNo,
+    phone: rcic.phone,
+    avatar: rcic.avatar,
+    isActive: rcic.isActive,
+    isOnline: rcic.isOnline,
+    level: rcic.level,
+  };
+}
+
+// 获取当前登录的顾问（与会员一致：优先 rcic_id cookie，再兜底 session）
 export async function getCurrentRCIC(): Promise<RCICUser | null> {
   try {
     const cookieStore = await cookies();
+    const rcicId = cookieStore.get(RCIC_ID_COOKIE)?.value;
+    if (rcicId) {
+      const rcic = await prisma.rCIC.findUnique({
+        where: { id: rcicId },
+      });
+      if (rcic && rcic.isActive) {
+        await prisma.rCIC.update({
+          where: { id: rcicId },
+          data: { lastActiveAt: new Date(), isOnline: true },
+        });
+        return toRCICUser(rcic);
+      }
+    }
     const token = cookieStore.get(RCIC_SESSION_COOKIE)?.value;
-
     if (!token) return null;
-
     const session = await prisma.rCICSession.findUnique({
       where: { token },
       include: { rcic: true },
     });
-
-    if (!session || session.expiresAt < new Date()) {
-      return null;
-    }
-
-    // 更新最后活跃时间
+    if (!session || session.expiresAt < new Date()) return null;
     await prisma.rCIC.update({
       where: { id: session.rcic.id },
       data: { lastActiveAt: new Date(), isOnline: true },
     });
-
-    return {
-      id: session.rcic.id,
-      email: session.rcic.email,
-      name: session.rcic.name,
-      licenseNo: session.rcic.licenseNo, // 现在可以是 null
-      phone: session.rcic.phone,
-      avatar: session.rcic.avatar,
-      isActive: session.rcic.isActive,
-      isOnline: session.rcic.isOnline,
-      level: session.rcic.level, // 新增：返回顾问等级
-    };
+    return toRCICUser(session.rcic);
   } catch (error) {
     console.error('Get current RCIC error:', error);
     return null;
