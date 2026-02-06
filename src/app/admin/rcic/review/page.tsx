@@ -98,8 +98,10 @@ export default function AdminReviewPage() {
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; color: string }> = {
       pending: { label: "待审核", color: "bg-yellow-100 text-yellow-800" },
+      under_review: { label: "审核中", color: "bg-amber-100 text-amber-800" },
       approved: { label: "已通过", color: "bg-green-100 text-green-800" },
       rejected: { label: "已拒绝", color: "bg-red-100 text-red-800" },
+      suspended: { label: "已暂停", color: "bg-gray-100 text-gray-800" },
     };
 
     const { label, color } = statusMap[status] || { label: status, color: "bg-gray-100 text-gray-800" };
@@ -151,7 +153,7 @@ export default function AdminReviewPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <div className="text-sm text-gray-600">待审核</div>
             <div className="text-3xl font-bold text-yellow-600">
-              {consultants.filter((c) => c.approvalStatus === "pending").length}
+              {consultants.filter((c) => c.approvalStatus === "pending" || c.approvalStatus === "under_review").length}
             </div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
@@ -369,8 +371,8 @@ export default function AdminReviewPage() {
                 </div>
               )}
 
-              {/* Review Actions */}
-              {selectedConsultant.approvalStatus === "pending" && (
+              {/* Review Actions：待审核或审核中均可通过/拒绝 */}
+              {(selectedConsultant.approvalStatus === "pending" || selectedConsultant.approvalStatus === "under_review") && (
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">审核操作</h3>
                   <div className="space-y-4">

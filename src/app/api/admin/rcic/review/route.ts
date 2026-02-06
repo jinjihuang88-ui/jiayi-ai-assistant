@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 更新审核状态；通过时同时设为邮箱已验证，避免国内验证请求失败导致无法登录
+    // 更新审核状态（流程：先验证邮箱 → 再审核 → 审核通过才能登录，不在此处改 emailVerified）
     const newStatus = action === "approve" ? "approved" : "rejected";
     await prisma.rCIC.update({
       where: { id: rcicId },
@@ -67,7 +67,6 @@ export async function POST(request: NextRequest) {
         approvalStatus: newStatus,
         approvalNotes: notes || null,
         approvedAt: action === "approve" ? new Date() : null,
-        ...(action === "approve" ? { emailVerified: true } : {}),
       },
     });
 
