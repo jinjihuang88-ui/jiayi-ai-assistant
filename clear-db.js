@@ -2,28 +2,31 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🚀 开始清理数据库...');
+  console.log('🚀 开始清理数据库（用户 + 移民顾问 + 相关数据）...');
   console.log('');
   
   try {
-    // 按依赖顺序删除（先删除有外键关联的表）
+    // 按外键依赖顺序删除
     const messageCount = await prisma.message.deleteMany({});
-    console.log(`✓ Message 表已清空 (删除了 ${messageCount.count} 条记录)`);
+    console.log(`✓ messages 已清空 (${messageCount.count} 条)`);
     
     const caseCount = await prisma.case.deleteMany({});
-    console.log(`✓ Case 表已清空 (删除了 ${caseCount.count} 条记录)`);
+    console.log(`✓ cases 已清空 (${caseCount.count} 条)`);
+    
+    const sessionCount = await prisma.rCICSession.deleteMany({});
+    console.log(`✓ rcic_sessions 已清空 (${sessionCount.count} 条)`);
     
     const rcicCount = await prisma.rCIC.deleteMany({});
-    console.log(`✓ RCIC 表已清空 (删除了 ${rcicCount.count} 条记录)`);
+    console.log(`✓ rcics（移民顾问）已清空 (${rcicCount.count} 条)`);
     
     const userCount = await prisma.user.deleteMany({});
-    console.log(`✓ User 表已清空 (删除了 ${userCount.count} 条记录)`);
+    console.log(`✓ users（用户）已清空 (${userCount.count} 条)`);
+    
+    const tokenCount = await prisma.verificationToken.deleteMany({});
+    console.log(`✓ verification_tokens 已清空 (${tokenCount.count} 条)`);
     
     console.log('');
-    console.log('✅ 数据库清理完成！');
-    console.log('');
-    console.log('📝 下一步：运行数据库迁移');
-    console.log('   npx prisma migrate dev --name add_rcic_verification_fields');
+    console.log('✅ 清理完成！可重新注册用户和顾问进行测试。');
   } catch (error) {
     console.error('');
     console.error('❌ 清理失败:', error.message);

@@ -117,13 +117,21 @@ export default function Home() {
                 </span>
               </a>
             ) : (
-              /* 未登录状态 */
-              <a
-                href="/auth/login"
-                className="px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition-all duration-200 text-sm font-medium"
-              >
-                登录
-              </a>
+              /* 未登录状态：普通用户登录 + RCIC 顾问登录/注册 */
+              <>
+                <a
+                  href="/auth/login"
+                  className="px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition-all duration-200 text-sm font-medium"
+                >
+                  登录
+                </a>
+                <a
+                  href="/rcic/login"
+                  className="px-4 py-2 rounded-lg border border-white/30 text-white/90 hover:bg-white/10 transition-all duration-200 text-sm font-medium"
+                >
+                  顾问登录 / 注册
+                </a>
+              </>
             )}
             <a
               href="/assessment"
