@@ -63,11 +63,11 @@ model RCIC {
   approvedAt      DateTime? // 审核通过时间
   approvedBy      String?   // 审核人员ID
   
-  // 资质文档
-  idDocument        String? // 身份证件
-  licenseDocument   String? // 执照文件
-  experienceProof   String? // 从业证明
-  videoVerification String? // 视频认证
+  // 资质文档（可能为 data URL/base64，需长文本）
+  idDocument        String?  @db.LongText // 身份证件
+  licenseDocument   String?  @db.LongText // 执照文件
+  experienceProof   String?  @db.LongText // 从业证明
+  videoVerification String?  @db.LongText // 视频认证
   
   // 审核时间
   lastReviewDate DateTime? // 最后审核日期
@@ -82,8 +82,8 @@ model RCIC {
   // 基本信息
   country      String?
   city         String?
-  organization String? // 执业机构
-  bio          String? // 个人简介
+  organization String?  @db.Text // 执业机构
+  bio          String?  @db.LongText // 个人简介
   
   // 顾问展示信息（用于用户选择）
   profilePhoto      String?   // 职业照片URL
