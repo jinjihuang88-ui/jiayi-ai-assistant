@@ -82,10 +82,15 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    // 查找顾问（邮箱不区分大小写，避免注册时大小写与登录不一致）
-    const consultant = await prisma.rCIC.findFirst({
-      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+    // 查找顾问：先精确匹配（与注册时存的小写一致），再兜底不区分大小写（兼容生产环境）
+    let consultant = await prisma.rCIC.findUnique({
+      where: { email: normalizedEmail },
     });
+    if (!consultant) {
+      consultant = await prisma.rCIC.findFirst({
+        where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+      });
+    }
 
     if (!consultant || !consultant.password) {
       return NextResponse.json(
@@ -159,8 +164,9 @@ export async function POST(request: NextRequest) {
       redirectTo: '/rcic/dashboard',
     });
 
-    // 设置 session cookie（生产环境用 .jiayi.co 保证 www / 根域都能带上）
-    const isJiayi = process.env.NEXT_PUBLIC_APP_URL?.includes("jiayi.co");
+    // 设置 session cookie；生产且请求 host 为 jiayi.co 时设 domain 以便根域/www 都能带上
+    const host = request.headers.get("host") || "";
+    const isJiayi = host.includes("jiayi.co");
     response.cookies.set("rcic_session_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
