@@ -8,7 +8,12 @@ export default function AboutPage() {
       {/* Header - 与首页一致 */}
       <header className="sticky top-0 z-50 bg-[#1E293B] border-b border-slate-700/50 shadow-lg">
         <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
+          <div className="flex items-center gap-6">
+            <Link href="/" className="flex items-center gap-2 text-white/80 hover:text-white text-sm font-medium transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              返回首页
+            </Link>
+            <Link href="/" className="flex items-center gap-3 group">
             <img src="/logo.png" alt="加移 Logo" className="h-10 w-10 rounded-lg shadow-md" />
             <div className="flex flex-col">
               <span className="font-bold text-lg tracking-tight text-white">加移</span>
@@ -21,6 +26,7 @@ export default function AboutPage() {
             <Link href="/services" className="text-white/80 hover:text-white transition-colors py-2">服务</Link>
             <Link href="/about" className="text-white font-medium py-2">关于我们</Link>
           </nav>
+          </div>
           <div className="flex items-center gap-3">
             <Link href="/auth/login" className="px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 text-sm font-medium">会员登录</Link>
             <Link href="/rcic/login" className="px-4 py-2 rounded-lg border border-white/30 text-white/90 hover:bg-white/10 text-sm font-medium">顾问登录 / 注册</Link>

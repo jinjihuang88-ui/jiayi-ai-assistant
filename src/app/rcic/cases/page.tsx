@@ -129,13 +129,19 @@ function RCICCasesContent() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-700/50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="/rcic/dashboard" className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="Logo" className="h-8 w-8 rounded-lg" />
-            <div>
-              <span className="font-semibold text-white">加移AI助理</span>
-              <span className="ml-2 px-2 py-0.5 rounded text-xs bg-emerald-600 text-white">RCIC</span>
-            </div>
-          </a>
+          <div className="flex items-center gap-6">
+            <a href="/" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm font-medium transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              返回首页
+            </a>
+            <a href="/rcic/dashboard" className="flex items-center gap-3 group">
+              <img src="/logo.png" alt="Logo" className="h-8 w-8 rounded-lg" />
+              <div>
+                <span className="font-semibold text-white">加移AI助理</span>
+                <span className="ml-2 px-2 py-0.5 rounded text-xs bg-emerald-600 text-white">RCIC</span>
+              </div>
+            </a>
+          </div>
 
           <nav className="hidden md:flex items-center gap-6 text-sm">
             <a href="/rcic/dashboard" className="text-slate-400 hover:text-white transition-colors">仪表板</a>

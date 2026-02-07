@@ -241,6 +241,12 @@ function WorkPermitReviewContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
+        <div className="mb-6">
+          <a href="/applications" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+            返回申请列表
+          </a>
+        </div>
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium mb-4">

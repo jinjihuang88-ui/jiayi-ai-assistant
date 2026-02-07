@@ -26,6 +26,12 @@ export default function StudyPermitReviewPage() {
 
   return (
     <main className="max-w-3xl mx-auto px-6 py-12 space-y-8">
+      <div className="mb-6">
+        <a href="/applications" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm font-medium">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+          返回申请列表
+        </a>
+      </div>
       <h1 className="text-2xl font-semibold">学签申请 · 审核进度</h1>
 
       {/* ① 审核状态 */}

@@ -75,10 +75,16 @@ export default function ApplicationsPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-3 group">
-            <img src="/logo.png" alt="Logo" className="h-8 w-8 rounded-lg" />
-            <span className="font-semibold text-slate-900">加移AI助理</span>
-          </a>
+          <div className="flex items-center gap-6">
+            <a href="/" className="flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              返回首页
+            </a>
+            <a href="/" className="flex items-center gap-3 group">
+              <img src="/logo.png" alt="Logo" className="h-8 w-8 rounded-lg" />
+              <span className="font-semibold text-slate-900">加移AI助理</span>
+            </a>
+          </div>
           <nav className="flex items-center gap-6 text-sm">
             <a href="/assessment" className="text-slate-600 hover:text-slate-900 transition-colors">免费评估</a>
             <a href="/chat" className="text-slate-600 hover:text-slate-900 transition-colors">AI 咨询</a>

@@ -145,10 +145,16 @@ export default function DocumentsPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-3">
-            <img src="/logo.png" alt="Logo" className="h-10 w-10 rounded-lg shadow-md" />
-            <span className="font-semibold text-lg text-slate-900">加移AI助理</span>
-          </a>
+          <div className="flex items-center gap-6">
+            <a href="/member" className="flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              返回会员中心
+            </a>
+            <a href="/" className="flex items-center gap-3">
+              <img src="/logo.png" alt="Logo" className="h-10 w-10 rounded-lg shadow-md" />
+              <span className="font-semibold text-lg text-slate-900">加移AI助理</span>
+            </a>
+          </div>
 
           <nav className="hidden md:flex items-center gap-6 text-sm">
             <a href="/member" className="text-slate-600 hover:text-slate-900">会员中心</a>

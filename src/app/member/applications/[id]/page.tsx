@@ -57,11 +57,48 @@ const statusMap: Record<string, { label: string; color: string; bgColor: string;
 
 const typeIconMap: Record<string, { icon: string; color: string }> = {
   "study-permit": { icon: "🎓", color: "from-blue-500 to-cyan-500" },
+  study_permit: { icon: "🎓", color: "from-blue-500 to-cyan-500" },
   "visitor-visa": { icon: "✈️", color: "from-green-500 to-emerald-500" },
+  visitor_visa: { icon: "✈️", color: "from-green-500 to-emerald-500" },
   "work-permit": { icon: "💼", color: "from-purple-500 to-pink-500" },
+  work_permit: { icon: "💼", color: "from-purple-500 to-pink-500" },
   "express-entry": { icon: "🚀", color: "from-indigo-500 to-blue-500" },
+  express_entry: { icon: "🚀", color: "from-indigo-500 to-blue-500" },
   "provincial-nominee": { icon: "🏛️", color: "from-orange-500 to-red-500" },
+  provincial_nominee: { icon: "🏛️", color: "from-orange-500 to-red-500" },
 };
+
+/** 申请类型在 URL 中为短横线（如 visitor-visa），DB 中为下划线（visitor_visa） */
+function applicationTypeToPath(type: string): string {
+  return type.replace(/_/g, "-");
+}
+
+/** 从 API 返回的 formData（即整份 applicationData）中抽出用于「表单内容」展示的键值列表，与各申请页提交结构一致 */
+function getFormDisplayEntries(formData: Record<string, any>): { key: string; label: string; value: string }[] {
+  if (!formData || typeof formData !== "object") return [];
+  if (Array.isArray(formData.fields)) {
+    return formData.fields.map((f: { key: string; label?: string; value?: string }) => ({
+      key: f.key,
+      label: f.label || f.key,
+      value: f.value != null ? String(f.value) : "",
+    }));
+  }
+  if (formData.formData && typeof formData.formData === "object" && !Array.isArray(formData.formData)) {
+    return Object.entries(formData.formData).map(([key, value]) => ({
+      key,
+      label: key,
+      value: value != null && typeof value === "object" && !Array.isArray(value) ? JSON.stringify(value) : String(value ?? ""),
+    }));
+  }
+  const meta = new Set(["id", "type", "status", "createdAt", "updatedAt"]);
+  return Object.entries(formData)
+    .filter(([k]) => !meta.has(k))
+    .map(([key, value]) => ({
+      key,
+      label: key,
+      value: value != null && typeof value === "object" ? JSON.stringify(value) : String(value ?? ""),
+    }));
+}
 
 export default function ApplicationDetailPage() {
   const router = useRouter();
@@ -142,7 +179,7 @@ export default function ApplicationDetailPage() {
           <div className="flex items-center gap-3">
             {["draft", "needs_revision"].includes(application.status) && (
               <a
-                href={`/applications/${application.type}?id=${application.id}`}
+                href={`/applications/${applicationTypeToPath(application.type)}?id=${application.id}`}
                 className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700"
               >
                 {application.status === "draft" ? "继续填写" : "修改申请"}
@@ -262,7 +299,7 @@ export default function ApplicationDetailPage() {
               <div className="space-y-3">
                 {["draft", "needs_revision"].includes(application.status) && (
                   <a
-                    href={`/applications/${application.type}?id=${application.id}`}
+                    href={`/applications/${applicationTypeToPath(application.type)}?id=${application.id}`}
                     className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50"
                   >
                     <span className="text-xl">✏️</span>
@@ -288,23 +325,26 @@ export default function ApplicationDetailPage() {
           </div>
         )}
 
-        {activeTab === "form" && (
-          <div className="bg-white rounded-xl border border-slate-200 p-6">
-            <h3 className="font-semibold text-slate-900 mb-4">表单内容</h3>
-            {Object.keys(application.formData).length === 0 ? (
-              <p className="text-slate-500">暂无表单数据</p>
-            ) : (
-              <div className="space-y-4">
-                {Object.entries(application.formData).map(([key, value]) => (
-                  <div key={key} className="border-b border-slate-100 pb-3">
-                    <div className="text-sm text-slate-500 mb-1">{key}</div>
-                    <div className="text-slate-900">{String(value) || "-"}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+        {activeTab === "form" && (() => {
+          const entries = getFormDisplayEntries(application.formData);
+          return (
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <h3 className="font-semibold text-slate-900 mb-4">表单内容</h3>
+              {entries.length === 0 ? (
+                <p className="text-slate-500">暂无表单数据</p>
+              ) : (
+                <div className="space-y-4">
+                  {entries.map(({ key, label, value }) => (
+                    <div key={key} className="border-b border-slate-100 pb-3">
+                      <div className="text-sm text-slate-500 mb-1">{label}</div>
+                      <div className="text-slate-900">{value || "-"}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {activeTab === "timeline" && (
           <div className="bg-white rounded-xl border border-slate-200 p-6">

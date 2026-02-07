@@ -131,13 +131,19 @@ function RCICDocumentsContent() {
       {/* Header */}
       <header className="sticky top-0 z-50 bg-slate-800/80 backdrop-blur-xl border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
-              <span className="text-xl">🏛️</span>
-            </div>
-            <div>
-              <h1 className="font-semibold text-white">RCIC 顾问后台</h1>
-              <p className="text-sm text-slate-400">移民顾问管理系统</p>
+          <div className="flex items-center gap-6">
+            <a href="/" className="flex items-center gap-2 text-slate-400 hover:text-white text-sm font-medium transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              返回首页
+            </a>
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
+                <span className="text-xl">🏛️</span>
+              </div>
+              <div>
+                <h1 className="font-semibold text-white">RCIC 顾问后台</h1>
+                <p className="text-sm text-slate-400">移民顾问管理系统</p>
+              </div>
             </div>
           </div>
 
