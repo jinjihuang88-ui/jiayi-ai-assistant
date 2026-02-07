@@ -233,6 +233,62 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* English version — text only, no images */}
+      <section className="py-16 md:py-20 bg-slate-100 border-t-2 border-slate-200">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2 id="english" className="text-2xl md:text-3xl font-bold text-slate-800 mb-10">
+            In English
+          </h2>
+
+          <div className="space-y-10 text-slate-700 leading-relaxed">
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Why we built jiayi.co</h3>
+              <p>jiayi.co was not born from a plan to build “an immigration platform.” It came from many similar conversations. Some people consulted one immigration consultant after another before deciding; others had already paid fees but grew less and less sure they were on the right path; still others only realized after failing that the issue was not their qualifications but having taken the wrong path from the start. What they had in common: before making a decision, they did not have a truly neutral space to judge.</p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">The hardest part of immigration is not information</h3>
+              <p>Today there is no shortage of information on immigration—programs, policies, points, cases are everywhere. What is actually hard is something else: Am I suitable? Is this step worth starting? If it fails, who really bears the risk? These questions are rarely answered head-on—not because they don’t matter, but because they don’t help “close the deal.”</p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">We have seen too many unequal beginnings</h3>
+              <p>In the traditional immigration consulting flow, things usually go like this: the user pays before being fully certain; the consultant starts service with highly uncertain outcomes; if it fails, time and money fall largely on the user. Over time, immigration becomes something where risk is heavily concentrated on one side. We kept asking: if the cost of failure is so high, shouldn’t it be judged more seriously before starting?</p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">The idea behind jiayi.co is simple</h3>
+              <p>We are not trying to solve “how to immigrate faster.” We are trying to solve a more basic question: how to prevent immigration journeys that should not have started. So the basic logic of jiayi.co took shape.</p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">We start with AI initial assessment</h3>
+              <p>At jiayi.co, the AI initial assessment is not a “referee” that gives a verdict. It is more like a pre-immigration check-up. It does not promise success or recommend specific programs. It does one thing: help you spot clearly mismatched paths, flag high-risk points in your current situation, and let you step back and see the full picture before paying anything. If the assessment shows risk too high, we do not move to the consultant stage—not to reject anyone, but to avoid starting from an obviously unreasonable place.</p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Then we redesigned how payment works</h3>
+              <p>At jiayi.co we use a fund custody mechanism. Until agreed milestones or the final outcome are met, fees are not paid directly to the immigration consultant; only then is the amount released. We do this not because we “don’t trust consultants,” but because we believe that when risk is shared more fairly, the service itself aligns with results. Immigration can still fail, but failure should not be borne by one side alone.</p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">What role does jiayi.co play?</h3>
+              <p>We are not an intermediary or a judge. More accurately, jiayi.co aims to be a connector with clearer rules: between users and immigration consultants, between expectations and reality, and before the start—not only after the end. We want every start to be based on relatively clear, relatively rational judgment.</p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Why we take it slow</h3>
+              <p>Because we know immigration is not a “let’s try and see” decision. It involves time, money, career path, and even family. So at jiayi.co we would rather ask a few more questions before starting than talk about regret after the outcome.</p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">In closing</h3>
+              <p>If you are considering immigration, you may not need to decide right away. You may need a place where you can think it through without pressure or sales push. jiayi.co exists for that. We are not in a rush for you to start; we only hope that when you do start, it is a path you understand and are willing to take. We also welcome immigration consultants who care about results and take responsibility for their expertise—because we believe a good start should be fair for everyone.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer - 与首页一致 */}
       <footer className="bg-[#1E293B] text-white">
         <div className="max-w-7xl mx-auto px-6 py-16">
