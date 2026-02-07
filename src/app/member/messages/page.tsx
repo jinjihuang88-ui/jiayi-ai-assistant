@@ -41,6 +41,8 @@ function MessagesContent() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [selectedApp, setSelectedApp] = useState<string | null>(applicationId);
   const [consultant, setConsultant] = useState<Consultant | null>(null);
+  const [assignedTeamMemberName, setAssignedTeamMemberName] = useState<string | null>(null);
+  const [rcicReviewedAt, setRcicReviewedAt] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -95,9 +97,9 @@ function MessagesContent() {
       }
 
       setMessages(data.messages?.reverse() || []);
-      setConsultant(data.consultant || null); // 设置顾问信息
-      
-      console.log('[Messages] Consultant state updated:', data.consultant); // 调试日志
+      setConsultant(data.consultant || null);
+      setAssignedTeamMemberName(data.assignedTeamMemberName ?? null);
+      setRcicReviewedAt(data.rcicReviewedAt ?? null);
 
       // 标记为已读
       if (selectedApp) {
@@ -316,15 +318,28 @@ function MessagesContent() {
                       <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
                     )}
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-slate-900 flex items-center gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-slate-900 flex items-center gap-2 flex-wrap">
                       {consultant.name}
                       <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
                         {consultant.consultantType === 'A' ? '持牌顾问' : 
                          consultant.consultantType === 'B' ? '留学顾问' : '文案辅助'}
                       </span>
                     </h3>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-600 mt-0.5">
+                      您的持牌顾问：{consultant.name}
+                    </p>
+                    {assignedTeamMemberName && (
+                      <p className="text-sm text-slate-500">
+                        当前由顾问团队（{assignedTeamMemberName}）为您跟进
+                      </p>
+                    )}
+                    {rcicReviewedAt && (
+                      <p className="text-sm text-green-600 font-medium mt-0.5">
+                        持牌顾问已审核
+                      </p>
+                    )}
+                    <p className="text-xs text-slate-400 mt-0.5">
                       {consultant.organization || consultant.email}
                       {consultant.isOnline ? ' • 在线' : ' • 离线'}
                     </p>

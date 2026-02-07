@@ -129,15 +129,17 @@ model RCICSession {
 
 // 案件表
 model Case {
-  id          String   @id @default(cuid())
-  userId      String
-  rcicId      String?
-  type        String // visitor_visa, study_permit, immigration
-  status      String   @default("pending") // pending, in_progress, completed, cancelled
-  title       String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                    String    @id @default(cuid())
+  userId                String
+  rcicId                String?
+  type                  String    // visitor_visa, study_permit, immigration
+  status                String    @default("pending") // pending, in_progress, completed, cancelled
+  title                 String
+  description           String?
+  assignedTeamMemberId  String?   // 指派的文案/操作员 ID，日常跟进人
+  rcicReviewedAt        DateTime? // 持牌顾问审核时间（RCIC 或团队成员点击后均记在此，对外显示为持牌顾问审核）
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   // 关系
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -146,6 +148,7 @@ model Case {
 
   @@index([userId])
   @@index([rcicId])
+  @@index([assignedTeamMemberId])
   @@map("cases")
 }
 

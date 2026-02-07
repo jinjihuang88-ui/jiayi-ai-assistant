@@ -73,6 +73,8 @@ export async function GET(request: NextRequest) {
       user: c.user,
       documents: [],
       _count: { messages: c._count.messages },
+      assignedTeamMemberId: c.assignedTeamMemberId,
+      rcicReviewedAt: c.rcicReviewedAt?.toISOString() ?? null,
     }));
 
     const stats = {

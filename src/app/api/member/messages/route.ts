@@ -60,10 +60,11 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // 获取顾问信息
+    // 获取顾问信息、跟进人、持牌顾问审核状态（会员端展示：持牌顾问张三、顾问团队李四、持牌顾问已审核）
     let consultant = null;
+    let assignedTeamMemberName: string | null = null;
+    let rcicReviewedAt: string | null = null;
     if (caseId) {
-      // 如果指定了caseId，获取该案件的顾问信息
       const caseItem = await prisma.case.findUnique({
         where: { id: caseId },
         include: {
@@ -83,6 +84,16 @@ export async function GET(request: NextRequest) {
         },
       });
       consultant = caseItem?.rcic || null;
+      if (caseItem) {
+        rcicReviewedAt = caseItem.rcicReviewedAt?.toISOString() ?? null;
+        if (caseItem.assignedTeamMemberId) {
+          const assigned = await prisma.rCICTeamMember.findUnique({
+            where: { id: caseItem.assignedTeamMemberId },
+            select: { name: true },
+          });
+          assignedTeamMemberName = assigned?.name ?? null;
+        }
+      }
     } else {
       // 如果没有指定caseId，获取用户分配的顾问（用于咨询）
       console.log('[Messages API] No caseId, fetching user assigned consultant...'); // 调试日志
@@ -117,7 +128,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       messages,
-      consultant, // 返回顾问信息
+      consultant,
+      assignedTeamMemberName: caseId ? assignedTeamMemberName : null,
+      rcicReviewedAt: caseId ? rcicReviewedAt : null,
       onlineRcicCount,
     });
   } catch (error) {

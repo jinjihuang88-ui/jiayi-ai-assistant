@@ -1,18 +1,97 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { Application, ApplicationField } from "@/types/application";
 
+interface CaseDetail {
+  id: string;
+  type: string;
+  status: string;
+  title: string;
+  description: string | null;
+  assignedTeamMemberId: string | null;
+  rcicReviewedAt: string | null;
+  createdAt: string;
+  user: { id: string; email: string; name: string | null; phone: string | null };
+  assignedTeamMember: { id: string; name: string; email: string; role: string } | null;
+  _count: { messages: number };
+}
+
+interface TeamMember {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
 export default function RcicCaseDetail() {
+  const params = useParams();
+  const router = useRouter();
+  const caseId = typeof params?.id === "string" ? params.id : null;
+  const [caseDetail, setCaseDetail] = useState<CaseDetail | null>(null);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [assigning, setAssigning] = useState(false);
+  const [reviewing, setReviewing] = useState(false);
   const [application, setApplication] = useState<Application | null>(null);
 
-  // 读取 Application
   useEffect(() => {
+    if (caseId) {
+      fetch(`/api/rcic/cases/${caseId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.case) {
+            setCaseDetail(data.case);
+            setTeamMembers(data.teamMembers || []);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [caseId]);
+
+  useEffect(() => {
+    if (!caseId || caseDetail) return;
     const raw = localStorage.getItem("current_application");
     if (raw) {
-      setApplication(JSON.parse(raw));
+      try {
+        setApplication(JSON.parse(raw));
+      } catch (_) {}
     }
-  }, []);
+  }, [caseId, caseDetail]);
+
+  const handleAssign = async (memberId: string | null) => {
+    if (!caseId) return;
+    setAssigning(true);
+    try {
+      const res = await fetch(`/api/rcic/cases/${caseId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assignedTeamMemberId: memberId || null }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const updated = await fetch(`/api/rcic/cases/${caseId}`).then((r) => r.json());
+        if (updated.success) setCaseDetail(updated.case);
+      }
+    } finally {
+      setAssigning(false);
+    }
+  };
+
+  const handleMarkReviewed = async () => {
+    if (!caseId) return;
+    setReviewing(true);
+    try {
+      const res = await fetch(`/api/rcic/cases/${caseId}/review`, { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        const updated = await fetch(`/api/rcic/cases/${caseId}`).then((r) => r.json());
+        if (updated.success) setCaseDetail(updated.case);
+      }
+    } finally {
+      setReviewing(false);
+    }
+  };
 
   // 更新字段 review
   function updateReview(
@@ -56,6 +135,61 @@ export default function RcicCaseDetail() {
 
     localStorage.setItem("current_application", JSON.stringify(updated));
     alert("审核结果已保存");
+  }
+
+  if (caseDetail) {
+    return (
+      <main className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <a href="/rcic/cases" className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-6">
+            ← 返回案件列表
+          </a>
+          <div className="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 mb-6">
+            <h1 className="text-xl font-semibold text-white mb-1">{caseDetail.title || `案件 ${caseDetail.id.slice(0, 8)}`}</h1>
+            <p className="text-sm text-slate-400 mb-4">
+              用户：{caseDetail.user.name || caseDetail.user.email} · {caseDetail._count.messages} 条消息
+            </p>
+            <div className="flex flex-wrap gap-4 items-center">
+              <div>
+                <label className="text-xs text-slate-500 block mb-1">指派跟进人</label>
+                <select
+                  value={caseDetail.assignedTeamMemberId ?? ""}
+                  onChange={(e) => handleAssign(e.target.value || null)}
+                  disabled={assigning}
+                  className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm min-w-[180px]"
+                >
+                  <option value="">未指派</option>
+                  {teamMembers.map((m) => (
+                    <option key={m.id} value={m.id}>{m.name}（{m.role || "操作员"}）</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                {caseDetail.rcicReviewedAt ? (
+                  <span className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-green-500/20 text-green-400 text-sm">
+                    ✓ 持牌顾问已审核 · {new Date(caseDetail.rcicReviewedAt).toLocaleString("zh-CN")}
+                  </span>
+                ) : (
+                  <button
+                    onClick={handleMarkReviewed}
+                    disabled={reviewing}
+                    className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-500 disabled:opacity-50"
+                  >
+                    {reviewing ? "提交中…" : "标记为已审核"}
+                  </button>
+                )}
+              </div>
+              <a
+                href="/rcic/messages"
+                className="text-sm text-emerald-400 hover:text-emerald-300"
+              >
+                去消息沟通 →
+              </a>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   if (!application) {

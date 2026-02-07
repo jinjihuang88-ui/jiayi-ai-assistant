@@ -43,6 +43,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
     const limit = parseInt(searchParams.get("limit") || "50");
+    const assignedToMe = searchParams.get("assignedToMe") === "1" || searchParams.get("assignedToMe") === "true";
 
     // 构建查询条件（使用团队成员所属RCIC的ID）
     const where: any = {
@@ -51,6 +52,9 @@ export async function GET(request: Request) {
 
     if (status) {
       where.status = status;
+    }
+    if (assignedToMe) {
+      where.assignedTeamMemberId = member.id;
     }
 
     // 获取案件列表
@@ -113,6 +117,9 @@ export async function GET(request: Request) {
       submittedAt: c.createdAt.toISOString(),
       user: c.user,
       _count: c._count,
+      assignedTeamMemberId: c.assignedTeamMemberId,
+      assignedToMe: c.assignedTeamMemberId === member.id,
+      rcicReviewedAt: c.rcicReviewedAt?.toISOString() ?? null,
     }));
 
     return NextResponse.json({

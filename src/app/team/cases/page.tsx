@@ -20,9 +20,9 @@ interface Application {
     email: string;
     name: string | null;
   };
-  _count: {
-    messages: number;
-  };
+  _count: { messages: number };
+  assignedToMe?: boolean;
+  rcicReviewedAt?: string | null;
 }
 
 interface Stats {
@@ -39,6 +39,7 @@ export default function TeamCasesPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentFilter, setCurrentFilter] = useState("all");
+  const [assignedToMeOnly, setAssignedToMeOnly] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -48,7 +49,7 @@ export default function TeamCasesPage() {
     if (member) {
       fetchCases();
     }
-  }, [currentFilter, member]);
+  }, [currentFilter, assignedToMeOnly, member]);
 
   const checkAuth = async () => {
     try {
@@ -72,6 +73,9 @@ export default function TeamCasesPage() {
       const params = new URLSearchParams();
       if (currentFilter !== "all") {
         params.set("status", currentFilter);
+      }
+      if (assignedToMeOnly) {
+        params.set("assignedToMe", "1");
       }
 
       const res = await fetch(`/api/team/cases?${params}`);
@@ -168,7 +172,15 @@ export default function TeamCasesPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+        <div className="flex flex-wrap gap-2 mb-6">
+          <button
+            onClick={() => setAssignedToMeOnly(!assignedToMeOnly)}
+            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+              assignedToMeOnly ? "bg-purple-500 text-white" : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+            }`}
+          >
+            我负责跟进
+          </button>
           {filters.map((filter) => (
             <button
               key={filter.value}
@@ -207,11 +219,17 @@ export default function TeamCasesPage() {
                     {typeIconMap[app.type] || "📄"}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium text-white">{app.typeName}</span>
                       <span className={`px-2 py-0.5 rounded-full text-xs text-white ${statusMap[app.status]?.color || "bg-slate-500"}`}>
                         {statusMap[app.status]?.label || app.status}
                       </span>
+                      {app.assignedToMe && (
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-purple-500/80 text-white">我跟进</span>
+                      )}
+                      {app.rcicReviewedAt && (
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-green-500/80 text-white">持牌顾问已审核</span>
+                      )}
                       {app._count.messages > 0 && (
                         <span className="px-2 py-0.5 rounded-full text-xs bg-red-500 text-white">
                           {app._count.messages} 条新消息
