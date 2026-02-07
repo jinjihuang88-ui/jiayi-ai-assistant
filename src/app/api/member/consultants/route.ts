@@ -13,11 +13,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 获取所有顾问，优先显示持牌顾问
+    // 仅对会员展示持牌顾问（A），不展示文案(C)、留学顾问(B)等；不返回手机号
     const consultants = await prisma.rCIC.findMany({
       where: {
-        // 只要求账号激活，其他条件放宽
         isActive: true,
+        consultantType: 'A', // 只显示持牌顾问，不显示文案、操作员等
       },
       select: {
         id: true,
@@ -63,8 +63,7 @@ export async function GET(request: NextRequest) {
       languages: consultant.languages ? JSON.parse(consultant.languages) : [],
       certifications: consultant.certifications ? JSON.parse(consultant.certifications) : [],
       // 添加类型标签
-      typeLabel: consultant.consultantType === 'A' ? '持牌顾问' : 
-                 consultant.consultantType === 'B' ? '留学顾问' : '文案辅助',
+      typeLabel: '持牌顾问',
       // 添加状态标签
       statusLabel: consultant.approvalStatus === 'approved' ? '已认证' :
                    consultant.approvalStatus === 'under_review' ? '审核中' :

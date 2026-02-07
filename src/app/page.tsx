@@ -49,6 +49,9 @@ export default function Home() {
   /** 找顾问：须经会员登录后进入会员中心找顾问 */
   const consultantLink = user ? "/member/consultants" : `/auth/login?redirect=${encodeURIComponent("/member/consultants")}`;
 
+  /** 自助填写官方表格：须经会员登录后进入会员中心申请列表 */
+  const formFillLink = user ? "/member/applications" : `/auth/login?redirect=${encodeURIComponent("/member/applications")}`;
+
   return (
     <main className="bg-white text-slate-900">
       {/* Top Nav - 专业导航栏 */}
@@ -448,7 +451,7 @@ export default function Home() {
                 <li>• 自助 + AI 协助填写，材料仅对指定顾问可见 <span className="text-xs text-slate-400">Self + AI fill, consultant-only access</span></li>
                 <li>• 数据加密安全可靠，节约约 50% 成本 <span className="text-xs text-slate-400">Encrypted & secure, ~50% cost savings</span></li>
               </ul>
-              <a href="/applications" className="text-[#C62828] font-medium text-sm hover:underline">
+              <a href={formFillLink} className="text-[#C62828] font-medium text-sm hover:underline">
                 去填写 →
               </a>
             </div>
@@ -616,83 +619,87 @@ export default function Home() {
       {/* 双入口分流 */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-8 md:items-stretch">
             {/* 我是用户 */}
-            <div className="border-2 border-slate-200 rounded-2xl p-12 hover:border-[#C62828] transition-all duration-300">
-              <div className="text-6xl mb-6 text-center">👤</div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2 text-center">我是用户</h3>
-              <p className="text-sm text-slate-500 mb-4 text-center">I'm a User</p>
-              <p className="text-slate-600 mb-1 text-center">我想移民/留学/办理签证</p>
-              <p className="text-sm text-slate-400 mb-6 text-center">Immigration / Study / Visa</p>
-              <ul className="text-slate-600 space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <div>
-                    <span>免费AI评估</span>
-                    <p className="text-xs text-slate-400">Free AI Assessment</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <div>
-                    <span>安全下单</span>
-                    <p className="text-xs text-slate-400">Secure Payment</p>
-                  </div>
-                </li>
-              </ul>
+            <div className="border-2 border-slate-200 rounded-2xl p-12 hover:border-[#C62828] transition-all duration-300 flex flex-col">
+              <div className="flex-1">
+                <div className="text-6xl mb-6 text-center">👤</div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2 text-center">我是用户</h3>
+                <p className="text-sm text-slate-500 mb-4 text-center">I'm a User</p>
+                <p className="text-slate-600 mb-1 text-center">我想移民/留学/办理签证</p>
+                <p className="text-sm text-slate-400 mb-6 text-center">Immigration / Study / Visa</p>
+                <ul className="text-slate-600 space-y-3 mb-8">
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>免费AI评估</span>
+                      <p className="text-xs text-slate-400">Free AI Assessment</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>安全下单</span>
+                      <p className="text-xs text-slate-400">Secure Payment</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
               <a
                 href="/assessment"
                 className="block w-full px-6 py-3 rounded-xl bg-[#C62828] text-white font-semibold text-center
-                           hover:bg-[#B71C1C] transition-all duration-300 shadow-lg"
+                           hover:bg-[#B71C1C] transition-all duration-300 shadow-lg flex-shrink-0"
               >
                 开始评估 →
               </a>
             </div>
 
             {/* 我是顾问 */}
-            <div className="border-2 border-slate-200 rounded-2xl p-12 hover:border-[#1E293B] transition-all duration-300">
-              <div className="text-6xl mb-6 text-center">👨‍💼</div>
-              <h3 className="text-2xl font-bold text-slate-900 mb-2 text-center">我是顾问</h3>
-              <p className="text-sm text-slate-500 mb-4 text-center">I'm a Consultant</p>
-              <p className="text-slate-600 mb-1 text-center">我提供移民/留学/签证服务</p>
-              <p className="text-sm text-slate-400 mb-6 text-center">Immigration / Study / Visa Services</p>
-              <ul className="text-slate-600 space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <div>
-                    <span>获取中国客户</span>
-                    <p className="text-xs text-slate-400">Access Chinese Clients</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <div>
-                    <span>建立个人专业主页</span>
-                    <p className="text-xs text-slate-400">Build Professional Profile</p>
-                  </div>
-                </li>
-                <li className="flex items-start gap-2">
-                  <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <div>
-                    <span>使用平台工具提升效率</span>
-                    <p className="text-xs text-slate-400">Use Platform Tools</p>
-                  </div>
-                </li>
-              </ul>
+            <div className="border-2 border-slate-200 rounded-2xl p-12 hover:border-[#1E293B] transition-all duration-300 flex flex-col">
+              <div className="flex-1">
+                <div className="text-6xl mb-6 text-center">👨‍💼</div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2 text-center">我是顾问</h3>
+                <p className="text-sm text-slate-500 mb-4 text-center">I'm a Consultant</p>
+                <p className="text-slate-600 mb-1 text-center">我提供移民/留学/签证服务</p>
+                <p className="text-sm text-slate-400 mb-6 text-center">Immigration / Study / Visa Services</p>
+                <ul className="text-slate-600 space-y-3 mb-8">
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>获取中国客户</span>
+                      <p className="text-xs text-slate-400">Access Chinese Clients</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>建立个人专业主页</span>
+                      <p className="text-xs text-slate-400">Build Professional Profile</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>使用平台工具提升效率</span>
+                      <p className="text-xs text-slate-400">Use Platform Tools</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
               <a
                 href="/rcic/cases"
                 className="block w-full px-6 py-3 rounded-xl bg-[#1E293B] text-white font-semibold text-center
-                           hover:bg-[#0F172A] transition-all duration-300 shadow-lg"
+                           hover:bg-[#0F172A] transition-all duration-300 shadow-lg flex-shrink-0"
               >
                 顾问入驻 →
               </a>

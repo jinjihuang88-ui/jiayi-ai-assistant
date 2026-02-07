@@ -27,6 +27,8 @@ interface Consultant {
   isAcceptingCases: boolean;
   isOnline: boolean;
   lastActiveAt: string | null;
+  typeLabel?: string;
+  statusLabel?: string;
 }
 
 export default function ConsultantsPage() {
@@ -159,7 +161,21 @@ export default function ConsultantsPage() {
                   <h3 className="text-lg font-semibold text-slate-900 mb-1">
                     {consultant.name}
                   </h3>
-                  
+                  {consultant.typeLabel && (
+                    <span className="inline-block px-2 py-0.5 bg-[#C62828]/10 text-[#C62828] text-xs font-medium rounded mb-2">
+                      {consultant.typeLabel}
+                    </span>
+                  )}
+                  {consultant.licenseNumber && (
+                    <p className="text-sm text-slate-600 mb-1">
+                      牌照号：<span className="font-medium text-slate-800">{consultant.licenseNumber}</span>
+                    </p>
+                  )}
+                  {(consultant.country || consultant.city) && (
+                    <p className="text-sm text-slate-600 mb-2">
+                      地区：{[consultant.country, consultant.city].filter(Boolean).join(" · ")}
+                    </p>
+                  )}
                   {consultant.organization && (
                     <p className="text-sm text-slate-600 mb-2">{consultant.organization}</p>
                   )}
@@ -300,10 +316,20 @@ export default function ConsultantsPage() {
                     </div>
                   )}
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <div className="font-semibold text-slate-900">
                     {selectedConsultant.name}
                   </div>
+                  {selectedConsultant.licenseNumber && (
+                    <div className="text-sm text-slate-600">
+                      牌照号：{selectedConsultant.licenseNumber}
+                    </div>
+                  )}
+                  {(selectedConsultant.country || selectedConsultant.city) && (
+                    <div className="text-sm text-slate-600">
+                      地区：{[selectedConsultant.country, selectedConsultant.city].filter(Boolean).join(" · ")}
+                    </div>
+                  )}
                   {selectedConsultant.organization && (
                     <div className="text-sm text-slate-600">
                       {selectedConsultant.organization}
