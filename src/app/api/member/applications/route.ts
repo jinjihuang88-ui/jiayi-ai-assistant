@@ -14,7 +14,7 @@ const TYPE_NAMES: Record<string, string> = {
   provincial_nominee: "省提名项目",
   "provincial-nominee": "省提名项目",
   immigration: "移民申请",
-  consultation: "咨询会话",
+  consultation: "与顾问沟通",
 };
 
 function toFrontendStatus(dbStatus: string): string {
@@ -27,7 +27,7 @@ function toFrontendStatus(dbStatus: string): string {
   return map[dbStatus] ?? dbStatus;
 }
 
-/** 会员申请列表 = 该用户提交的案件（排除纯咨询类型可选，此处全部返回） */
+/** 会员申请列表 = 该用户提交的申请。业务规则：一般咨询不算案件；签合同收费后才算案件。与顾问沟通（type=consultation）仅用于消息，默认不列入申请列表。 */
 export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
@@ -37,20 +37,22 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const statusFilter = searchParams.get("status");
+    const includeConsultation = searchParams.get("includeConsultation") === "true";
 
-    const where: { userId: string; type?: string; status?: string } = { userId: user.id };
-    if (statusFilter && statusFilter !== "all") {
-      const toDb: Record<string, string> = {
-        draft: "pending",
-        submitted: "pending",
-        under_review: "in_progress",
-        needs_revision: "in_progress",
-        approved: "completed",
-        rejected: "cancelled",
-      };
-      const dbStatus = toDb[statusFilter];
-      if (dbStatus) where.status = dbStatus;
-    }
+    const toDb: Record<string, string> = {
+      draft: "pending",
+      submitted: "pending",
+      under_review: "in_progress",
+      needs_revision: "in_progress",
+      approved: "completed",
+      rejected: "cancelled",
+    };
+    const dbStatus = statusFilter && statusFilter !== "all" ? toDb[statusFilter] : undefined;
+    const where = {
+      userId: user.id,
+      ...(includeConsultation ? {} : { type: { not: "consultation" as const } }),
+      ...(dbStatus ? { status: dbStatus } : {}),
+    };
 
     const cases = await prisma.case.findMany({
       where,

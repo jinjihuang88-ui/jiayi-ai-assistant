@@ -14,7 +14,7 @@ const TYPE_NAMES: Record<string, string> = {
   provincial_nominee: "省提名项目",
   "provincial-nominee": "省提名项目",
   immigration: "移民申请",
-  consultation: "咨询会话",
+  consultation: "与顾问沟通",
 };
 
 function toFrontendStatus(dbStatus: string): string {

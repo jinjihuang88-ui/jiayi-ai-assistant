@@ -4,10 +4,14 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import CallModal from "@/components/CallModal";
 
-interface Application {
-  id: string;
-  type: string;
-  typeName: string;
+interface Contact {
+  contactId: string;
+  name: string;
+  type: "rcic" | "team_member";
+  typeLabel: string;
+  caseIds: string[];
+  avatar?: string | null;
+  isOnline?: boolean;
 }
 
 interface Consultant {
@@ -29,18 +33,17 @@ interface Message {
   senderName: string | null;
   isRead: boolean;
   createdAt: string;
-  application: Application | null;
+  application?: { id: string } | null;
   attachments?: string | null;
 }
 
 function MessagesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const applicationId = searchParams.get("applicationId");
-
   const [messages, setMessages] = useState<Message[]>([]);
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [selectedApp, setSelectedApp] = useState<string | null>(applicationId);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
+  const [primaryCaseId, setPrimaryCaseId] = useState<string | null>(null);
   const [consultant, setConsultant] = useState<Consultant | null>(null);
   const [assignedTeamMemberName, setAssignedTeamMemberName] = useState<string | null>(null);
   const [rcicReviewedAt, setRcicReviewedAt] = useState<string | null>(null);
@@ -60,36 +63,46 @@ function MessagesContent() {
   };
 
   useEffect(() => {
-    fetchApplications();
+    const cid = searchParams.get("contactId");
+    if (cid) setSelectedContactId(cid);
+  }, [searchParams]);
+
+  useEffect(() => {
+    fetchContacts();
+  }, []);
+
+  useEffect(() => {
     fetchMessages();
-  }, [selectedApp]);
+  }, [selectedContactId]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const fetchApplications = async () => {
+  const fetchContacts = async () => {
     try {
-      const res = await fetch("/api/member/applications");
+      const res = await fetch("/api/member/messages/contacts");
       const data = await res.json();
       if (data.success) {
-        setApplications(data.applications);
+        setContacts(data.contacts || []);
       }
     } catch (error) {
-      console.error("Error fetching applications:", error);
+      console.error("Error fetching contacts:", error);
     }
   };
 
   const fetchMessages = async () => {
+    if (!selectedContactId) {
+      setMessages([]);
+      setConsultant(null);
+      setPrimaryCaseId(null);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     try {
-      const params = new URLSearchParams();
-      if (selectedApp) params.set("applicationId", selectedApp);
-
-      const res = await fetch(`/api/member/messages?${params}`);
+      const res = await fetch(`/api/member/messages?contactId=${encodeURIComponent(selectedContactId)}`);
       const data = await res.json();
-
-      console.log('[Messages] API Response:', data); // 调试日志
-      console.log('[Messages] Consultant:', data.consultant); // 调试日志
 
       if (!data.success) {
         if (res.status === 401) {
@@ -102,13 +115,13 @@ function MessagesContent() {
       setConsultant(data.consultant || null);
       setAssignedTeamMemberName(data.assignedTeamMemberName ?? null);
       setRcicReviewedAt(data.rcicReviewedAt ?? null);
+      setPrimaryCaseId(data.primaryCaseId ?? null);
 
-      // 标记为已读
-      if (selectedApp) {
+      if (data.primaryCaseId) {
         await fetch("/api/member/messages/read", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ applicationId: selectedApp }),
+          body: JSON.stringify({ applicationId: data.primaryCaseId }),
         });
       }
     } catch (error) {
@@ -134,7 +147,7 @@ function MessagesContent() {
   };
 
   const handleSend = async () => {
-    if ((!newMessage.trim() && selectedFiles.length === 0) || sending) return;
+    if (!selectedContactId || ((!newMessage.trim() && selectedFiles.length === 0) || sending)) return;
 
     setSending(true);
     setUploading(true);
@@ -175,7 +188,8 @@ function MessagesContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          applicationId: selectedApp,
+          contactId: selectedContactId,
+          applicationId: primaryCaseId,
           content: newMessage.trim() || "发送了文件",
           attachments,
         }),
@@ -206,13 +220,7 @@ function MessagesContent() {
     }
   };
 
-  const typeIconMap: Record<string, string> = {
-    "study-permit": "🎓",
-    "visitor-visa": "✈️",
-    "work-permit": "💼",
-    "express-entry": "🚀",
-    "provincial-nominee": "🏛️",
-  };
+  const selectedContact = contacts.find((c) => c.contactId === selectedContactId);
 
   return (
     <main className="min-h-screen bg-slate-50">
@@ -241,58 +249,41 @@ function MessagesContent() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex gap-6 h-[calc(100vh-12rem)]">
-          {/* Sidebar - Application List */}
+          {/* Sidebar - 联系人（顾问/文案/操作员） */}
           <div className="w-80 bg-white rounded-xl border border-slate-200 flex flex-col">
             <div className="p-4 border-b border-slate-100">
               <h2 className="font-semibold text-slate-900">消息</h2>
-              <p className="text-sm text-slate-500">与移民顾问沟通</p>
+              <p className="text-sm text-slate-500">与顾问、文案或操作员沟通</p>
             </div>
 
             <div className="flex-1 overflow-y-auto">
-              {/* All Messages */}
-              <button
-                onClick={() => setSelectedApp(null)}
-                className={`w-full p-4 text-left border-b border-slate-100 hover:bg-slate-50 transition-colors ${
-                  !selectedApp ? "bg-red-50" : ""
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-lg">
-                    💬
-                  </div>
-                  <div>
-                    <div className="font-medium text-slate-900">全部消息</div>
-                    <div className="text-sm text-slate-500">查看所有对话</div>
-                  </div>
-                </div>
-              </button>
-
-              {/* Application Conversations */}
-              {applications.map((app) => (
+              {contacts.map((c) => (
                 <button
-                  key={app.id}
-                  onClick={() => setSelectedApp(app.id)}
+                  key={c.contactId}
+                  onClick={() => setSelectedContactId(c.contactId)}
                   className={`w-full p-4 text-left border-b border-slate-100 hover:bg-slate-50 transition-colors ${
-                    selectedApp === app.id ? "bg-red-50" : ""
+                    selectedContactId === c.contactId ? "bg-red-50" : ""
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-lg">
-                      {typeIconMap[app.type] || "📄"}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-slate-900 truncate">{app.typeName}</div>
-                      <div className="text-sm text-slate-500 truncate">
-                        #{app.id.slice(0, 8).toUpperCase()}
+                    {c.avatar ? (
+                      <img src={c.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-lg">
+                        {c.name.charAt(0)}
                       </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-slate-900 truncate">{c.name}</div>
+                      <div className="text-sm text-slate-500 truncate">{c.typeLabel}</div>
                     </div>
                   </div>
                 </button>
               ))}
 
-              {applications.length === 0 && (
+              {contacts.length === 0 && (
                 <div className="p-6 text-center text-slate-500 text-sm">
-                  暂无申请
+                  暂无联系人，有案件分配后会出现
                 </div>
               )}
             </div>
@@ -302,35 +293,31 @@ function MessagesContent() {
           <div className="flex-1 bg-white rounded-xl border border-slate-200 flex flex-col">
             {/* Chat Header */}
             <div className="p-4 border-b border-slate-100">
-              {consultant ? (
+              {selectedContact ? (
                 <div className="flex items-center gap-3">
-                  <div className="relative">
-                    {consultant.avatar || consultant.profilePhoto ? (
-                      <img
-                        src={consultant.avatar || consultant.profilePhoto}
-                        alt={consultant.name}
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-medium text-lg">
-                        {consultant.name.charAt(0)}
-                      </div>
-                    )}
-                    {consultant.isOnline && (
-                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
-                    )}
-                  </div>
+                  {selectedContact.avatar ? (
+                    <img
+                      src={selectedContact.avatar}
+                      alt={selectedContact.name}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-medium text-lg">
+                      {selectedContact.name.charAt(0)}
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-slate-900 flex items-center gap-2 flex-wrap">
-                      {consultant.name}
+                      {selectedContact.name}
                       <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                        {consultant.consultantType === 'A' ? '持牌顾问' : 
-                         consultant.consultantType === 'B' ? '留学顾问' : '文案辅助'}
+                        {selectedContact.typeLabel}
                       </span>
                     </h3>
-                    <p className="text-sm text-slate-600 mt-0.5">
-                      您的持牌顾问：{consultant.name}
-                    </p>
+                    {consultant && (
+                      <p className="text-sm text-slate-600 mt-0.5">
+                        您的持牌顾问：{consultant.name}
+                      </p>
+                    )}
                     {assignedTeamMemberName && (
                       <p className="text-sm text-slate-500">
                         当前由顾问团队（{assignedTeamMemberName}）为您跟进
@@ -341,24 +328,18 @@ function MessagesContent() {
                         您提交的申请资料已由持牌顾问审核
                       </p>
                     )}
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      {consultant.organization || consultant.email}
-                      {consultant.isOnline ? ' • 在线' : ' • 离线'}
-                    </p>
+                    {consultant && (
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        {consultant.organization || consultant.email}
+                        {consultant.isOnline ? ' • 在线' : ' • 离线'}
+                      </p>
+                    )}
                   </div>
                 </div>
               ) : (
                 <div>
-                  <h3 className="font-semibold text-slate-900">
-                    {selectedApp
-                      ? applications.find((a) => a.id === selectedApp)?.typeName || "对话"
-                      : "全部消息"}
-                  </h3>
-                  <p className="text-sm text-slate-500">
-                    {selectedApp
-                      ? `申请编号: ${selectedApp.slice(0, 8).toUpperCase()}`
-                      : "选择一个申请开始对话"}
-                  </p>
+                  <h3 className="font-semibold text-slate-900">消息</h3>
+                  <p className="text-sm text-slate-500">选择左侧联系人开始对话</p>
                 </div>
               )}
             </div>
@@ -468,11 +449,10 @@ function MessagesContent() {
               
               <div className="flex gap-3">
                 {/* 视频/语音通话 */}
-                {selectedApp && (
+                {primaryCaseId && (
                   <>
                     <button
                       onClick={() => setCallModal({ type: "video" })}
-                      disabled={!selectedApp}
                       className="px-4 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                       title="视频通话"
                     >
@@ -480,7 +460,6 @@ function MessagesContent() {
                     </button>
                     <button
                       onClick={() => setCallModal({ type: "voice" })}
-                      disabled={!selectedApp}
                       className="px-4 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                       title="语音通话"
                     >
@@ -531,9 +510,9 @@ function MessagesContent() {
       </div>
 
       {/* 视频/语音通话弹窗 */}
-      {callModal && selectedApp && (
+      {callModal && primaryCaseId && (
         <CallModal
-          caseId={selectedApp}
+          caseId={primaryCaseId}
           type={callModal.type}
           role="member"
           onClose={() => setCallModal(null)}

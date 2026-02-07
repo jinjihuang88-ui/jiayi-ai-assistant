@@ -17,10 +17,12 @@ interface User {
   avatar: string | null;
 }
 
-interface Application {
-  id: string;
-  type: string;
-  typeName: string;
+interface Contact {
+  contactId: string;
+  name: string;
+  email: string;
+  avatar?: string | null;
+  caseIds: string[];
 }
 
 interface Attachment {
@@ -35,32 +37,25 @@ interface Attachment {
 interface Message {
   id: string;
   content: string;
-  messageType: string;
+  messageType?: string;
   senderType: string;
-  senderName: string | null;
-  isRead: boolean;
+  senderName?: string | null;
+  isRead?: boolean;
   createdAt: string;
-  user: User;
-  application: Application | null;
+  user?: User;
+  application?: { id: string } | null;
   attachments: Attachment[];
-}
-
-interface Conversation {
-  applicationId: string;
-  application: Application;
-  user: User;
-  lastMessage: Message;
-  unreadCount: number;
 }
 
 function RCICMessagesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const applicationIdParam = searchParams.get("applicationId");
+  const contactIdParam = searchParams.get("contactId");
 
   const [rcic, setRcic] = useState<RCIC | null>(null);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(applicationIdParam);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(contactIdParam);
+  const [primaryCaseId, setPrimaryCaseId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -78,22 +73,30 @@ function RCICMessagesContent() {
   }, []);
 
   useEffect(() => {
+    const cid = searchParams.get("contactId");
+    if (cid) setSelectedContactId(cid);
+  }, [searchParams]);
+
+  useEffect(() => {
     if (rcic) {
-      fetchConversations();
+      fetchContacts();
     }
   }, [rcic]);
 
   useEffect(() => {
-    if (selectedConversation) {
-      fetchMessages(selectedConversation);
+    if (selectedContactId) {
+      fetchMessages(selectedContactId);
+    } else {
+      setMessages([]);
+      setPrimaryCaseId(null);
     }
-  }, [selectedConversation]);
+  }, [selectedContactId]);
 
-  // 轮询来电（顾问/文案侧）
+  // 轮询来电
   useEffect(() => {
-    if (!selectedConversation) return;
+    if (!primaryCaseId) return;
     const poll = () => {
-      fetch(`/api/call/rooms?caseId=${selectedConversation}`)
+      fetch(`/api/call/rooms?caseId=${primaryCaseId}`)
         .then((r) => r.json())
         .then((data) => {
           if (data.success && data.rooms?.length) {
@@ -112,7 +115,7 @@ function RCICMessagesContent() {
     poll();
     const t = setInterval(poll, 3000);
     return () => clearInterval(t);
-  }, [selectedConversation]);
+  }, [primaryCaseId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -134,62 +137,36 @@ function RCICMessagesContent() {
     }
   };
 
-  const fetchConversations = async () => {
+  const fetchContacts = async () => {
     try {
-      // 获取所有有消息的申请
-      const res = await fetch("/api/rcic/cases?limit=100");
+      const res = await fetch("/api/rcic/messages/contacts");
       const data = await res.json();
-
       if (data.success) {
-        // 转换为会话格式
-        const convs: Conversation[] = data.applications
-          .filter((app: any) => app._count.messages > 0 || app.status !== "draft")
-          .map((app: any) => ({
-            applicationId: app.id,
-            application: {
-              id: app.id,
-              type: app.type,
-              typeName: app.typeName,
-            },
-            user: app.user,
-            unreadCount: app._count.messages,
-          }));
-
-        setConversations(convs);
-
-        // 如果有URL参数，自动选择
-        if (applicationIdParam && !selectedConversation) {
-          setSelectedConversation(applicationIdParam);
-        }
+        setContacts(data.contacts || []);
       }
     } catch (error) {
-      console.error("Error fetching conversations:", error);
+      console.error("Error fetching contacts:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchMessages = async (applicationId: string) => {
+  const fetchMessages = async (contactId: string) => {
     try {
-      const res = await fetch(`/api/rcic/messages?applicationId=${applicationId}`);
+      const res = await fetch(`/api/rcic/messages?contactId=${encodeURIComponent(contactId)}`);
       const data = await res.json();
 
       if (data.success) {
-        setMessages(data.messages);
+        setMessages(data.messages || []);
+        setPrimaryCaseId(data.primaryCaseId ?? null);
 
-        // 标记为已读
-        await fetch("/api/rcic/messages/read", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ applicationId }),
-        });
-
-        // 更新会话未读数
-        setConversations((prev) =>
-          prev.map((conv) =>
-            conv.applicationId === applicationId ? { ...conv, unreadCount: 0 } : conv
-          )
-        );
+        if (data.primaryCaseId) {
+          await fetch("/api/rcic/messages/read", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ applicationId: data.primaryCaseId }),
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -201,7 +178,7 @@ function RCICMessagesContent() {
   };
 
   const handleSend = async () => {
-    if (!newMessage.trim() || !selectedConversation || sending) return;
+    if (!newMessage.trim() || !selectedContactId || sending) return;
 
     setSending(true);
     try {
@@ -209,9 +186,9 @@ function RCICMessagesContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          applicationId: selectedConversation,
+          contactId: selectedContactId,
+          caseId: primaryCaseId,
           content: newMessage.trim(),
-          messageType: "text",
         }),
       });
 
@@ -230,21 +207,16 @@ function RCICMessagesContent() {
   };
 
   const handleFileUpload = async (file: File, type: "image" | "file") => {
-    if (!file || !selectedConversation) return;
+    if (!file || !selectedContactId) return;
 
     setUploading(true);
     setShowUploadMenu(false);
 
     try {
-      // 上传文件
       const formData = new FormData();
       formData.append("file", file);
 
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
       const uploadData = await uploadRes.json();
 
       if (!uploadData.success) {
@@ -252,14 +224,13 @@ function RCICMessagesContent() {
         return;
       }
 
-      // 发送带附件的消息
       const res = await fetch("/api/rcic/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          applicationId: selectedConversation,
+          contactId: selectedContactId,
+          caseId: primaryCaseId,
           content: type === "image" ? "发送了一张图片" : `发送了文件: ${file.name}`,
-          messageType: type,
           attachments: [{
             fileName: uploadData.filename,
             url: uploadData.url,
@@ -291,14 +262,6 @@ function RCICMessagesContent() {
     if (bytes < 1024) return bytes + " B";
     if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-  };
-
-  const typeIconMap: Record<string, string> = {
-    "study-permit": "🎓",
-    "visitor-visa": "✈️",
-    "work-permit": "💼",
-    "express-entry": "🚀",
-    "provincial-nominee": "🏛️",
   };
 
   const renderAttachment = (attachment: Attachment) => {
@@ -337,7 +300,7 @@ function RCICMessagesContent() {
     );
   };
 
-  const selectedConv = conversations.find((c) => c.applicationId === selectedConversation);
+  const selectedContact = contacts.find((c) => c.contactId === selectedContactId);
 
   return (
     <main className="min-h-screen bg-slate-900">
@@ -377,11 +340,11 @@ function RCICMessagesContent() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex gap-6 h-[calc(100vh-12rem)]">
-          {/* Sidebar - Conversations */}
+          {/* Sidebar - 会员联系人 */}
           <div className="w-80 bg-slate-800/50 rounded-xl border border-slate-700 flex flex-col">
             <div className="p-4 border-b border-slate-700">
               <h2 className="font-semibold text-white">消息</h2>
-              <p className="text-sm text-slate-400">与申请人沟通</p>
+              <p className="text-sm text-slate-400">与会员沟通</p>
             </div>
 
             <div className="flex-1 overflow-y-auto">
@@ -389,37 +352,30 @@ function RCICMessagesContent() {
                 <div className="p-6 flex items-center justify-center">
                   <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
                 </div>
-              ) : conversations.length === 0 ? (
+              ) : contacts.length === 0 ? (
                 <div className="p-6 text-center text-slate-500 text-sm">
-                  暂无消息
+                  暂无联系人
                 </div>
               ) : (
-                conversations.map((conv) => (
+                contacts.map((c) => (
                   <button
-                    key={conv.applicationId}
-                    onClick={() => setSelectedConversation(conv.applicationId)}
+                    key={c.contactId}
+                    onClick={() => setSelectedContactId(c.contactId)}
                     className={`w-full p-4 text-left border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors ${
-                      selectedConversation === conv.applicationId ? "bg-emerald-900/30" : ""
+                      selectedContactId === c.contactId ? "bg-emerald-900/30" : ""
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-slate-700 flex items-center justify-center text-lg">
-                        {typeIconMap[conv.application.type] || "📄"}
-                      </div>
+                      {c.avatar ? (
+                        <img src={c.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-lg text-white">
+                          {c.name.charAt(0)}
+                        </div>
+                      )}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-white truncate">
-                            {conv.user.name || conv.user.email.split("@")[0]}
-                          </span>
-                          {conv.unreadCount > 0 && (
-                            <span className="px-2 py-0.5 rounded-full text-xs bg-red-500 text-white">
-                              {conv.unreadCount}
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-sm text-slate-400 truncate">
-                          {conv.application.typeName}
-                        </div>
+                        <div className="font-medium text-white truncate">{c.name}</div>
+                        <div className="text-sm text-slate-400 truncate">{c.email}</div>
                       </div>
                     </div>
                   </button>
@@ -430,10 +386,10 @@ function RCICMessagesContent() {
 
           {/* Chat Area */}
           <div className="flex-1 bg-slate-800/50 rounded-xl border border-slate-700 flex flex-col">
-            {!selectedConversation ? (
+            {!selectedContactId ? (
               <div className="flex-1 flex flex-col items-center justify-center text-slate-500">
                 <div className="text-4xl mb-4">💬</div>
-                <p>选择一个会话开始沟通</p>
+                <p>选择左侧会员开始沟通</p>
               </div>
             ) : (
               <>
@@ -467,18 +423,20 @@ function RCICMessagesContent() {
                 <div className="p-4 border-b border-slate-700 flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-white">
-                      {selectedConv?.user.name || selectedConv?.user.email}
+                      {selectedContact?.name || selectedContact?.email}
                     </h3>
                     <p className="text-sm text-slate-400">
-                      {selectedConv?.application.typeName} · #{selectedConversation.slice(0, 8).toUpperCase()}
+                      {selectedContact?.email}
                     </p>
                   </div>
-                  <a
-                    href={`/rcic/cases/${selectedConversation}`}
-                    className="px-4 py-2 rounded-lg bg-emerald-600/20 text-emerald-400 text-sm hover:bg-emerald-600/30 transition-colors"
-                  >
-                    查看申请
-                  </a>
+                  {primaryCaseId && (
+                    <a
+                      href={`/rcic/cases/${primaryCaseId}`}
+                      className="px-4 py-2 rounded-lg bg-emerald-600/20 text-emerald-400 text-sm hover:bg-emerald-600/30 transition-colors"
+                    >
+                      查看案件
+                    </a>
+                  )}
                 </div>
 
                 {/* Messages */}
@@ -504,7 +462,7 @@ function RCICMessagesContent() {
                           >
                             {msg.senderType !== "rcic" && (
                               <div className="text-xs font-medium mb-1 text-emerald-400">
-                                {msg.user?.name || msg.user?.email || "用户"}
+                                会员
                               </div>
                             )}
                             {msg.messageType === "text" && (
@@ -629,9 +587,9 @@ function RCICMessagesContent() {
       </div>
 
       {/* 视频/语音通话弹窗 */}
-      {callModal && selectedConversation && (
+      {callModal && primaryCaseId && (
         <CallModal
-          caseId={selectedConversation}
+          caseId={primaryCaseId}
           type={callModal.type}
           role="rcic"
           roomId={callModal.roomId}

@@ -16,16 +16,42 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    // 同时支持 caseId 和 applicationId 参数
     const caseId = searchParams.get('caseId') || searchParams.get('applicationId');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const contactId = searchParams.get('contactId');
+    const limit = parseInt(searchParams.get('limit') || '100');
 
-    const where: any = {};
-    if (caseId) {
-      where.caseId = caseId;
-      // 验证case所有权
+    let caseIds: string[] = [];
+    if (contactId) {
+      const [prefix, id] = contactId.startsWith('team_')
+        ? ['team', contactId.slice(5)]
+        : contactId.startsWith('rcic_')
+          ? ['rcic', contactId.slice(5)]
+          : [null, null];
+      if (prefix && id) {
+        const whereCase: { userId: string; rcicId?: string; assignedTeamMemberId?: string } = {
+          userId: user.id,
+        };
+        if (prefix === 'rcic') whereCase.rcicId = id;
+        else whereCase.assignedTeamMemberId = id;
+        const casesForContact = await prisma.case.findMany({
+          where: whereCase,
+          select: { id: true },
+        });
+        caseIds = casesForContact.map((c) => c.id);
+      }
+      if (caseIds.length === 0) {
+        return NextResponse.json({
+          success: true,
+          messages: [],
+          consultant: null,
+          assignedTeamMemberName: null,
+          rcicReviewedAt: null,
+          primaryCaseId: null,
+        });
+      }
+    } else if (caseId) {
       const caseItem = await prisma.case.findFirst({
-        where: { id: caseId, userId: user.id }
+        where: { id: caseId, userId: user.id },
       });
       if (!caseItem) {
         return NextResponse.json(
@@ -33,7 +59,11 @@ export async function GET(request: NextRequest) {
           { status: 404 }
         );
       }
+      caseIds = [caseId];
     }
+
+    const where: { caseId?: string | { in: string[] } } =
+      caseIds.length === 1 ? { caseId: caseIds[0] } : { caseId: { in: caseIds } };
 
     const messages = await prisma.message.findMany({
       where,
@@ -62,13 +92,14 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // 获取顾问信息、跟进人、持牌顾问审核状态（会员端展示：持牌顾问张三、顾问团队李四、持牌顾问已审核）
-    let consultant = null;
+    let consultant: unknown = null;
     let assignedTeamMemberName: string | null = null;
     let rcicReviewedAt: string | null = null;
-    if (caseId) {
+    const primaryCaseId = caseIds[0] ?? null;
+
+    if (caseIds.length > 0) {
       const caseItem = await prisma.case.findUnique({
-        where: { id: caseId },
+        where: { id: caseIds[0] },
         include: {
           rcic: {
             select: {
@@ -96,9 +127,9 @@ export async function GET(request: NextRequest) {
           assignedTeamMemberName = assigned?.name ?? null;
         }
       }
-    } else {
-      // 如果没有指定caseId，获取用户分配的顾问（用于咨询）
-      console.log('[Messages API] No caseId, fetching user assigned consultant...'); // 调试日志
+    }
+
+    if (!contactId && !caseId) {
       const userWithRcic = await prisma.user.findUnique({
         where: { id: user.id },
         include: {
@@ -117,12 +148,9 @@ export async function GET(request: NextRequest) {
           },
         },
       });
-      console.log('[Messages API] User with RCIC:', userWithRcic?.id, userWithRcic?.assignedRcicId); // 调试日志
       consultant = userWithRcic?.assignedRcic || null;
-      console.log('[Messages API] Consultant:', consultant?.id, consultant?.name); // 调试日志
     }
 
-    // 获取已审核通过的顾问数量
     const onlineRcicCount = await prisma.rCIC.count({
       where: { approvalStatus: 'approved' },
     });
@@ -131,8 +159,9 @@ export async function GET(request: NextRequest) {
       success: true,
       messages,
       consultant,
-      assignedTeamMemberName: caseId ? assignedTeamMemberName : null,
-      rcicReviewedAt: caseId ? rcicReviewedAt : null,
+      assignedTeamMemberName: caseIds.length > 0 ? assignedTeamMemberName : null,
+      rcicReviewedAt: caseIds.length > 0 ? rcicReviewedAt : null,
+      primaryCaseId,
       onlineRcicCount,
     });
   } catch (error) {
@@ -158,13 +187,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    console.log('[Send Message] Request body:', JSON.stringify(body));
-    // 同时支持 caseId 和 applicationId 参数
     const caseId = body.caseId || body.applicationId;
+    const contactId = body.contactId;
     const { content, attachments } = body;
-    console.log('[Send Message] Parsed - caseId:', caseId, 'content:', content?.substring(0, 50));
 
-    // 验证消息内容（如果有附件，内容可以为空）
     if ((!content || !content.trim()) && !attachments) {
       return NextResponse.json(
         { success: false, message: '消息内容不能为空' },
@@ -172,48 +198,67 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let actualCaseId = caseId;
+    let actualCaseId: string | null = caseId;
 
-    // 如果没有指定caseId，检查用户是否有分配的顾问
+    if (contactId && !actualCaseId) {
+      const [prefix, id] = contactId.startsWith('team_')
+        ? ['team', contactId.slice(5)]
+        : contactId.startsWith('rcic_')
+          ? ['rcic', contactId.slice(5)]
+          : [null, null];
+      if (prefix && id) {
+        const whereCase: { userId: string; rcicId?: string; assignedTeamMemberId?: string } = {
+          userId: user.id,
+        };
+        if (prefix === 'rcic') whereCase.rcicId = id;
+        else whereCase.assignedTeamMemberId = id;
+        const casesForContact = await prisma.case.findMany({
+          where: whereCase,
+          orderBy: { updatedAt: 'desc' },
+          select: { id: true, type: true },
+        });
+        const consultation = casesForContact.find((c) => c.type === 'consultation');
+        actualCaseId = consultation?.id ?? casesForContact[0]?.id ?? null;
+        if (!actualCaseId && prefix === 'rcic') {
+          const consultationCase = await prisma.case.create({
+            data: {
+              userId: user.id,
+              rcicId: id,
+              type: 'consultation',
+              title: '与顾问沟通',
+              status: 'pending',
+            },
+          });
+          actualCaseId = consultationCase.id;
+        }
+      }
+    }
+
     if (!actualCaseId) {
-      console.log('[Send Message] No caseId provided, checking assigned RCIC...');
       const userWithRcic = await prisma.user.findUnique({
         where: { id: user.id },
         select: { assignedRcicId: true },
       });
-
-      console.log('[Send Message] User RCIC assignment:', userWithRcic?.assignedRcicId);
       if (!userWithRcic?.assignedRcicId) {
-        console.log('[Send Message] No assigned RCIC found');
         return NextResponse.json(
           { success: false, message: '请先选择顾问' },
           { status: 400 }
         );
       }
-
-      // 自动创建一个咨询案件
-      console.log('[Send Message] Creating consultation case...');
       const consultationCase = await prisma.case.create({
         data: {
           userId: user.id,
           rcicId: userWithRcic.assignedRcicId,
-          type: 'consultation', // 咨询类型
-          title: '咨询会话', // 默认标题
+          type: 'consultation',
+          title: '与顾问沟通',
           status: 'pending',
         },
       });
       actualCaseId = consultationCase.id;
-      console.log('[Send Message] Created case:', actualCaseId);
-    } else {
-      console.log('[Send Message] Using existing caseId:', caseId);
-      // 验证case所有权
+    } else if (actualCaseId) {
       const caseItem = await prisma.case.findFirst({
-        where: {
-          id: caseId,
-          userId: user.id,
-        },
+        where: { id: actualCaseId, userId: user.id },
       });
-
       if (!caseItem) {
         return NextResponse.json(
           { success: false, message: 'Case不存在' },

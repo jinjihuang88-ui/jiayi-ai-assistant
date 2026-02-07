@@ -18,10 +18,12 @@ interface User {
   avatar: string | null;
 }
 
-interface Application {
-  id: string;
-  type: string;
-  title: string;
+interface Contact {
+  contactId: string;
+  name: string;
+  email: string;
+  avatar?: string | null;
+  caseIds: string[];
 }
 
 interface Attachment {
@@ -36,32 +38,25 @@ interface Attachment {
 interface Message {
   id: string;
   content: string;
-  messageType: string;
+  messageType?: string;
   senderType: string;
-  senderName: string | null;
-  isRead: boolean;
+  senderName?: string | null;
+  isRead?: boolean;
   createdAt: string;
-  user: User;
-  application: Application | null;
-  attachments: Attachment[];
-}
-
-interface Conversation {
-  caseId: string;
-  case: Application;
-  user: User;
-  lastMessage: Message;
-  unreadCount: number;
+  user?: User;
+  application?: { id: string } | null;
+  attachments: Attachment[] | { url?: string; name?: string; fileName?: string }[];
 }
 
 function TeamMessagesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const caseIdParam = searchParams.get("caseId");
+  const contactIdParam = searchParams.get("contactId");
 
   const [member, setMember] = useState<TeamMember | null>(null);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(caseIdParam);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(contactIdParam);
+  const [primaryCaseId, setPrimaryCaseId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -79,22 +74,29 @@ function TeamMessagesContent() {
   }, []);
 
   useEffect(() => {
+    const cid = searchParams.get("contactId");
+    if (cid) setSelectedContactId(cid);
+  }, [searchParams]);
+
+  useEffect(() => {
     if (member) {
-      fetchConversations();
+      fetchContacts();
     }
   }, [member]);
 
   useEffect(() => {
-    if (selectedConversation) {
-      fetchMessages(selectedConversation);
+    if (selectedContactId) {
+      fetchMessages(selectedContactId);
+    } else {
+      setMessages([]);
+      setPrimaryCaseId(null);
     }
-  }, [selectedConversation]);
+  }, [selectedContactId]);
 
-  // 轮询来电（文案/操作员侧）
   useEffect(() => {
-    if (!selectedConversation) return;
+    if (!primaryCaseId) return;
     const poll = () => {
-      fetch(`/api/call/rooms?caseId=${selectedConversation}`)
+      fetch(`/api/call/rooms?caseId=${primaryCaseId}`)
         .then((r) => r.json())
         .then((data) => {
           if (data.success && data.rooms?.length) {
@@ -113,7 +115,7 @@ function TeamMessagesContent() {
     poll();
     const t = setInterval(poll, 3000);
     return () => clearInterval(t);
-  }, [selectedConversation]);
+  }, [primaryCaseId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -137,34 +139,34 @@ function TeamMessagesContent() {
     }
   };
 
-  const fetchConversations = async () => {
+  const fetchContacts = async () => {
     try {
-      const res = await fetch("/api/team/conversations");
+      const res = await fetch("/api/team/messages/contacts");
       const data = await res.json();
-
       if (data.success) {
-        setConversations(data.conversations);
+        setContacts(data.contacts || []);
       }
     } catch (error) {
-      console.error("Error fetching conversations:", error);
+      console.error("Error fetching contacts:", error);
     }
   };
 
-  const fetchMessages = async (caseId: string) => {
+  const fetchMessages = async (contactId: string) => {
     try {
-      const res = await fetch(`/api/team/messages?caseId=${caseId}`);
+      const res = await fetch(`/api/team/messages?contactId=${encodeURIComponent(contactId)}`);
       const data = await res.json();
 
       if (data.success) {
-        setMessages(data.messages);
-        // 标记为已读
-        await fetch("/api/team/messages/read", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ caseId: caseId }),
-        });
-        // 刷新对话列表
-        fetchConversations();
+        setMessages(data.messages || []);
+        setPrimaryCaseId(data.primaryCaseId ?? null);
+
+        if (data.primaryCaseId) {
+          await fetch("/api/team/messages/read", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ caseId: data.primaryCaseId }),
+          });
+        }
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
@@ -176,7 +178,7 @@ function TeamMessagesContent() {
   };
 
   const handleSend = async () => {
-    if (!newMessage.trim() || sending || !selectedConversation) return;
+    if (!newMessage.trim() || sending || !selectedContactId) return;
 
     setSending(true);
     try {
@@ -184,9 +186,9 @@ function TeamMessagesContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          caseId: selectedConversation,
+          contactId: selectedContactId,
+          caseId: primaryCaseId,
           content: newMessage,
-          messageType: "text",
         }),
       });
 
@@ -194,7 +196,6 @@ function TeamMessagesContent() {
       if (data.success) {
         setMessages([...messages, data.message]);
         setNewMessage("");
-        fetchConversations();
       } else {
         alert(data.message);
       }
@@ -206,21 +207,16 @@ function TeamMessagesContent() {
   };
 
   const handleFileUpload = async (file: File, type: "image" | "file") => {
-    if (!file || !selectedConversation) return;
+    if (!file || !selectedContactId) return;
 
     setUploading(true);
     setShowUploadMenu(false);
 
     try {
-      // 上传文件
       const formData = new FormData();
       formData.append("file", file);
 
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
+      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
       const uploadData = await uploadRes.json();
 
       if (!uploadData.success) {
@@ -228,27 +224,22 @@ function TeamMessagesContent() {
         return;
       }
 
-      // 发送带附件的消息
       const res = await fetch("/api/team/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          caseId: selectedConversation,
+          contactId: selectedContactId,
+          caseId: primaryCaseId,
           content: type === "image" ? "发送了一张图片" : `发送了文件: ${file.name}`,
-          messageType: type,
-          attachments: [{
-            fileName: uploadData.filename,
-            url: uploadData.url,
-            fileSize: uploadData.fileSize,
-            mimeType: uploadData.mimeType,
-          }],
+          fileUrl: uploadData.url,
+          fileName: uploadData.filename,
+          fileType: uploadData.mimeType,
         }),
       });
 
       const data = await res.json();
       if (data.success) {
         setMessages([...messages, data.message]);
-        fetchConversations();
       } else {
         alert(data.message);
       }
@@ -281,7 +272,7 @@ function TeamMessagesContent() {
     }
   };
 
-  const selectedConv = conversations.find((c) => c.caseId === selectedConversation);
+  const selectedContact = contacts.find((c) => c.contactId === selectedContactId);
 
   if (loading) {
     return (
@@ -329,53 +320,39 @@ function TeamMessagesContent() {
       </header>
 
       <div className="flex h-[calc(100vh-73px)]">
-        {/* 对话列表 */}
+        {/* 会员联系人列表 */}
         <div className="w-80 bg-slate-800 border-r border-slate-700 flex flex-col">
           <div className="p-4 border-b border-slate-700">
-            <h2 className="font-semibold text-white">对话列表</h2>
-            <p className="text-sm text-slate-400 mt-1">共 {conversations.length} 个对话</p>
+            <h2 className="font-semibold text-white">消息</h2>
+            <p className="text-sm text-slate-400 mt-1">与会员沟通 · 共 {contacts.length} 人</p>
           </div>
 
           <div className="flex-1 overflow-y-auto">
-            {conversations.length === 0 ? (
+            {contacts.length === 0 ? (
               <div className="p-8 text-center">
                 <div className="text-4xl mb-2">💬</div>
-                <p className="text-slate-400 text-sm">暂无对话</p>
+                <p className="text-slate-400 text-sm">暂无联系人</p>
               </div>
             ) : (
-              conversations.map((conv) => (
+              contacts.map((c) => (
                 <div
-                  key={conv.caseId}
-                  onClick={() => setSelectedConversation(conv.caseId)}
+                  key={c.contactId}
+                  onClick={() => setSelectedContactId(c.contactId)}
                   className={`p-4 border-b border-slate-700 cursor-pointer transition-colors ${
-                    selectedConversation === conv.caseId
-                      ? "bg-slate-700"
-                      : "hover:bg-slate-700/50"
+                    selectedContactId === c.contactId ? "bg-slate-700" : "hover:bg-slate-700/50"
                   }`}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white font-medium">
-                        {conv.user.name?.[0] || conv.user.email[0].toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="font-medium text-white truncate">
-                          {conv.user.name || conv.user.email}
-                        </span>
-                        {conv.unreadCount > 0 && (
-                          <span className="ml-2 px-2 py-0.5 rounded-full bg-red-500 text-white text-xs">
-                            {conv.unreadCount}
-                          </span>
-                        )}
+                  <div className="flex items-center gap-3">
+                    {c.avatar ? (
+                      <img src={c.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                        <span className="text-white font-medium">{c.name.charAt(0)}</span>
                       </div>
-                      <p className="text-sm text-slate-400 truncate">
-                        {conv.lastMessage.content}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1">
-                        {formatTime(conv.lastMessage.createdAt)}
-                      </p>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-white truncate">{c.name}</div>
+                      <div className="text-sm text-slate-400 truncate">{c.email}</div>
                     </div>
                   </div>
                 </div>
@@ -386,7 +363,7 @@ function TeamMessagesContent() {
 
         {/* 消息区域 */}
         <div className="flex-1 flex flex-col bg-slate-900">
-          {selectedConversation && selectedConv ? (
+          {selectedContactId && selectedContact ? (
             <>
               {/* 来电提示 */}
               {incomingRooms.length > 0 && (
@@ -417,59 +394,64 @@ function TeamMessagesContent() {
               {/* 对话头部 */}
               <div className="p-4 border-b border-slate-700 bg-slate-800">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                    <span className="text-white font-medium">
-                      {selectedConv.user.name?.[0] || selectedConv.user.email[0].toUpperCase()}
-                    </span>
-                  </div>
+                  {selectedContact.avatar ? (
+                    <img src={selectedContact.avatar} alt="" className="w-10 h-10 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                      <span className="text-white font-medium">{selectedContact.name.charAt(0)}</span>
+                    </div>
+                  )}
                   <div>
-                    <h3 className="font-medium text-white">
-                      {selectedConv.user.name || selectedConv.user.email}
-                    </h3>
-                    <p className="text-sm text-slate-400">
-                      {selectedConv.case.title}
-                    </p>
+                    <h3 className="font-medium text-white">{selectedContact.name}</h3>
+                    <p className="text-sm text-slate-400">{selectedContact.email}</p>
                   </div>
                 </div>
               </div>
 
               {/* 消息列表 */}
               <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                {messages.map((msg) => (
+                {messages.map((msg) => {
+                  const atts = Array.isArray(msg.attachments) ? msg.attachments : [];
+                  const firstAtt = atts[0];
+                  const isRcic = msg.senderType === "rcic";
+                  return (
                   <div
                     key={msg.id}
-                    className={`flex ${msg.senderType === "team_member" ? "justify-end" : "justify-start"}`}
+                    className={`flex ${isRcic ? "justify-end" : "justify-start"}`}
                   >
                     <div
                       className={`max-w-md px-4 py-3 rounded-2xl ${
-                        msg.senderType === "team_member"
+                        isRcic
                           ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
                           : "bg-slate-800 text-white"
                       }`}
                     >
-                      {msg.messageType === "image" && msg.attachments.length > 0 ? (
-                        <img
-                          src={msg.attachments[0].url}
-                          alt="图片"
-                          className="max-w-full rounded-lg"
-                        />
-                      ) : msg.messageType === "file" && msg.attachments.length > 0 ? (
-                        <a
-                          href={msg.attachments[0].url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 underline"
-                        >
-                          <span>📄</span>
-                          <span>{msg.attachments[0].fileName}</span>
-                        </a>
+                      {firstAtt?.url ? (
+                        /\.(jpg|jpeg|png|gif|webp)/i.test(firstAtt.url) ? (
+                          <img
+                            src={firstAtt.url}
+                            alt="图片"
+                            className="max-w-full rounded-lg"
+                          />
+                        ) : (
+                          <a
+                            href={firstAtt.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 underline"
+                          >
+                            <span>📄</span>
+                            <span>{(firstAtt as { fileName?: string; name?: string }).fileName ?? (firstAtt as { fileName?: string; name?: string }).name ?? "文件"}</span>
+                          </a>
+                        )
                       ) : (
                         <p>{msg.content}</p>
                       )}
                       <p className="text-xs mt-2 opacity-70">{formatTime(msg.createdAt)}</p>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
                 <div ref={messagesEndRef} />
               </div>
 
@@ -570,9 +552,9 @@ function TeamMessagesContent() {
           ) : null}
 
           {/* 视频/语音通话弹窗 */}
-          {callModal && selectedConversation && (
+          {callModal && primaryCaseId && (
             <CallModal
-              caseId={selectedConversation}
+              caseId={primaryCaseId}
               type={callModal.type}
               role="team"
               roomId={callModal.roomId}
@@ -580,11 +562,11 @@ function TeamMessagesContent() {
             />
           )}
 
-          {!selectedConversation || !selectedConv ? (
+          {!selectedContactId || !selectedContact ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <div className="text-6xl mb-4">💬</div>
-                <p className="text-slate-400">选择一个对话开始聊天</p>
+                <p className="text-slate-400">选择左侧会员开始聊天</p>
               </div>
             </div>
           ) : null}

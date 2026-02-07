@@ -13,6 +13,7 @@ const TYPE_NAMES: Record<string, string> = {
   provincial_nominee: "省提名",
   "provincial-nominee": "省提名",
   immigration: "移民",
+  consultation: "与顾问沟通",
 };
 
 function toFrontendStatus(dbStatus: string): string {
@@ -36,7 +37,9 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(searchParams.get("limit") ?? "50", 10) || 50, 100);
     const statusFilter = searchParams.get("status");
 
-    const where: { rcicId: string; status?: string } = { rcicId: rcic.id };
+    // 咨询不算案件：只列签合同收费后的正式案件（type !== consultation）
+    const baseWhere = { rcicId: rcic.id, type: { not: "consultation" as const } };
+    const where: { rcicId: string; type: { not: string }; status?: string } = baseWhere;
     if (statusFilter && statusFilter !== "all") {
       const toDbStatus: Record<string, string> = {
         submitted: "pending",
@@ -59,9 +62,9 @@ export async function GET(request: NextRequest) {
           _count: { select: { messages: true } },
         },
       }),
-      prisma.case.count({ where: { rcicId: rcic.id, status: "pending" } }),
-      prisma.case.count({ where: { rcicId: rcic.id, status: "in_progress" } }),
-      prisma.case.count({ where: { rcicId: rcic.id, status: "completed" } }),
+      prisma.case.count({ where: { ...baseWhere, status: "pending" } }),
+      prisma.case.count({ where: { ...baseWhere, status: "in_progress" } }),
+      prisma.case.count({ where: { ...baseWhere, status: "completed" } }),
     ]);
 
     const applications = cases.map((c) => ({

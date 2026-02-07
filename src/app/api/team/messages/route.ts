@@ -39,38 +39,76 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 获取caseId
     const { searchParams } = new URL(request.url);
     const caseId = searchParams.get("caseId");
+    const contactId = searchParams.get("contactId");
 
-    if (!caseId) {
+    let caseIds: string[] = [];
+
+    if (contactId && contactId.startsWith("member_")) {
+      const userId = contactId.slice(7);
+      const casesForMember = await prisma.case.findMany({
+        where: { assignedTeamMemberId: member.id, userId },
+        orderBy: { updatedAt: "desc" },
+        select: { id: true },
+      });
+      caseIds = casesForMember.map((c) => c.id);
+      if (caseIds.length === 0) {
+        return NextResponse.json({
+          success: true,
+          messages: [],
+          primaryCaseId: null,
+        });
+      }
+    } else if (caseId) {
+      const caseData = await prisma.case.findUnique({
+        where: { id: caseId },
+      });
+      if (!caseData || caseData.rcicId !== member.rcicId || caseData.assignedTeamMemberId !== member.id) {
+        return NextResponse.json(
+          { success: false, message: "无权访问该案件" },
+          { status: 403 }
+        );
+      }
+      caseIds = [caseId];
+    } else {
       return NextResponse.json(
-        { success: false, message: "缺少caseId参数" },
+        { success: false, message: "请提供 caseId 或 contactId" },
         { status: 400 }
       );
     }
 
-    // 验证案件是否属于该团队成员的RCIC
-    const caseData = await prisma.case.findUnique({
-      where: { id: caseId },
-    });
+    const where = caseIds.length === 1
+      ? { caseId: caseIds[0] }
+      : { caseId: { in: caseIds } };
 
-    if (!caseData || caseData.rcicId !== member.rcicId) {
-      return NextResponse.json(
-        { success: false, message: "无权访问该案件" },
-        { status: 403 }
-      );
-    }
-
-    // 获取消息列表
-    const messages = await prisma.message.findMany({
-      where: { caseId },
+    const rawMessages = await prisma.message.findMany({
+      where,
       orderBy: { createdAt: "asc" },
     });
+
+    const messages = rawMessages.map((msg) => {
+      let attachments: { url?: string; name?: string; fileName?: string }[] = [];
+      if (msg.attachments) {
+        try {
+          const parsed = JSON.parse(msg.attachments);
+          attachments = Array.isArray(parsed)
+            ? parsed.map((f: any) => ({ url: f.url, name: f.name, fileName: f.name ?? f.fileName }))
+            : [];
+        } catch (_) {}
+      }
+      return {
+        ...msg,
+        attachments,
+      };
+    });
+
+    const primaryCaseId = caseIds[0] ?? null;
 
     return NextResponse.json({
       success: true,
       messages,
+      primaryCaseId,
     });
   } catch (error) {
     console.error("[Team Messages GET] Error:", error);
@@ -119,28 +157,39 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { caseId, content, fileUrl, fileName, fileType } = body;
+    let caseId = body.caseId;
+    const contactId = body.contactId;
+    const { content, fileUrl, fileName, fileType } = body;
 
-    if (!caseId || !content) {
+    if (!content && !fileUrl) {
       return NextResponse.json(
-        { success: false, message: "缺少必要参数" },
+        { success: false, message: "消息内容不能为空" },
         { status: 400 }
       );
     }
 
-    // 验证案件是否属于该团队成员的RCIC
+    if (contactId && contactId.startsWith("member_") && !caseId) {
+      const userId = contactId.slice(7);
+      const casesForMember = await prisma.case.findMany({
+        where: { assignedTeamMemberId: member.id, userId },
+        orderBy: { updatedAt: "desc" },
+        select: { id: true, type: true },
+      });
+      const consultation = casesForMember.find((c) => c.type === "consultation");
+      caseId = consultation?.id ?? casesForMember[0]?.id ?? null;
+    }
+
     const caseData = await prisma.case.findUnique({
       where: { id: caseId },
     });
 
-    if (!caseData || caseData.rcicId !== member.rcicId) {
+    if (!caseData || caseData.rcicId !== member.rcicId || caseData.assignedTeamMemberId !== member.id) {
       return NextResponse.json(
         { success: false, message: "无权访问该案件" },
         { status: 403 }
       );
     }
 
-    // 准备附件数据
     let attachments = null;
     if (fileUrl) {
       attachments = JSON.stringify([
@@ -152,15 +201,14 @@ export async function POST(request: NextRequest) {
       ]);
     }
 
-    // 创建消息（使用rcicId作为senderId，senderType为rcic）
     const message = await prisma.message.create({
       data: {
-        caseId,
-        senderId: member.rcicId, // 使用RCIC的ID作为发送者
-        senderType: "rcic", // 团队成员代表RCIC发送
-        content,
+        caseId: caseData.id,
+        senderId: member.rcicId,
+        senderType: "rcic",
+        content: content || "发送了文件",
         attachments,
-        read: true, // 自己发送的消息标记为已读
+        read: true,
       },
     });
 

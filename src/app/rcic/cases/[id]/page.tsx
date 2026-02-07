@@ -146,7 +146,7 @@ export default function RcicCaseDetail() {
           </a>
           <div className="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 mb-6">
             <h1 className="text-xl font-semibold text-white mb-1">{caseDetail.title || `案件 ${caseDetail.id.slice(0, 8)}`}</h1>
-            <p className="text-xs text-slate-500 mb-2">案件 = 用户提交的申请（已填写的移民/留学/旅游等资料）；案内含跟进、消息、文件与资料审核。</p>
+            <p className="text-xs text-slate-500 mb-2">案件 = 签合同收费后形成，由顾问跟踪至确定结束。案内含跟进、消息、文件与资料审核。</p>
             <p className="text-sm text-slate-400 mb-4">
               用户：{caseDetail.user.name || caseDetail.user.email} · {caseDetail._count.messages} 条消息
             </p>

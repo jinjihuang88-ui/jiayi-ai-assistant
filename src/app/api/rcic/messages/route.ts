@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentRCIC } from '@/lib/rcic-auth';
 
-// 获取消息列表（顾问端）
+// 获取消息列表（顾问端）：支持 caseId 或 contactId（member_<userId>）
 export async function GET(request: NextRequest) {
   try {
     const rcic = await getCurrentRCIC();
@@ -14,16 +14,30 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const caseId = searchParams.get('caseId');
+    const caseId = searchParams.get('caseId') || searchParams.get('applicationId');
+    const contactId = searchParams.get('contactId');
     const limit = parseInt(searchParams.get('limit') || '50');
 
-    const where: any = {};
+    let caseIds: string[] = [];
 
-    if (caseId) {
-      where.caseId = caseId;
-      // 验证case归属
+    if (contactId && contactId.startsWith('member_')) {
+      const userId = contactId.slice(7);
+      const casesForMember = await prisma.case.findMany({
+        where: { rcicId: rcic.id, userId },
+        orderBy: { updatedAt: 'desc' },
+        select: { id: true },
+      });
+      caseIds = casesForMember.map((c) => c.id);
+      if (caseIds.length === 0) {
+        return NextResponse.json({
+          success: true,
+          messages: [],
+          primaryCaseId: null,
+        });
+      }
+    } else if (caseId) {
       const caseItem = await prisma.case.findFirst({
-        where: { id: caseId, rcicId: rcic.id }
+        where: { id: caseId, rcicId: rcic.id },
       });
       if (!caseItem) {
         return NextResponse.json(
@@ -31,7 +45,17 @@ export async function GET(request: NextRequest) {
           { status: 404 }
         );
       }
+      caseIds = [caseId];
+    } else {
+      return NextResponse.json(
+        { success: false, message: '请提供 caseId 或 contactId' },
+        { status: 400 }
+      );
     }
+
+    const where = caseIds.length === 1
+      ? { caseId: caseIds[0] }
+      : { caseId: { in: caseIds } };
 
     const messages = await prisma.message.findMany({
       where,
@@ -49,13 +73,12 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    // 解析attachments字段
     const messagesWithAttachments = messages.map(msg => {
-      let attachments = [];
+      let attachments: any[] = [];
       if (msg.attachments) {
         try {
           const parsed = JSON.parse(msg.attachments);
-          attachments = parsed.map((file: any, idx: number) => ({
+          attachments = (Array.isArray(parsed) ? parsed : []).map((file: any, idx: number) => ({
             id: `${msg.id}-${idx}`,
             fileName: file.name,
             fileType: file.type?.startsWith('image/') ? 'image' : 'document',
@@ -71,14 +94,17 @@ export async function GET(request: NextRequest) {
         ...msg,
         attachments,
         messageType: 'text',
-        senderName: null, // 需要时可以通过senderId单独查询
+        senderName: null,
         application: null,
       };
     });
 
+    const primaryCaseId = caseIds[0] ?? null;
+
     return NextResponse.json({
       success: true,
       messages: messagesWithAttachments.reverse(),
+      primaryCaseId,
     });
   } catch (error) {
     console.error('Get RCIC messages error:', error);
@@ -89,7 +115,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// 发送消息（顾问端）
+// 发送消息（顾问端）：支持 caseId 或 contactId（member_<userId>），可选 attachments
 export async function POST(request: NextRequest) {
   try {
     const rcic = await getCurrentRCIC();
@@ -100,22 +126,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { caseId, content } = await request.json();
+    const body = await request.json();
+    let caseId = body.caseId || body.applicationId;
+    const contactId = body.contactId;
+    const content = body.content?.trim() ?? '';
+    const attachments = body.attachments;
 
-    // 验证消息内容
-    if (!content || !content.trim()) {
+    if (!content && !attachments) {
       return NextResponse.json(
         { success: false, message: '消息内容不能为空' },
         { status: 400 }
       );
     }
 
-    // 验证case归属
+    if (contactId && contactId.startsWith('member_') && !caseId) {
+      const userId = contactId.slice(7);
+      const casesForMember = await prisma.case.findMany({
+        where: { rcicId: rcic.id, userId },
+        orderBy: { updatedAt: 'desc' },
+        select: { id: true, type: true },
+      });
+      const consultation = casesForMember.find((c) => c.type === 'consultation');
+      caseId = consultation?.id ?? casesForMember[0]?.id ?? null;
+    }
+
     const caseItem = await prisma.case.findFirst({
-      where: {
-        id: caseId,
-        rcicId: rcic.id,
-      },
+      where: { id: caseId, rcicId: rcic.id },
     });
 
     if (!caseItem) {
@@ -125,13 +161,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 创建消息
+    let attachmentsStr: string | null = null;
+    if (attachments && Array.isArray(attachments)) {
+      attachmentsStr = JSON.stringify(
+        attachments.map((a: any) => ({
+          name: a.fileName ?? a.name,
+          url: a.url,
+          type: a.mimeType ?? a.fileType ?? 'file',
+          size: a.fileSize ?? 0,
+        }))
+      );
+    }
+
     const message = await prisma.message.create({
       data: {
-        caseId,
+        caseId: caseItem.id,
         senderId: rcic.id,
         senderType: 'rcic',
-        content: content.trim(),
+        content: content || '发送了文件',
+        attachments: attachmentsStr,
       },
     });
 

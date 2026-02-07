@@ -45,9 +45,10 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get("limit") || "50");
     const assignedToMe = searchParams.get("assignedToMe") === "1" || searchParams.get("assignedToMe") === "true";
 
-    // 构建查询条件（使用团队成员所属RCIC的ID）
+    // 咨询不算案件：只列正式案件（type !== consultation）
     const where: any = {
       rcicId: member.rcicId,
+      type: { not: "consultation" },
     };
 
     if (status) {
@@ -83,19 +84,18 @@ export async function GET(request: Request) {
       take: limit,
     });
 
-    // 获取统计数据
+    // 咨询不算案件；统计仅含正式案件
+    const statsWhere = { rcicId: member.rcicId, type: { not: "consultation" } };
     const stats = {
       pending: await prisma.case.count({
-        where: { rcicId: member.rcicId, status: "submitted" },
+        where: { ...statsWhere, status: "pending" },
       }),
       underReview: await prisma.case.count({
-        where: { rcicId: member.rcicId, status: "under_review" },
+        where: { ...statsWhere, status: "in_progress" },
       }),
-      needsRevision: await prisma.case.count({
-        where: { rcicId: member.rcicId, status: "needs_revision" },
-      }),
+      needsRevision: 0,
       approved: await prisma.case.count({
-        where: { rcicId: member.rcicId, status: "approved" },
+        where: { ...statsWhere, status: "completed" },
       }),
     };
 
@@ -106,6 +106,7 @@ export async function GET(request: Request) {
       "work-permit": "工作许可",
       "express-entry": "快速通道",
       "provincial-nominee": "省提名",
+      consultation: "与顾问沟通",
     };
 
     const applications = cases.map((c) => ({

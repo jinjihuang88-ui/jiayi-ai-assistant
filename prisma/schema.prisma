@@ -127,17 +127,21 @@ model RCICSession {
   @@map("rcic_sessions")
 }
 
-// 案件表（案件 = 用户确定申请后自己填好的移民/留学/旅游等资料提交给顾问形成的申请单；案内含跟进、消息、文件、审核）
+// 案件表
+// 业务规则：一般会员咨询不算案件；签合同收费之后才算为一个案件，该案件由顾问跟踪直到顾问确定结束。
+// type=consultation 仅用于「与顾问沟通」消息线程，不列入任何案件列表。
+// contractedAt 非空表示已签合同收费，正式案件；顾问将案件标记完成前 status 为 pending/in_progress，完成后为 completed。
 model Case {
   id                    String    @id @default(cuid())
   userId                String
   rcicId                String?
-  type                  String    // consultation | visitor_visa, study_permit, immigration 等申请类型
+  type                  String    // consultation=仅咨询对话 | visitor_visa, study_permit 等=申请类型
   status                String    @default("pending") // pending, in_progress, completed, cancelled
   title                 String
   description           String?
   assignedTeamMemberId  String?   // 指派的文案/操作员 ID，日常跟进人
-  rcicReviewedAt        DateTime? // 用户申请资料已审核时间（持牌顾问或文案/操作员均可操作，对外统一显示为持牌顾问审核）
+  rcicReviewedAt        DateTime? // 用户申请资料已审核时间
+  contractedAt          DateTime? // 签合同/收费时间；非空表示正式案件，跟踪至顾问结束
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
