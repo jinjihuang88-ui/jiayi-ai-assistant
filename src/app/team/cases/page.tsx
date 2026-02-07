@@ -228,7 +228,7 @@ export default function TeamCasesPage() {
                         <span className="px-2 py-0.5 rounded-full text-xs bg-purple-500/80 text-white">我跟进</span>
                       )}
                       {app.rcicReviewedAt && (
-                        <span className="px-2 py-0.5 rounded-full text-xs bg-green-500/80 text-white">持牌顾问已审核</span>
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-green-500/80 text-white">资料已审核</span>
                       )}
                       {app._count.messages > 0 && (
                         <span className="px-2 py-0.5 rounded-full text-xs bg-red-500 text-white">

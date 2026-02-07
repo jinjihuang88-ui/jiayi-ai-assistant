@@ -26,7 +26,7 @@ export async function POST(
       data: { rcicReviewedAt: new Date() },
     });
 
-    return NextResponse.json({ success: true, message: "已标记为持牌顾问审核" });
+    return NextResponse.json({ success: true, message: "用户申请资料已审核（持牌顾问）" });
   } catch (error) {
     console.error("[rcic/cases/[id]/review]", error);
     return NextResponse.json(

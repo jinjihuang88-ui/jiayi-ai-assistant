@@ -336,7 +336,7 @@ function MessagesContent() {
                     )}
                     {rcicReviewedAt && (
                       <p className="text-sm text-green-600 font-medium mt-0.5">
-                        持牌顾问已审核
+                        您提交的申请资料已由持牌顾问审核
                       </p>
                     )}
                     <p className="text-xs text-slate-400 mt-0.5">

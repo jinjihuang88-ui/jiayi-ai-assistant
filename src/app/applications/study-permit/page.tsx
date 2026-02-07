@@ -623,11 +623,33 @@ export default function StudyPermitPage() {
               </button>
             ) : (
               <button
-                onClick={() => {
-                  localStorage.setItem(
-                    "current_application",
-                    JSON.stringify({ ...application, status: "submitted" })
-                  );
+                onClick={async () => {
+                  const payload = { ...application, status: "submitted" as const };
+                  localStorage.setItem("current_application", JSON.stringify(payload));
+                  try {
+                    const res = await fetch("/api/member/applications/submit", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        type: "study-permit",
+                        title: "学签申请",
+                        applicationData: payload,
+                      }),
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                      window.location.href = `/applications/study-permit/review?caseId=${data.caseId}`;
+                      return;
+                    }
+                    if (res.status === 400) {
+                      alert(data.message || "请先选择顾问后再提交");
+                      window.location.href = "/member/consultants";
+                      return;
+                    }
+                  } catch (_) {
+                    alert("提交失败，请稍后重试");
+                    return;
+                  }
                   window.location.href = "/applications/study-permit/review";
                 }}
                 className="px-8 py-3 rounded-xl bg-gradient-to-r from-green-600 to-green-500 text-white font-medium

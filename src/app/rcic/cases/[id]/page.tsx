@@ -146,6 +146,7 @@ export default function RcicCaseDetail() {
           </a>
           <div className="bg-slate-800/50 rounded-2xl border border-slate-700/50 p-6 mb-6">
             <h1 className="text-xl font-semibold text-white mb-1">{caseDetail.title || `案件 ${caseDetail.id.slice(0, 8)}`}</h1>
+            <p className="text-xs text-slate-500 mb-2">案件 = 用户提交的申请（已填写的移民/留学/旅游等资料）；案内含跟进、消息、文件与资料审核。</p>
             <p className="text-sm text-slate-400 mb-4">
               用户：{caseDetail.user.name || caseDetail.user.email} · {caseDetail._count.messages} 条消息
             </p>
@@ -167,7 +168,7 @@ export default function RcicCaseDetail() {
               <div>
                 {caseDetail.rcicReviewedAt ? (
                   <span className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-green-500/20 text-green-400 text-sm">
-                    ✓ 持牌顾问已审核 · {new Date(caseDetail.rcicReviewedAt).toLocaleString("zh-CN")}
+                    ✓ 用户申请资料已审核（持牌顾问）· {new Date(caseDetail.rcicReviewedAt).toLocaleString("zh-CN")}
                   </span>
                 ) : (
                   <button
@@ -175,7 +176,7 @@ export default function RcicCaseDetail() {
                     disabled={reviewing}
                     className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-500 disabled:opacity-50"
                   >
-                    {reviewing ? "提交中…" : "标记为已审核"}
+                    {reviewing ? "提交中…" : "用户申请资料已审核"}
                   </button>
                 )}
               </div>

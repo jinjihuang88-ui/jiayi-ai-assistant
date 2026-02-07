@@ -88,7 +88,7 @@ export default function TeamCaseDetailPage() {
           <div className="flex items-center gap-4">
             {caseDetail?.rcicReviewedAt ? (
               <span className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-green-500/20 text-green-400 text-sm">
-                ✓ 持牌顾问已审核 ·{" "}
+                ✓ 用户申请资料已审核（持牌顾问）·{" "}
                 {new Date(caseDetail.rcicReviewedAt).toLocaleString("zh-CN")}
               </span>
             ) : (
@@ -97,7 +97,7 @@ export default function TeamCaseDetailPage() {
                 disabled={reviewing}
                 className="px-4 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-500 disabled:opacity-50"
               >
-                {reviewing ? "提交中…" : "标记为已审核"}
+                {reviewing ? "提交中…" : "用户申请资料已审核"}
               </button>
             )}
             <a href="/team/messages" className="text-sm text-purple-400 hover:text-purple-300">

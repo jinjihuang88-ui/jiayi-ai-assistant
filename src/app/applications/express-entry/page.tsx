@@ -630,17 +630,40 @@ export default function ExpressEntryApplicationPage() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const application: Application = {
       id: Date.now().toString(),
       type: "express-entry",
-      status: "draft",
+      status: "submitted",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       formData,
     };
-    
     localStorage.setItem(`application_${application.id}`, JSON.stringify(application));
+    try {
+      const res = await fetch("/api/member/applications/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "express-entry",
+          title: "快速通道申请",
+          applicationData: application,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        window.location.href = `/applications/express-entry/review?id=${application.id}&caseId=${data.caseId}`;
+        return;
+      }
+      if (res.status === 400) {
+        alert(data.message || "请先选择顾问后再提交");
+        window.location.href = "/member/consultants";
+        return;
+      }
+    } catch (_) {
+      alert("提交失败，请稍后重试");
+      return;
+    }
     window.location.href = `/applications/express-entry/review?id=${application.id}`;
   };
 
