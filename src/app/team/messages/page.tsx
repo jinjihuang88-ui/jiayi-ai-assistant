@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import CallModal from "@/components/CallModal";
 
 interface TeamMember {
   id: string;
@@ -67,6 +68,8 @@ function TeamMessagesContent() {
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showUploadMenu, setShowUploadMenu] = useState(false);
+  const [callModal, setCallModal] = useState<{ type: "video" | "voice"; roomId?: string | null } | null>(null);
+  const [incomingRooms, setIncomingRooms] = useState<{ roomId: string; type: "video" | "voice" }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -85,6 +88,31 @@ function TeamMessagesContent() {
     if (selectedConversation) {
       fetchMessages(selectedConversation);
     }
+  }, [selectedConversation]);
+
+  // 轮询来电（文案/操作员侧）
+  useEffect(() => {
+    if (!selectedConversation) return;
+    const poll = () => {
+      fetch(`/api/call/rooms?caseId=${selectedConversation}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.success && data.rooms?.length) {
+            setIncomingRooms(
+              data.rooms.map((r: { roomId: string; type: string }) => ({
+                roomId: r.roomId,
+                type: r.type === "voice" ? "voice" : "video",
+              }))
+            );
+          } else {
+            setIncomingRooms([]);
+          }
+        })
+        .catch(() => setIncomingRooms([]));
+    };
+    poll();
+    const t = setInterval(poll, 3000);
+    return () => clearInterval(t);
   }, [selectedConversation]);
 
   useEffect(() => {
@@ -360,6 +388,32 @@ function TeamMessagesContent() {
         <div className="flex-1 flex flex-col bg-slate-900">
           {selectedConversation && selectedConv ? (
             <>
+              {/* 来电提示 */}
+              {incomingRooms.length > 0 && (
+                <div className="p-4 border-b border-slate-700 bg-amber-900/20 flex items-center justify-between gap-4">
+                  <span className="text-amber-400 text-sm">
+                    用户发起{incomingRooms[0].type === "video" ? "视频" : "语音"}通话
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setCallModal({ type: incomingRooms[0].type, roomId: incomingRooms[0].roomId });
+                        setIncomingRooms([]);
+                      }}
+                      className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-500"
+                    >
+                      接听
+                    </button>
+                    <button
+                      onClick={() => setIncomingRooms([])}
+                      className="px-4 py-2 rounded-lg bg-slate-600 text-slate-300 text-sm hover:bg-slate-500"
+                    >
+                      拒绝
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* 对话头部 */}
               <div className="p-4 border-b border-slate-700 bg-slate-800">
                 <div className="flex items-center gap-3">
@@ -422,6 +476,21 @@ function TeamMessagesContent() {
               {/* 输入区域 */}
               <div className="p-4 border-t border-slate-700 bg-slate-800">
                 <div className="flex items-center gap-3">
+                  {/* 视频/语音通话 */}
+                  <button
+                    onClick={() => setCallModal({ type: "video" })}
+                    className="p-3 rounded-xl bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white disabled:opacity-50 transition-colors"
+                    title="视频通话"
+                  >
+                    📹 视频
+                  </button>
+                  <button
+                    onClick={() => setCallModal({ type: "voice" })}
+                    className="p-3 rounded-xl bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white disabled:opacity-50 transition-colors"
+                    title="语音通话"
+                  >
+                    🎤 语音
+                  </button>
                   {/* 文件上传按钮 */}
                   <div className="relative">
                     <button
@@ -498,14 +567,27 @@ function TeamMessagesContent() {
                 </div>
               </div>
             </>
-          ) : (
+          ) : null}
+
+          {/* 视频/语音通话弹窗 */}
+          {callModal && selectedConversation && (
+            <CallModal
+              caseId={selectedConversation}
+              type={callModal.type}
+              role="team"
+              roomId={callModal.roomId}
+              onClose={() => setCallModal(null)}
+            />
+          )}
+
+          {!selectedConversation || !selectedConv ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <div className="text-6xl mb-4">💬</div>
                 <p className="text-slate-400">选择一个对话开始聊天</p>
               </div>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </main>

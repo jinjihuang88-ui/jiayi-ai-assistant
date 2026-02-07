@@ -60,7 +60,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-2">登录</h2>
-          <p className="text-gray-600">欢迎回到嘉怡移民助手</p>
+          <p className="text-gray-600">欢迎回到加移顾问平台</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

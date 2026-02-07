@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import CallModal from "@/components/CallModal";
 
 interface RCIC {
   id: string;
@@ -66,6 +67,8 @@ function RCICMessagesContent() {
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showUploadMenu, setShowUploadMenu] = useState(false);
+  const [callModal, setCallModal] = useState<{ type: "video" | "voice"; roomId?: string | null } | null>(null);
+  const [incomingRooms, setIncomingRooms] = useState<{ roomId: string; type: "video" | "voice" }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -84,6 +87,31 @@ function RCICMessagesContent() {
     if (selectedConversation) {
       fetchMessages(selectedConversation);
     }
+  }, [selectedConversation]);
+
+  // 轮询来电（顾问/文案侧）
+  useEffect(() => {
+    if (!selectedConversation) return;
+    const poll = () => {
+      fetch(`/api/call/rooms?caseId=${selectedConversation}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.success && data.rooms?.length) {
+            setIncomingRooms(
+              data.rooms.map((r: { roomId: string; type: string }) => ({
+                roomId: r.roomId,
+                type: r.type === "voice" ? "voice" : "video",
+              }))
+            );
+          } else {
+            setIncomingRooms([]);
+          }
+        })
+        .catch(() => setIncomingRooms([]));
+    };
+    poll();
+    const t = setInterval(poll, 3000);
+    return () => clearInterval(t);
   }, [selectedConversation]);
 
   useEffect(() => {
@@ -409,6 +437,32 @@ function RCICMessagesContent() {
               </div>
             ) : (
               <>
+                {/* 来电提示 */}
+                {incomingRooms.length > 0 && (
+                  <div className="p-4 border-b border-slate-700 bg-amber-900/20 flex items-center justify-between gap-4">
+                    <span className="text-amber-400 text-sm">
+                      用户发起{incomingRooms[0].type === "video" ? "视频" : "语音"}通话
+                    </span>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setCallModal({ type: incomingRooms[0].type, roomId: incomingRooms[0].roomId });
+                          setIncomingRooms([]);
+                        }}
+                        className="px-4 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-500"
+                      >
+                        接听
+                      </button>
+                      <button
+                        onClick={() => setIncomingRooms([])}
+                        className="px-4 py-2 rounded-lg bg-slate-600 text-slate-300 text-sm hover:bg-slate-500"
+                      >
+                        拒绝
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Chat Header */}
                 <div className="p-4 border-b border-slate-700 flex items-center justify-between">
                   <div>
@@ -477,6 +531,21 @@ function RCICMessagesContent() {
                 {/* Input Area */}
                 <div className="p-4 border-t border-slate-700">
                   <div className="flex gap-3 items-end">
+                    {/* 视频/语音通话 */}
+                    <button
+                      onClick={() => setCallModal({ type: "video" })}
+                      className="p-3 rounded-xl border border-slate-600 hover:bg-slate-700 transition-colors"
+                      title="视频通话"
+                    >
+                      <span className="text-slate-400 text-sm">📹 视频</span>
+                    </button>
+                    <button
+                      onClick={() => setCallModal({ type: "voice" })}
+                      className="p-3 rounded-xl border border-slate-600 hover:bg-slate-700 transition-colors"
+                      title="语音通话"
+                    >
+                      <span className="text-slate-400 text-sm">🎤 语音</span>
+                    </button>
                     {/* Upload Button */}
                     <div className="relative">
                       <button
@@ -558,6 +627,17 @@ function RCICMessagesContent() {
           </div>
         </div>
       </div>
+
+      {/* 视频/语音通话弹窗 */}
+      {callModal && selectedConversation && (
+        <CallModal
+          caseId={selectedConversation}
+          type={callModal.type}
+          role="rcic"
+          roomId={callModal.roomId}
+          onClose={() => setCallModal(null)}
+        />
+      )}
     </main>
   );
 }

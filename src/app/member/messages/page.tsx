@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import CallModal from "@/components/CallModal";
 
 interface Application {
   id: string;
@@ -49,6 +50,7 @@ function MessagesContent() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [callModal, setCallModal] = useState<{ type: "video" | "voice" } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -465,6 +467,27 @@ function MessagesContent() {
               )}
               
               <div className="flex gap-3">
+                {/* 视频/语音通话 */}
+                {selectedApp && (
+                  <>
+                    <button
+                      onClick={() => setCallModal({ type: "video" })}
+                      disabled={!selectedApp}
+                      className="px-4 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                      title="视频通话"
+                    >
+                      📹 视频
+                    </button>
+                    <button
+                      onClick={() => setCallModal({ type: "voice" })}
+                      disabled={!selectedApp}
+                      className="px-4 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                      title="语音通话"
+                    >
+                      🎤 语音
+                    </button>
+                  </>
+                )}
                 {/* 文件上传按钮 */}
                 <input
                   ref={fileInputRef}
@@ -506,6 +529,16 @@ function MessagesContent() {
           </div>
         </div>
       </div>
+
+      {/* 视频/语音通话弹窗 */}
+      {callModal && selectedApp && (
+        <CallModal
+          caseId={selectedApp}
+          type={callModal.type}
+          role="member"
+          onClose={() => setCallModal(null)}
+        />
+      )}
 
       {/* Toast Notification */}
       {toast && (

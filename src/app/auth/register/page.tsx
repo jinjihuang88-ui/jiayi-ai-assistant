@@ -123,7 +123,7 @@ export default function UserRegisterPage() {
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-2">用户注册</h2>
-          <p className="text-gray-600">创建您的嘉怡移民助手账户</p>
+          <p className="text-gray-600">创建您的加移顾问平台账户</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

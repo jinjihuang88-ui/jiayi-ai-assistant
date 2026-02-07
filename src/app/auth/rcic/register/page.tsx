@@ -125,7 +125,7 @@ export default function RCICRegisterPage() {
       <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-2">移民顾问注册</h2>
-          <p className="text-gray-600">加入嘉怡移民助手顾问平台</p>
+          <p className="text-gray-600">加入加移顾问平台</p>
         </div>
 
         {/* 步骤指示器 */}

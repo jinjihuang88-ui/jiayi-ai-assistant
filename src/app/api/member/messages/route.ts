@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
+import { getCaseFollowerEmail } from '@/lib/case-follower';
+import { sendCaseFollowerFileNotification } from '@/lib/email';
 
 // 获取消息列表
 export async function GET(request: NextRequest) {
@@ -231,6 +233,28 @@ export async function POST(request: NextRequest) {
         attachments: attachments || null,
       },
     });
+
+    // 会员发送文件/图片时，发邮件通知该案件跟进人
+    const hasAttachments = (() => {
+      if (!attachments) return false;
+      try {
+        const arr = typeof attachments === 'string' ? JSON.parse(attachments) : attachments;
+        return Array.isArray(arr) && arr.length > 0;
+      } catch {
+        return false;
+      }
+    })();
+    if (hasAttachments) {
+      getCaseFollowerEmail(prisma, actualCaseId)
+        .then((follower) => {
+          if (follower?.email) {
+            sendCaseFollowerFileNotification(follower.email, { caseTitle: follower.caseTitle }).catch((e) =>
+              console.error('[Send Message] Notify follower file:', e)
+            );
+          }
+        })
+        .catch((e) => console.error('[Send Message] getCaseFollowerEmail:', e));
+    }
 
     return NextResponse.json({
       success: true,
