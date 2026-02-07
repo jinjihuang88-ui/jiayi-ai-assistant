@@ -18,12 +18,20 @@ function cleanContent(content: string): string {
     .trim();
 }
 
+function genSessionUserId(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+  return "web_" + Math.random().toString(36).slice(2) + "_" + Date.now();
+}
+
 export default function ChatBox() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const sessionUserIdRef = useRef<string>("");
+  const conversationIdRef = useRef<string>("");
+  if (!sessionUserIdRef.current) sessionUserIdRef.current = genSessionUserId();
 
   const scrollToBottom = () => {
     if (messagesContainerRef.current) {
@@ -44,26 +52,88 @@ export default function ChatBox() {
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch("/api/chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({
+          message: userMessage,
+          user_id: sessionUserIdRef.current,
+          conversation_id: conversationIdRef.current || undefined,
+        }),
       });
 
-      const data = await res.json();
-      let replyContent = data.reply || "抱歉，暂时无法回复。";
-      
-      // 清理内容
-      replyContent = cleanContent(replyContent);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error || "请求失败");
+      }
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: replyContent },
-      ]);
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let fullContent = "";
+      if (reader) {
+        let buffer = "";
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+            try {
+              const data = JSON.parse(trimmed);
+              if (data.conversation_id) {
+                conversationIdRef.current = data.conversation_id;
+              }
+              if (data.content) {
+                fullContent += data.content;
+                setMessages((prev) => {
+                  const next = [...prev];
+                  const last = next[next.length - 1];
+                  if (last?.role === "assistant") {
+                    next[next.length - 1] = { ...last, content: fullContent };
+                  } else {
+                    next.push({ role: "assistant", content: fullContent });
+                  }
+                  return next;
+                });
+              }
+              if (data.error) throw new Error(data.error);
+            } catch (e) {
+              if (e instanceof SyntaxError) continue;
+              throw e;
+            }
+          }
+        }
+      }
+
+      if (!fullContent) {
+        const fallback = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: userMessage,
+            user_id: sessionUserIdRef.current,
+            conversation_id: conversationIdRef.current || undefined,
+          }),
+        });
+        const data = await fallback.json();
+        if (data.conversation_id) conversationIdRef.current = data.conversation_id;
+        fullContent = cleanContent(data.reply || "抱歉，暂时无法回复。");
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: fullContent },
+        ]);
+      }
     } catch (error) {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "网络错误，请稍后重试。" },
+        {
+          role: "assistant",
+          content:
+            error instanceof Error ? error.message : "网络错误，请稍后重试。",
+        },
       ]);
     } finally {
       setIsLoading(false);

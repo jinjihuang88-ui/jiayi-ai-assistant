@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { message } = await req.json();
+    const { message, user_id, conversation_id } = await req.json();
 
     if (!process.env.COZE_API_KEY) {
       return NextResponse.json({
@@ -11,20 +11,26 @@ export async function POST(req: NextRequest) {
     }
 
     const botId = process.env.COZE_BOT_ID || "7598385173373190195";
+    const userId = typeof user_id === "string" && user_id ? user_id : "web_user_" + Date.now();
 
-    // 使用非流式请求，更稳定
+    const body: Record<string, unknown> = {
+      bot_id: botId,
+      user: userId,
+      query: message,
+      stream: false,
+      auto_save_history: true,
+    };
+    if (typeof conversation_id === "string" && conversation_id) {
+      body.conversation_id = conversation_id;
+    }
+
     const res = await fetch("https://api.coze.cn/open_api/v2/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${process.env.COZE_API_KEY}`,
       },
-      body: JSON.stringify({
-        bot_id: botId,
-        user: "web_user_" + Date.now(),
-        query: message,
-        stream: false,
-      }),
+      body: JSON.stringify(body),
     });
 
     if (!res.ok) {
@@ -58,7 +64,11 @@ export async function POST(req: NextRequest) {
       reply = "AI 服务返回错误，请稍后再试。";
     }
 
-    return NextResponse.json({ reply });
+    const conversationId = data.conversation_id ?? data.conversation?.id ?? null;
+    return NextResponse.json({
+      reply,
+      ...(conversationId ? { conversation_id: conversationId } : {}),
+    });
   } catch (e) {
     console.error("Chat API error:", e);
     return NextResponse.json({
