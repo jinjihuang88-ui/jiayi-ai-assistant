@@ -46,6 +46,9 @@ export default function Home() {
     }
   };
 
+  /** 找顾问：须经会员登录后进入会员中心找顾问 */
+  const consultantLink = user ? "/member/consultants" : `/auth/login?redirect=${encodeURIComponent("/member/consultants")}`;
+
   return (
     <main className="bg-white text-slate-900">
       {/* Top Nav - 专业导航栏 */}
@@ -80,7 +83,7 @@ export default function Home() {
               首页 <span className="text-xs ml-1 opacity-60">Home</span>
             </a>
             <a
-              href="/consultants"
+              href={consultantLink}
               className="text-white/80 hover:text-white transition-colors duration-200 py-2"
             >
               找顾问 <span className="text-xs ml-1 opacity-60">Find Consultants</span>
@@ -190,7 +193,7 @@ export default function Home() {
                 AI顾问
               </a>
               <a
-                href="/applications"
+                href={consultantLink}
                 className="px-8 py-4 rounded-xl border-2 border-slate-300 text-slate-700 font-semibold text-lg
                            hover:border-[#C62828] hover:text-[#C62828] transition-all duration-300"
               >
@@ -428,7 +431,7 @@ export default function Home() {
                 <li>• 成功案例与评价可查 <span className="text-xs text-slate-400">Cases & reviews</span></li>
                 <li>• 价格与服务范围透明 <span className="text-xs text-slate-400">Transparent pricing</span></li>
               </ul>
-              <a href="/applications" className="text-[#C62828] font-medium text-sm hover:underline">
+              <a href={consultantLink} className="text-[#C62828] font-medium text-sm hover:underline">
                 找顾问 →
               </a>
             </div>
@@ -465,7 +468,7 @@ export default function Home() {
                 <li>• 关键节点确认后放款 <span className="text-xs text-slate-400">Release after milestones</span></li>
                 <li>• 所有沟通与文件留痕 <span className="text-xs text-slate-400">All records traceable</span></li>
               </ul>
-              <a href="/applications" className="text-[#C62828] font-medium text-sm hover:underline">
+              <a href={consultantLink} className="text-[#C62828] font-medium text-sm hover:underline">
                 了解更多 →
               </a>
             </div>
@@ -593,7 +596,7 @@ export default function Home() {
             </a>
 
             {/* 更多服务 */}
-            <a href="/applications" className="group">
+            <a href={consultantLink} className="group">
               <div className="bg-white rounded-2xl p-6 border border-slate-200 
                               hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full flex flex-col items-center justify-center">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-slate-400 to-gray-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
@@ -784,7 +787,7 @@ export default function Home() {
               免费AI移民初评
             </a>
             <a
-              href="/applications"
+              href={consultantLink}
               className="px-8 py-4 rounded-xl border-2 border-slate-300 text-slate-700 font-semibold text-lg
                          hover:border-[#C62828] hover:text-[#C62828] transition-all duration-300"
             >
