@@ -7,19 +7,26 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@jiayi.co';
 const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || '加移顾问平台';
 
-// 生产环境务必设为 https://www.jiayi.co，国内访问验证链接依赖此地址
+// 邮件中的链接必须使用自定义域名 https://www.jiayi.co，国内访问 *.vercel.app 易超时或无法打开
 function getAppUrl(): string {
-  const url = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  if (url.startsWith('http://') && !url.includes('localhost')) {
-    return url.replace('http://', 'https://');
+  if (process.env.APP_URL) {
+    const u = process.env.APP_URL.trim();
+    return u.startsWith('http') ? u : `https://${u}`;
   }
-  return url;
+  const env = process.env.VERCEL_ENV || process.env.NODE_ENV;
+  if (env === 'production') return 'https://www.jiayi.co';
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    const u = process.env.NEXT_PUBLIC_APP_URL.trim();
+    return u.startsWith('http') ? u : `https://${u}`;
+  }
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3000';
 }
-const APP_URL = getAppUrl();
 
 // 发送验证邮件
 export async function sendVerificationEmail(email: string, token: string) {
-  const verificationUrl = `${APP_URL}/auth/verify?token=${token}`;
+  const baseUrl = getAppUrl();
+  const verificationUrl = `${baseUrl}/auth/verify?token=${token}`;
 
   try {
     const { data, error } = await resend.emails.send({
@@ -146,7 +153,7 @@ export async function sendWelcomeEmail(email: string, name: string) {
                       <table width="100%" cellpadding="0" cellspacing="0">
                         <tr>
                           <td align="center" style="padding: 20px 0;">
-                            <a href="${APP_URL}/auth/login" style="display: inline-block; padding: 16px 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
+                            <a href="${getAppUrl()}/auth/login" style="display: inline-block; padding: 16px 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
                               立即登录
                             </a>
                           </td>
@@ -185,7 +192,7 @@ export async function sendWelcomeEmail(email: string, name: string) {
 
 // 发送密码重置邮件
 export async function sendPasswordResetEmail(email: string, token: string) {
-  const resetUrl = `${APP_URL}/auth/reset-password?token=${token}`;
+  const resetUrl = `${getAppUrl()}/auth/reset-password?token=${token}`;
 
   try {
     const { data, error } = await resend.emails.send({
@@ -384,7 +391,7 @@ export async function sendCaseFollowerMissedCallNotification(
 
 // 发送RCIC邮箱验证邮件
 export async function sendRCICVerificationEmail(email: string, token: string, name: string) {
-  const verificationUrl = `${APP_URL}/rcic/verify?token=${token}`;
+  const verificationUrl = `${getAppUrl()}/rcic/verify?token=${token}`;
 
   try {
     const { data, error } = await resend.emails.send({

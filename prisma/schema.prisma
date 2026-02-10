@@ -127,6 +127,22 @@ model RCICSession {
   @@map("rcic_sessions")
 }
 
+// IRCC 官方持牌顾问公开名录（网页抓取或导入，仅展示公开信息，未入驻平台）
+model IRCCConsultant {
+  id                 String   @id @default(cuid())
+  licenseNumber      String   // 注册编号
+  registrationStatus String   // 注册状态 如 Active, Inactive
+  companyAddress     String?  @db.Text // 公司地址（公开）
+  region             String?  // 地区 如 Ontario, BC
+  websiteUrl         String?  @db.Text // 官网链接
+  name               String?  // 顾问姓名（公开）
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([region])
+  @@map("ircc_consultants")
+}
+
 // 案件表
 // 业务规则：一般会员咨询不算案件；签合同收费之后才算为一个案件，该案件由顾问跟踪直到顾问确定结束。
 // type=consultation 仅用于「与顾问沟通」消息线程，不列入任何案件列表。

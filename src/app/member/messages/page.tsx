@@ -42,6 +42,7 @@ function MessagesContent() {
   const searchParams = useSearchParams();
   const [messages, setMessages] = useState<Message[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [contracted, setContracted] = useState(false);
   const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
   const [primaryCaseId, setPrimaryCaseId] = useState<string | null>(null);
   const [consultant, setConsultant] = useState<Consultant | null>(null);
@@ -85,9 +86,26 @@ function MessagesContent() {
       const data = await res.json();
       if (data.success) {
         setContacts(data.contacts || []);
+        setContracted(!!data.contracted);
       }
     } catch (error) {
       console.error("Error fetching contacts:", error);
+    }
+  };
+
+  const handleCancelContract = async () => {
+    if (!contracted || !confirm("确定要取消与当前顾问的合约吗？取消后可重新选择顾问。")) return;
+    try {
+      const res = await fetch("/api/member/cancel-contract", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+      const data = await res.json();
+      if (data.success) {
+        showToast(data.message || "合约已取消", "success");
+        await fetchContacts();
+      } else {
+        showToast(data.message || "取消失败", "error");
+      }
+    } catch (e) {
+      showToast("取消合约失败", "error");
     }
   };
 
@@ -260,6 +278,15 @@ function MessagesContent() {
             <div className="p-4 border-b border-slate-100">
               <h2 className="font-semibold text-slate-900">消息</h2>
               <p className="text-sm text-slate-500">与顾问、文案或操作员沟通</p>
+              {contracted && (
+                <button
+                  type="button"
+                  onClick={handleCancelContract}
+                  className="mt-2 text-xs text-amber-600 hover:text-amber-700 underline"
+                >
+                  取消合约后可更换顾问
+                </button>
+              )}
             </div>
 
             <div className="flex-1 overflow-y-auto">

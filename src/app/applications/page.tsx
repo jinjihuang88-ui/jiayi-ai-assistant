@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
 const applications = [
   {
@@ -63,12 +64,27 @@ const applications = [
   },
 ];
 
-export default function ApplicationsPage() {
+function backConfig(from: string | null) {
+  if (from === "member") return { href: "/member", label: "返回会员中心" };
+  if (from === "rcic") return { href: "/rcic/dashboard", label: "返回顾问后台" };
+  if (from === "team") return { href: "/team/dashboard", label: "返回团队后台" };
+  return { href: "/", label: "返回首页" };
+}
+
+function ApplicationsContent() {
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
   const [isLoaded, setIsLoaded] = useState(false);
+  const back = backConfig(from);
 
   useEffect(() => {
     setIsLoaded(true);
   }, []);
+
+  const appendFrom = (path: string) => {
+    if (!from) return path;
+    return path + (path.includes("?") ? "&" : "?") + "from=" + encodeURIComponent(from);
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -76,9 +92,9 @@ export default function ApplicationsPage() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/50">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-6">
-            <a href="/" className="flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors">
+            <a href={back.href} className="flex items-center gap-2 text-slate-600 hover:text-slate-900 text-sm font-medium transition-colors">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-              返回首页
+              {back.label}
             </a>
             <a href="/" className="flex items-center gap-3 group">
               <img src="/logo.png" alt="Logo" className="h-8 w-8 rounded-lg" />
@@ -170,7 +186,7 @@ export default function ApplicationsPage() {
                   {/* Action Button */}
                   {app.status === 'available' ? (
                     <a
-                      href={app.href}
+                      href={appendFrom(app.href)}
                       className={`
                         w-full py-3 rounded-xl bg-gradient-to-r ${app.color} text-white font-semibold
                         flex items-center justify-center gap-2
@@ -222,5 +238,17 @@ export default function ApplicationsPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function ApplicationsPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-b from-slate-50 to-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-slate-300 border-t-red-500" />
+      </main>
+    }>
+      <ApplicationsContent />
+    </Suspense>
   );
 }

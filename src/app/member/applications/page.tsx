@@ -135,7 +135,7 @@ export default function ApplicationsPage() {
             <p className="text-slate-600">管理您的所有移民申请</p>
           </div>
           <a
-            href="/applications"
+            href="/applications?from=member"
             className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-600 to-red-500 text-white font-medium hover:from-red-700 hover:to-red-600 shadow-lg shadow-red-500/25"
           >
             + 新建申请
@@ -173,7 +173,7 @@ export default function ApplicationsPage() {
               {filter === "all" ? "您还没有任何申请记录" : `没有${filterOptions.find((o) => o.value === filter)?.label}的申请`}
             </p>
             <a
-              href="/applications"
+              href="/applications?from=member"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-red-600 text-white font-medium hover:bg-red-700"
             >
               开始新申请
@@ -244,7 +244,7 @@ export default function ApplicationsPage() {
                         </a>
                         {["draft", "needs_revision"].includes(app.status) && (
                           <a
-                            href={`/applications/${app.type}?id=${app.id}`}
+                            href={`/applications/${app.type}?id=${app.id}&from=member`}
                             className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700"
                           >
                             {app.status === "draft" ? "继续填写" : "修改申请"}

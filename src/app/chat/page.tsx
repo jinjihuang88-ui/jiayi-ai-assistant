@@ -52,6 +52,7 @@ export default function ChatPage() {
                   { icon: "🏛️", title: "官方数据驱动", desc: "基于 IRCC 官方公开信息" },
                   { icon: "💬", title: "即时对话", desc: "实时 AI 智能回复" },
                   { icon: "🔒", title: "隐私优先", desc: "不收集敏感个人信息" },
+                  { icon: "⚖️", title: "不替代专业判断", desc: "Does not replace professional judgment." },
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-white border border-slate-200 hover:shadow-md transition-shadow">
                     <span className="text-2xl">{item.icon}</span>

@@ -310,6 +310,8 @@ const colorClasses: Record<string, { bg: string; border: string; text: string }>
 
 function ExpressEntryReviewContent() {
   const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+  const applicationsBackHref = from ? `/applications?from=${encodeURIComponent(from)}` : "/applications";
   const [application, setApplication] = useState<Application | null>(null);
 
   useEffect(() => {
@@ -339,7 +341,7 @@ function ExpressEntryReviewContent() {
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <a href="/applications" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium">
+          <a href={applicationsBackHref} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             返回申请列表
           </a>

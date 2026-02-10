@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Application } from "@/types/application";
 
 // AI 咨询弹窗组件
@@ -100,7 +101,10 @@ function AIHelpModal({
   );
 }
 
-export default function StudyPermitPage() {
+function StudyPermitPageContent() {
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+  const applicationsBackHref = from ? `/applications?from=${encodeURIComponent(from)}` : "/applications";
   const [currentStep, setCurrentStep] = useState(0);
   const [aiHelpField, setAiHelpField] = useState<{label: string; hint?: string} | null>(null);
   const [application, setApplication] = useState<Application>({
@@ -509,7 +513,7 @@ export default function StudyPermitPage() {
             <img src="/logo.png" alt="Logo" className="h-10 w-10 rounded-lg" />
             <span className="font-semibold text-red-600">加移AI助理</span>
           </a>
-          <a href="/applications" className="text-slate-600 hover:text-slate-900">
+          <a href={applicationsBackHref} className="text-slate-600 hover:text-slate-900">
             ← 返回申请列表
           </a>
         </div>
@@ -638,7 +642,9 @@ export default function StudyPermitPage() {
                     });
                     const data = await res.json();
                     if (data.success) {
-                      window.location.href = `/applications/study-permit/review?caseId=${data.caseId}`;
+                      let url = `/applications/study-permit/review?caseId=${data.caseId}`;
+                      if (from) url += `&from=${encodeURIComponent(from)}`;
+                      window.location.href = url;
                       return;
                     }
                     if (res.status === 400) {
@@ -650,7 +656,9 @@ export default function StudyPermitPage() {
                     alert("提交失败，请稍后重试");
                     return;
                   }
-                  window.location.href = "/applications/study-permit/review";
+                  let url = "/applications/study-permit/review";
+                  if (from) url += `?from=${encodeURIComponent(from)}`;
+                  window.location.href = url;
                 }}
                 className="px-8 py-3 rounded-xl bg-gradient-to-r from-green-600 to-green-500 text-white font-medium
                            hover:from-green-700 hover:to-green-600 transition-all shadow-lg"
@@ -681,5 +689,13 @@ export default function StudyPermitPage() {
         fieldHint={aiHelpField?.hint}
       />
     </main>
+  );
+}
+
+export default function StudyPermitPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50"><div className="text-center text-slate-600">加载中...</div></div>}>
+      <StudyPermitPageContent />
+    </Suspense>
   );
 }

@@ -31,6 +31,16 @@ interface Consultant {
   statusLabel?: string;
 }
 
+interface IRCCConsultantItem {
+  id: string;
+  licenseNumber: string;
+  registrationStatus: string;
+  companyAddress: string | null;
+  region: string | null;
+  websiteUrl: string | null;
+  name: string | null;
+}
+
 export default function ConsultantsPage() {
   const router = useRouter();
   const [consultants, setConsultants] = useState<Consultant[]>([]);
@@ -38,9 +48,26 @@ export default function ConsultantsPage() {
   const [selectedConsultant, setSelectedConsultant] = useState<Consultant | null>(null);
   const [showModal, setShowModal] = useState(false);
 
+  const [irccConsultants, setIrccConsultants] = useState<IRCCConsultantItem[]>([]);
+  const [irccRegionOptions, setIrccRegionOptions] = useState<string[]>([]);
+  const [irccRegionFilter, setIrccRegionFilter] = useState<string>("");
+  const [irccLoading, setIrccLoading] = useState(true);
+  const [contracted, setContracted] = useState<boolean | null>(null);
+
   useEffect(() => {
     fetchConsultants();
   }, []);
+
+  useEffect(() => {
+    fetch("/api/member/contract-status")
+      .then((r) => r.json())
+      .then((d) => d.success && setContracted(!!d.contracted))
+      .catch(() => setContracted(false));
+  }, []);
+
+  useEffect(() => {
+    fetchIrccConsultants(irccRegionFilter || undefined);
+  }, [irccRegionFilter]);
 
   const fetchConsultants = async () => {
     try {
@@ -54,6 +81,25 @@ export default function ConsultantsPage() {
       console.error("获取顾问列表失败:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchIrccConsultants = async (region?: string) => {
+    setIrccLoading(true);
+    try {
+      const url = region
+        ? `/api/member/consultants/ircc-official?region=${encodeURIComponent(region)}`
+        : "/api/member/consultants/ircc-official";
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.success) {
+        setIrccConsultants(data.consultants);
+        setIrccRegionOptions(data.regionOptions || []);
+      }
+    } catch (error) {
+      console.error("获取 IRCC 官方名录失败:", error);
+    } finally {
+      setIrccLoading(false);
     }
   };
 
@@ -82,6 +128,7 @@ export default function ConsultantsPage() {
         router.push('/member');
       } else {
         alert(data.message || '分配失败');
+        setShowModal(false);
       }
     } catch (error) {
       console.error('分配顾问失败:', error);
@@ -116,15 +163,35 @@ export default function ConsultantsPage() {
         </div>
       </div>
 
-      {/* 顾问列表 */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {consultants.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-slate-400 text-lg">暂无可用顾问</div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+        {contracted === true && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between gap-4">
+            <p className="text-amber-800 text-sm">
+              您已与顾问签约，无法更换顾问。如需更换，请先在消息页取消合约后再选择新顾问。
+            </p>
+            <a
+              href="/member/messages"
+              className="shrink-0 px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-700"
+            >
+              前往消息
+            </a>
           </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {consultants.map((consultant) => (
+        )}
+        {/* 一、平台入驻顾问（原有逻辑不变） */}
+        <section>
+          <h2 className="text-lg font-semibold text-slate-800 mb-4">
+            平台入驻顾问
+          </h2>
+          <p className="text-sm text-slate-500 mb-4">
+            以下顾问已入驻本平台，您可以选择其一作为您的移民顾问。
+          </p>
+          {consultants.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
+              <div className="text-slate-400 text-lg">暂无可用顾问</div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {consultants.map((consultant) => (
               <div
                 key={consultant.id}
                 className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow overflow-hidden"
@@ -277,21 +344,117 @@ export default function ConsultantsPage() {
 
                   {/* 选择按钮 */}
                   <button
-                    onClick={() => handleSelectConsultant(consultant)}
-                    disabled={!consultant.isAcceptingCases}
+                    onClick={() => !contracted && handleSelectConsultant(consultant)}
+                    disabled={contracted === true || !consultant.isAcceptingCases}
                     className={`w-full py-3 rounded-xl font-medium transition-colors ${
-                      consultant.isAcceptingCases
-                        ? "bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600"
-                        : "bg-slate-200 text-slate-500 cursor-not-allowed"
+                      contracted || !consultant.isAcceptingCases
+                        ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                        : "bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600"
                     }`}
                   >
-                    {consultant.isAcceptingCases ? "选择此顾问" : "暂不接收新案件"}
+                    {contracted ? "已签约，无法更换" : consultant.isAcceptingCases ? "选择此顾问" : "暂不接收新案件"}
                   </button>
                 </div>
               </div>
             ))}
+            </div>
+          )}
+        </section>
+
+        {/* 二、IRCC 官方持牌顾问名录（仅公开信息，未入驻，按地区筛选） */}
+        <section>
+          <h2 className="text-lg font-semibold text-slate-800 mb-2">
+            IRCC 官方持牌顾问名录
+          </h2>
+          <p className="text-sm text-slate-500 mb-4">
+            以下为 IRCC 官方公开注册信息，仅供查阅与筛选；该名录中的顾问未入驻本平台，不可在此选择。
+          </p>
+          <div className="mb-4 space-y-2">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-sm text-slate-600">按地区筛选：</span>
+              <select
+                value={irccRegionFilter}
+                onChange={(e) => setIrccRegionFilter(e.target.value)}
+                className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-800 bg-white min-w-[140px]"
+              >
+                <option value="">全部地区</option>
+                {irccRegionOptions.map((r) => (
+                  <option key={r} value={r}>{r}</option>
+                ))}
+              </select>
+            </div>
+            <p className="text-xs text-slate-500">
+              官方名录当前不包含地区字段，仅展示「全部地区」。若需按省/城市筛选，请前往
+              <a
+                href="https://college-ic.ca/protecting-the-public/find-an-immigration-consultant"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline ml-1"
+              >
+                College 官网查询
+              </a>
+              。
+            </p>
           </div>
-        )}
+          {irccLoading ? (
+            <div className="py-12 text-center text-slate-500">加载中...</div>
+          ) : irccConsultants.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
+              <div className="text-slate-400 text-lg">暂无公开名录数据</div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {irccConsultants.map((c) => (
+                <div
+                  key={c.id}
+                  className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden p-5"
+                >
+                  {c.name && (
+                    <h3 className="text-base font-semibold text-slate-900 mb-2">{c.name}</h3>
+                  )}
+                  <dl className="space-y-1.5 text-sm">
+                    <div>
+                      <dt className="text-slate-500 inline">注册编号：</dt>
+                      <dd className="inline font-medium text-slate-800">{c.licenseNumber}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-slate-500 inline">注册状态：</dt>
+                      <dd className="inline text-slate-700">{c.registrationStatus}</dd>
+                    </div>
+                    {c.region && (
+                      <div>
+                        <dt className="text-slate-500 inline">地区：</dt>
+                        <dd className="inline text-slate-700">{c.region}</dd>
+                      </div>
+                    )}
+                    {c.companyAddress && (
+                      <div>
+                        <dt className="text-slate-500 block mb-0.5">公司地址：</dt>
+                        <dd className="text-slate-700">{c.companyAddress}</dd>
+                      </div>
+                    )}
+                  </dl>
+                  {c.websiteUrl && (
+                    <a
+                      href={c.websiteUrl.startsWith("http") ? c.websiteUrl : `https://${c.websiteUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-4 inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      官网链接
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* 信息来源声明 */}
+        <footer className="pt-8 pb-4 border-t border-slate-200 text-center text-sm text-slate-500">
+          信息来源声明：信息来源于公开渠道，仅供参考。
+        </footer>
       </div>
 
       {/* 确认模态框 */}

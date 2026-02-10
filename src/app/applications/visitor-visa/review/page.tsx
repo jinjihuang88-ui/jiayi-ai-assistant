@@ -1,9 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Application, ApplicationField } from "@/types/application";
 
-export default function VisitorVisaReviewPage() {
+function VisitorVisaReviewPageContent() {
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+  const applicationsBackHref = from ? `/applications?from=${encodeURIComponent(from)}` : "/applications";
+  const formHref = from ? `/applications/visitor-visa?from=${encodeURIComponent(from)}` : "/applications/visitor-visa";
   const [application, setApplication] = useState<Application | null>(null);
 
   useEffect(() => {
@@ -59,7 +64,7 @@ export default function VisitorVisaReviewPage() {
             <img src="/logo.png" alt="Logo" className="h-10 w-10 rounded-lg" />
             <span className="font-semibold text-red-600">加移AI助理</span>
           </a>
-          <a href="/applications" className="text-slate-600 hover:text-slate-900">
+          <a href={applicationsBackHref} className="text-slate-600 hover:text-slate-900">
             ← 返回申请列表
           </a>
         </div>
@@ -152,7 +157,7 @@ export default function VisitorVisaReviewPage() {
         {/* Action Buttons */}
         <div className="mt-8 flex gap-4">
           <a
-            href="/applications/visitor-visa"
+            href={formHref}
             className="flex-1 py-3 px-6 bg-white border border-slate-300 rounded-xl text-center font-medium text-slate-700 hover:bg-slate-50 transition-all"
           >
             修改申请
@@ -166,5 +171,13 @@ export default function VisitorVisaReviewPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function VisitorVisaReviewPage() {
+  return (
+    <Suspense fallback={<main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50"><div className="text-slate-600">加载中...</div></main>}>
+      <VisitorVisaReviewPageContent />
+    </Suspense>
   );
 }

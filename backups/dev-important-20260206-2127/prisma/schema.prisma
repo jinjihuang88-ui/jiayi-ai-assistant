@@ -1,0 +1,284 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 使用 TiDB Cloud（MySQL 协议）；连接串在 TiDB 控制台 Connect -> Prisma 获取，末尾加 ?sslaccept=strict
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String
+  password        String
+  phone           String?
+  avatar          String?   // 新增：用户头像
+  emailVerified   Boolean   @default(false)
+  emailVerifiedAt DateTime?
+  lastLoginAt     DateTime? // 新增：最后登录时间
+  assignedRcicId  String?   // 分配的顾问ID（用于咨询）
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // 关系
+  cases          Case[]
+  assignedRcic   RCIC?     @relation("UserAssignedRcic", fields: [assignedRcicId], references: [id])
+
+  @@map("users")
+}
+
+// 移民顾问表（RCIC）
+model RCIC {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  phone     String?
+  avatar    String?   // 新增：顾问头像
+  
+  // 邮箱验证
+  emailVerified          Boolean   @default(false)
+  emailVerifiedAt        DateTime?
+  verificationToken      String?   // 邮箱验证token
+  verificationTokenExpiry DateTime? // 验证token过期时间
+  
+  // 顾问类型和资质
+  consultantType    String    @default("A") // A: 持牌顾问, B: 留学顾问, C: 文案辅助
+  licenseNumber     String?   // RCIC 执照编号（A类必填）
+  licenseNo         String?   // 新增：兼容旧代码的字段名
+  level             String?   // 新增：顾问等级（兼容旧代码）
+  licenseVerified   Boolean   @default(false)
+  licenseExpiryDate DateTime? // 执照过期日期
+  yearsOfExperience Int?      // 从业年限
+  
+  // 审核状态
+  approvalStatus  String    @default("pending") // pending, under_review, approved, rejected, suspended
+  approvalNotes   String?   // 审核备注
+  approvedAt      DateTime? // 审核通过时间
+  approvedBy      String?   // 审核人员ID
+  
+  // 资质文档（可能为 data URL/base64，需长文本）
+  idDocument        String?  @db.LongText // 身份证件
+  licenseDocument   String?  @db.LongText // 执照文件
+  experienceProof   String?  @db.LongText // 从业证明
+  videoVerification String?  @db.LongText // 视频认证
+  
+  // 审核时间
+  lastReviewDate DateTime? // 最后审核日期
+  nextReviewDate DateTime? // 下次审核日期（持牌顾问6-12个月复核）
+  
+  // 账号和在线状态（新增）
+  isActive      Boolean   @default(true)  // 账号是否激活（是否被禁用/封号）
+  isOnline      Boolean   @default(false) // 是否在线
+  lastLoginAt   DateTime? // 最后登录时间
+  lastActiveAt  DateTime? // 最后活跃时间
+  
+  // 基本信息
+  country      String?
+  city         String?
+  organization String?  @db.Text // 执业机构
+  bio          String?  @db.LongText // 个人简介
+  
+  // 顾问展示信息（用于用户选择）
+  profilePhoto      String?   // 职业照片URL
+  specialties       String?   // 专业领域（JSON数组），如: ["Express Entry", "Family Sponsorship"]
+  serviceRegions    String?   // 服务区域（JSON数组），如: ["Ontario", "British Columbia"]
+  successRate       Float?    @default(0) // 成功率（0-100）
+  totalCases        Int?      @default(0) // 总案件数
+  successfulCases   Int?      @default(0) // 成功案件数
+  averageRating     Float?    @default(0) // 平均评分（0-5）
+  totalReviews      Int?      @default(0) // 评价数量
+  languages         String?   // 语言能力（JSON数组），如: ["English", "Mandarin", "French"]
+  certifications    String?   // 证书和荣誉（JSON数组）
+  isAcceptingCases  Boolean   @default(true) // 是否接收新案件
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关系
+  cases          Case[]
+  sessions       RCICSession[] // 新增：会话关系
+  assignedUsers  User[]    @relation("UserAssignedRcic") // 分配给该顾问的用户
+
+  @@map("rcics")
+}
+
+// RCIC 会话表（新增）
+model RCICSession {
+  id        String   @id @default(cuid())
+  rcicId    String
+  token     String   @unique
+  expiresAt DateTime
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  // 关系
+  rcic RCIC @relation(fields: [rcicId], references: [id], onDelete: Cascade)
+
+  @@index([rcicId])
+  @@index([token])
+  @@map("rcic_sessions")
+}
+
+// 案件表（案件 = 用户确定申请后自己填好的移民/留学/旅游等资料提交给顾问形成的申请单；案内含跟进、消息、文件、审核）
+model Case {
+  id                    String    @id @default(cuid())
+  userId                String
+  rcicId                String?
+  type                  String    // consultation | visitor_visa, study_permit, immigration 等申请类型
+  status                String    @default("pending") // pending, in_progress, completed, cancelled
+  title                 String
+  description           String?
+  assignedTeamMemberId  String?   // 指派的文案/操作员 ID，日常跟进人
+  rcicReviewedAt        DateTime? // 用户申请资料已审核时间（持牌顾问或文案/操作员均可操作，对外统一显示为持牌顾问审核）
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // 关系
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rcic     RCIC?     @relation(fields: [rcicId], references: [id], onDelete: SetNull)
+  messages Message[]
+
+  @@index([userId])
+  @@index([rcicId])
+  @@index([assignedTeamMemberId])
+  @@map("cases")
+}
+
+// 消息表
+model Message {
+  id         String   @id @default(cuid())
+  caseId     String
+  senderId   String
+  senderType String // user or rcic
+  content    String   @db.LongText
+  attachments String? @db.LongText // JSON array of file URLs (可能包含 data URL/base64)
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  // 关系
+  case Case  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  // 注意：senderId 可以是 User.id 或 RCIC.id，由 senderType 字段区分
+  // 不使用外键约束，因为 senderId 不能同时指向两个表
+
+  @@index([caseId])
+  @@index([senderId])
+  @@map("messages")
+}
+
+// RCIC团队成员表（阶段1：最简化版本）
+model RCICTeamMember {
+  id        String   @id @default(cuid())
+  rcicId    String   // 所属RCIC的ID（不使用外键，避免复杂关系）
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("operator") // operator: 文案/操作员
+  
+  // 邮箱验证
+  emailVerified   Boolean   @default(false)
+  emailVerifiedAt DateTime?
+  
+  // 状态
+  isActive    Boolean   @default(true)  // 是否启用
+  lastLoginAt DateTime? // 最后登录时间
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([rcicId])
+  @@map("rcic_team_members")
+}
+
+// RCIC团队成员会话表
+model RCICTeamMemberSession {
+  id        String   @id @default(cuid())
+  memberId  String   // 团队成员ID（不使用外键，避免复杂关系）
+  token     String   @unique
+  expiresAt DateTime
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@index([memberId])
+  @@index([token])
+  @@map("rcic_team_member_sessions")
+}
+
+// 邮箱验证令牌表
+model VerificationToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  type      String   // email_verification, password_reset
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([token])
+  @@map("verification_tokens")
+}
+
+// 内部对话表（RCIC和团队成员之间的一对一对话）
+model InternalConversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 对话参与者（两个人）
+  participant1Id   String
+  participant1Type String // "rcic" 或 "team_member"
+  participant2Id   String
+  participant2Type String // "rcic" 或 "team_member"
+
+  // 最后一条消息
+  lastMessageAt      DateTime?
+  lastMessageContent String?  @db.LongText
+
+  // 关系
+  messages InternalMessage[]
+
+  @@unique([participant1Id, participant2Id])
+  @@map("internal_conversations")
+}
+
+// 内部消息表
+model InternalMessage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // 消息内容
+  content     String? @db.LongText
+  messageType String  @default("text") // "text", "file", "image"
+
+  // 文件信息（如果是文件或图片）
+  fileUrl      String? @db.LongText
+  fileName     String? @db.Text
+  fileSize     Int?
+  fileMimeType String? @db.Text
+
+  // 发送者
+  senderId   String
+  senderType String // "rcic" 或 "team_member"
+
+  // 接收者
+  receiverId   String
+  receiverType String // "rcic" 或 "team_member"
+
+  // 已读状态
+  isRead Boolean @default(false)
+  readAt DateTime?
+
+  // 关联对话
+  conversationId String
+  conversation   InternalConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@map("internal_messages")
+}

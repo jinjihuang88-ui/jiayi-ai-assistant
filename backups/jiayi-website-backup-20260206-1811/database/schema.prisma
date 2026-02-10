@@ -1,0 +1,137 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String
+  password        String
+  phone           String?
+  emailVerified   Boolean   @default(false)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // 关系
+  cases    Case[]
+  messages Message[]
+
+  @@map("users")
+}
+
+// 移民顾问表（RCIC）
+model RCIC {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  phone     String?
+  
+  // 邮箱验证
+  emailVerified   Boolean   @default(false)
+  emailVerifiedAt DateTime?
+  
+  // 顾问类型和资质
+  consultantType    String    @default("A") // A: 持牌顾问, B: 留学顾问, C: 文案辅助
+  licenseNumber     String?   // RCIC 执照编号（A类必填）
+  licenseVerified   Boolean   @default(false)
+  licenseExpiryDate DateTime? // 执照过期日期
+  yearsOfExperience Int?      // 从业年限
+  
+  // 审核状态
+  approvalStatus  String    @default("pending") // pending, under_review, approved, rejected, suspended
+  approvalNotes   String?   // 审核备注
+  approvedAt      DateTime? // 审核通过时间
+  approvedBy      String?   // 审核人员ID
+  
+  // 资质文档
+  idDocument        String? // 身份证件
+  licenseDocument   String? // 执照文件
+  experienceProof   String? // 从业证明
+  videoVerification String? // 视频认证
+  
+  // 审核时间
+  lastReviewDate DateTime? // 最后审核日期
+  nextReviewDate DateTime? // 下次审核日期（持牌顾问6-12个月复核）
+  
+  // 基本信息
+  country      String?
+  city         String?
+  organization String? // 执业机构
+  bio          String? // 个人简介
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 关系
+  cases    Case[]
+  messages Message[]
+
+  @@map("rcics")
+}
+
+// 案件表
+model Case {
+  id          String   @id @default(cuid())
+  userId      String
+  rcicId      String?
+  type        String // visitor_visa, study_permit, immigration
+  status      String   @default("pending") // pending, in_progress, completed, cancelled
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 关系
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rcic     RCIC?     @relation(fields: [rcicId], references: [id], onDelete: SetNull)
+  messages Message[]
+
+  @@index([userId])
+  @@index([rcicId])
+  @@map("cases")
+}
+
+// 消息表
+model Message {
+  id        String   @id @default(cuid())
+  caseId    String
+  senderId  String
+  senderType String // user or rcic
+  content   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // 关系
+  case Case  @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  user User? @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  rcic RCIC? @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([caseId])
+  @@index([senderId])
+  @@map("messages")
+}
+
+// 邮箱验证令牌表
+model VerificationToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  type      String   // email_verification, password_reset
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([token])
+  @@map("verification_tokens")
+}

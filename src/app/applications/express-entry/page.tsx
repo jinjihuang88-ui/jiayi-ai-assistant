@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Application } from "@/types/application";
 
 // AI 咨询弹窗组件
@@ -211,7 +212,10 @@ function StepIndicator({ currentStep, totalSteps, stepTitles }: { currentStep: n
   );
 }
 
-export default function ExpressEntryApplicationPage() {
+function ExpressEntryApplicationPageContent() {
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+  const applicationsBackHref = from ? `/applications?from=${encodeURIComponent(from)}` : "/applications";
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 18;
   
@@ -652,7 +656,9 @@ export default function ExpressEntryApplicationPage() {
       });
       const data = await res.json();
       if (data.success) {
-        window.location.href = `/applications/express-entry/review?id=${application.id}&caseId=${data.caseId}`;
+        let url = `/applications/express-entry/review?id=${application.id}&caseId=${data.caseId}`;
+        if (from) url += `&from=${encodeURIComponent(from)}`;
+        window.location.href = url;
         return;
       }
       if (res.status === 400) {
@@ -664,7 +670,9 @@ export default function ExpressEntryApplicationPage() {
       alert("提交失败，请稍后重试");
       return;
     }
-    window.location.href = `/applications/express-entry/review?id=${application.id}`;
+    let url = `/applications/express-entry/review?id=${application.id}`;
+    if (from) url += `&from=${encodeURIComponent(from)}`;
+    window.location.href = url;
   };
 
   const countryOptions = [
@@ -3886,7 +3894,7 @@ export default function ExpressEntryApplicationPage() {
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-red-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <a href="/applications" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium">
+          <a href={applicationsBackHref} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             返回申请列表
           </a>
@@ -3923,6 +3931,24 @@ export default function ExpressEntryApplicationPage() {
                        disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
             >
               上一步
+            </button>
+
+            <button
+              onClick={() => {
+                const draft = {
+                  id: Date.now().toString(),
+                  type: "express-entry",
+                  status: "draft" as const,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                  formData,
+                };
+                localStorage.setItem(`application_${draft.id}`, JSON.stringify(draft));
+                alert("草稿已保存！");
+              }}
+              className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            >
+              💾 保存草稿
             </button>
 
             {currentStep < totalSteps ? (
@@ -3991,5 +4017,13 @@ export default function ExpressEntryApplicationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ExpressEntryApplicationPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-red-50"><div className="text-center text-gray-600">加载中...</div></div>}>
+      <ExpressEntryApplicationPageContent />
+    </Suspense>
   );
 }

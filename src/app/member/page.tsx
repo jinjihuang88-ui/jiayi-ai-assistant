@@ -60,6 +60,7 @@ export default function MemberDashboard() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [contracted, setContracted] = useState(false);
 
   useEffect(() => {
     fetchUserData();
@@ -92,6 +93,11 @@ export default function MemberDashboard() {
         setNotifications(notifData.notifications);
         setUnreadCount(notifData.unreadCount);
       }
+
+      // 签约状态（已签约时不再显示「选择顾问」，改为「与顾问沟通」）
+      const contractRes = await fetch("/api/member/contract-status");
+      const contractData = await contractRes.json();
+      if (contractData.success) setContracted(!!contractData.contracted);
     } catch (error) {
       console.error("Error fetching user data:", error);
     } finally {
@@ -217,7 +223,7 @@ export default function MemberDashboard() {
                   <div className="text-4xl mb-4">📝</div>
                   <p className="text-slate-500 mb-4">您还没有任何申请</p>
                   <a
-                    href="/applications"
+                    href="/applications?from=member"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700"
                   >
                     开始新申请
@@ -259,11 +265,13 @@ export default function MemberDashboard() {
               <h2 className="font-semibold text-slate-900 mb-4">快速操作</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { label: "选择顾问", href: "/member/consultants", icon: "👨‍⚖️", color: "from-orange-500 to-red-500" },
-                  { label: "学习签证", href: "/applications/study-permit", icon: "🎓", color: "from-blue-500 to-cyan-500" },
-                  { label: "访客签证", href: "/applications/visitor-visa", icon: "✈️", color: "from-green-500 to-emerald-500" },
-                  { label: "工作签证", href: "/applications/work-permit", icon: "💼", color: "from-purple-500 to-pink-500" },
-                  { label: "技术移民", href: "/applications/express-entry", icon: "🚀", color: "from-indigo-500 to-blue-500" },
+                  contracted
+                    ? { label: "与顾问沟通", href: "/member/messages", icon: "💬", color: "from-orange-500 to-red-500" }
+                    : { label: "选择顾问", href: "/member/consultants", icon: "👨‍⚖️", color: "from-orange-500 to-red-500" },
+                  { label: "学习签证", href: "/applications/study-permit?from=member", icon: "🎓", color: "from-blue-500 to-cyan-500" },
+                  { label: "访客签证", href: "/applications/visitor-visa?from=member", icon: "✈️", color: "from-green-500 to-emerald-500" },
+                  { label: "工作签证", href: "/applications/work-permit?from=member", icon: "💼", color: "from-purple-500 to-pink-500" },
+                  { label: "技术移民", href: "/applications/express-entry?from=member", icon: "🚀", color: "from-indigo-500 to-blue-500" },
                 ].map((action, i) => (
                   <a
                     key={i}

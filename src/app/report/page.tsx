@@ -68,7 +68,7 @@ function ReportContent() {
             Powered by Official Canadian Data
           </p>
           <div className="text-sm text-slate-500 space-y-1">
-            <div>加移AI助理 · MaplePath AI</div>
+            <div>加移AI助理 · MapleBridge</div>
             <div>{new Date().toLocaleDateString()}</div>
           </div>
         </div>

@@ -179,7 +179,7 @@ export default function ApplicationDetailPage() {
           <div className="flex items-center gap-3">
             {["draft", "needs_revision"].includes(application.status) && (
               <a
-                href={`/applications/${applicationTypeToPath(application.type)}?id=${application.id}`}
+                href={`/applications/${applicationTypeToPath(application.type)}?id=${application.id}&from=member`}
                 className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-medium hover:bg-red-700"
               >
                 {application.status === "draft" ? "继续填写" : "修改申请"}
@@ -299,7 +299,7 @@ export default function ApplicationDetailPage() {
               <div className="space-y-3">
                 {["draft", "needs_revision"].includes(application.status) && (
                   <a
-                    href={`/applications/${applicationTypeToPath(application.type)}?id=${application.id}`}
+                    href={`/applications/${applicationTypeToPath(application.type)}?id=${application.id}&from=member`}
                     className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50"
                   >
                     <span className="text-xl">✏️</span>

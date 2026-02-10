@@ -40,10 +40,29 @@ export async function GET(request: NextRequest) {
         caseIds = casesForContact.map((c) => c.id);
       }
       if (caseIds.length === 0) {
+        // 已选顾问、尚未发过消息时：仍返回该顾问信息，便于右侧显示「您的持牌顾问：XXX」
+        let consultantForContact: unknown = null;
+        if (prefix === 'rcic' && id) {
+          const rcic = await prisma.rCIC.findUnique({
+            where: { id },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              avatar: true,
+              profilePhoto: true,
+              consultantType: true,
+              organization: true,
+              isOnline: true,
+              lastActiveAt: true,
+            },
+          });
+          consultantForContact = rcic;
+        }
         return NextResponse.json({
           success: true,
           messages: [],
-          consultant: null,
+          consultant: consultantForContact,
           assignedTeamMemberName: null,
           rcicReviewedAt: null,
           primaryCaseId: null,

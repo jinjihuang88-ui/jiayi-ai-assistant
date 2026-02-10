@@ -45,3 +45,5 @@ prisma/migrations/
 
 # uploads
 /public/uploads/
+
+.vercel

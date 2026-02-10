@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Application } from "@/types/application";
 
 // AI 咨询弹窗组件
@@ -211,7 +212,10 @@ function StepIndicator({ currentStep, totalSteps, stepTitles }: { currentStep: n
   );
 }
 
-export default function WorkPermitApplicationPage() {
+function WorkPermitApplicationPageContent() {
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+  const applicationsBackHref = from ? `/applications?from=${encodeURIComponent(from)}` : "/applications";
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 12;
   
@@ -460,7 +464,9 @@ export default function WorkPermitApplicationPage() {
       });
       const data = await res.json();
       if (data.success) {
-        window.location.href = `/applications/work-permit/review?id=${application.id}&caseId=${data.caseId}`;
+        let url = `/applications/work-permit/review?id=${application.id}&caseId=${data.caseId}`;
+        if (from) url += `&from=${encodeURIComponent(from)}`;
+        window.location.href = url;
         return;
       }
       if (res.status === 400) {
@@ -472,7 +478,9 @@ export default function WorkPermitApplicationPage() {
       alert("提交失败，请稍后重试");
       return;
     }
-    window.location.href = `/applications/work-permit/review?id=${application.id}`;
+    let url = `/applications/work-permit/review?id=${application.id}`;
+    if (from) url += `&from=${encodeURIComponent(from)}`;
+    window.location.href = url;
   };
 
   const countryOptions = [
@@ -1281,7 +1289,7 @@ export default function WorkPermitApplicationPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <a href="/applications" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium">
+          <a href={applicationsBackHref} className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-medium">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             返回申请列表
           </a>
@@ -1320,6 +1328,24 @@ export default function WorkPermitApplicationPage() {
               上一步
             </button>
 
+            <button
+              onClick={() => {
+                const draft = {
+                  id: Date.now().toString(),
+                  type: "work-permit",
+                  status: "draft" as const,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                  formData,
+                };
+                localStorage.setItem(`application_${draft.id}`, JSON.stringify(draft));
+                alert("草稿已保存！");
+              }}
+              className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            >
+              💾 保存草稿
+            </button>
+
             {currentStep < totalSteps ? (
               <button
                 onClick={nextStep}
@@ -1356,5 +1382,13 @@ export default function WorkPermitApplicationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function WorkPermitApplicationPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-blue-50"><div className="text-center text-gray-600">加载中...</div></div>}>
+      <WorkPermitApplicationPageContent />
+    </Suspense>
   );
 }

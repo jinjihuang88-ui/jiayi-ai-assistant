@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "加移AI助理 | MaplePath AI",
+  title: "加移AI助理 | MapleBridge",
   description: "AI-Powered Immigration Assistant Built on Official Canadian Data",
 };
 

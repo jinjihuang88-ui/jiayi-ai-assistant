@@ -82,6 +82,20 @@ export async function POST(request: NextRequest) {
       });
     } else {
       // 没有指定案件，直接将顾问分配给用户（用于咨询）
+      // 已签约用户不可再选其他顾问，需先取消合约
+      const contractedCase = await prisma.case.findFirst({
+        where: { userId: user.id, contractedAt: { not: null } },
+      });
+      if (contractedCase) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: '您已与顾问签约，无法更换顾问。如需更换请先取消合约。',
+          },
+          { status: 400 }
+        );
+      }
+
       console.log('[Assign Consultant] Assigning consultant to user...'); // 调试日志
       const updatedUser = await prisma.user.update({
         where: { id: user.id },

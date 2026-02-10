@@ -67,7 +67,7 @@ export default function Home() {
                 加移AI助理
               </span>
               <span className="ml-2 text-sm font-normal text-slate-400">
-                MaplePath AI
+                MapleBridge
               </span>
             </div>
           </a>
@@ -586,7 +586,7 @@ export default function Home() {
                 <img src="/logo.png" alt="Logo" className="h-10 w-10 rounded-lg" />
                 <div>
                   <div className="font-bold text-lg">加移AI助理</div>
-                  <div className="text-sm text-slate-400">MaplePath AI</div>
+                  <div className="text-sm text-slate-400">MapleBridge</div>
                 </div>
               </div>
               <p className="text-slate-400 text-sm leading-relaxed max-w-md">
@@ -619,7 +619,7 @@ export default function Home() {
           </div>
 
           <div className="border-t border-slate-800 mt-12 pt-8 text-center text-sm text-slate-500">
-            © {new Date().getFullYear()} 加移AI助理 · MaplePath AI · AI 辅助信息平台，不构成移民或法律建议
+            © {new Date().getFullYear()} 加移AI助理 · MapleBridge · AI 辅助信息平台，不构成移民或法律建议
           </div>
         </div>
       </footer>

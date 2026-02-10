@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Application } from "@/types/application";
 
 // AI 咨询弹窗组件
@@ -100,7 +101,10 @@ function AIHelpModal({
   );
 }
 
-export default function VisitorVisaPage() {
+function VisitorVisaPageContent() {
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+  const applicationsBackHref = from ? `/applications?from=${encodeURIComponent(from)}` : "/applications";
   const [currentStep, setCurrentStep] = useState(0);
   const [aiHelpField, setAiHelpField] = useState<{label: string; hint?: string} | null>(null);
   const [application, setApplication] = useState<Application>({
@@ -603,7 +607,7 @@ export default function VisitorVisaPage() {
             <img src="/logo.png" alt="Logo" className="h-10 w-10 rounded-lg" />
             <span className="font-semibold text-red-600">加移AI助理</span>
           </a>
-          <a href="/applications" className="text-slate-600 hover:text-slate-900">
+          <a href={applicationsBackHref} className="text-slate-600 hover:text-slate-900">
             ← 返回申请列表
           </a>
         </div>
@@ -697,6 +701,16 @@ export default function VisitorVisaPage() {
               ← 上一步
             </button>
             
+            <button
+              onClick={() => {
+                localStorage.setItem("current_application", JSON.stringify({ ...application, status: "draft" }));
+                alert("草稿已保存！");
+              }}
+              className="px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition-all"
+            >
+              💾 保存草稿
+            </button>
+            
             {currentStep < steps.length - 1 ? (
               <button
                 onClick={() => setCurrentStep(currentStep + 1)}
@@ -722,7 +736,9 @@ export default function VisitorVisaPage() {
                     });
                     const data = await res.json();
                     if (data.success) {
-                      window.location.href = `/applications/visitor-visa/review?caseId=${data.caseId}`;
+                      let url = `/applications/visitor-visa/review?caseId=${data.caseId}`;
+                      if (from) url += `&from=${encodeURIComponent(from)}`;
+                      window.location.href = url;
                       return;
                     }
                     if (res.status === 400) {
@@ -734,7 +750,9 @@ export default function VisitorVisaPage() {
                     alert("提交失败，请稍后重试");
                     return;
                   }
-                  window.location.href = "/applications/visitor-visa/review";
+                  let url = "/applications/visitor-visa/review";
+                  if (from) url += `?from=${encodeURIComponent(from)}`;
+                  window.location.href = url;
                 }}
                 className="px-8 py-3 rounded-xl bg-gradient-to-r from-green-600 to-green-500 text-white font-medium
                            hover:from-green-700 hover:to-green-600 transition-all shadow-lg"
@@ -765,5 +783,13 @@ export default function VisitorVisaPage() {
         fieldHint={aiHelpField?.hint}
       />
     </main>
+  );
+}
+
+export default function VisitorVisaPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50"><div className="text-center text-slate-600">加载中...</div></div>}>
+      <VisitorVisaPageContent />
+    </Suspense>
   );
 }

@@ -17,6 +17,7 @@ export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -56,57 +57,41 @@ export default function Home() {
     <main className="bg-white text-slate-900">
       {/* Top Nav - 专业导航栏 */}
       <header className="sticky top-0 z-50 bg-[#1E293B] border-b border-slate-700/50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-12 py-4 flex items-center justify-between">
-          
-          {/* Logo + Brand */}
-          <a href="/" className="flex items-center gap-3 group">
-            <div className="relative">
-              <img
-                src="/logo.png"
-                alt="加移 Logo"
-                className="h-10 w-10 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300"
-              />
-            </div>
-            <div className="flex flex-col">
-              <div className="font-bold text-lg tracking-tight text-white">
-                加移
+        <div className="relative w-full max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
+          {/* 左侧：首页仅 Logo + 加移，无「返回首页」 */}
+          <div className="flex items-center gap-3 shrink-0">
+            <a href="/" className="flex items-center gap-3 group shrink-0">
+              <img src="/logo.png" alt="加移 Logo" className="h-10 w-10 rounded-lg shadow-md group-hover:shadow-lg transition-all duration-300" />
+              <div className="flex flex-col">
+                <div className="font-bold text-lg tracking-tight text-white">加移</div>
+                <div className="text-xs text-white/50 font-light">Powered by MapleBridge</div>
               </div>
-              <div className="text-xs text-white/50 font-light">
-                Powered by MapleBridge
-              </div>
-            </div>
-          </a>
+            </a>
+          </div>
 
-          {/* Main Navigation */}
-          <nav className="hidden lg:flex items-center gap-8 text-[15px] font-medium">
-            <a
-              href="/"
-              className="text-white hover:text-white/80 transition-colors duration-200 py-2"
-            >
-              首页 <span className="text-xs ml-1 opacity-60">Home</span>
-            </a>
-            <a
-              href={consultantLink}
-              className="text-white/80 hover:text-white transition-colors duration-200 py-2"
-            >
-              找顾问 <span className="text-xs ml-1 opacity-60">Find Consultants</span>
-            </a>
-            <a
-              href="/services"
-              className="text-white/80 hover:text-white transition-colors duration-200 py-2"
-            >
-              服务 <span className="text-xs ml-1 opacity-60">Services</span>
-            </a>
-            <a
-              href="/about"
-              className="text-white/80 hover:text-white transition-colors duration-200 py-2"
-            >
-              关于我们 <span className="text-xs ml-1 opacity-60">About</span>
-            </a>
+          {/* 中间：仅导航链接，居中；每项中文在左、英文在右 */}
+          <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:flex items-center gap-6 md:gap-8 text-[15px] font-medium">
+            <a href="/" className="text-white hover:text-white/80 transition-colors duration-200 py-2 flex items-center gap-1.5"><span>首页</span><span className="text-xs opacity-60">Home</span></a>
+            <a href={consultantLink} className="text-white/80 hover:text-white transition-colors duration-200 py-2 flex items-center gap-1.5"><span>找顾问</span><span className="text-xs opacity-60">Find Consultants</span></a>
+            <a href="/services" className="text-white/80 hover:text-white transition-colors duration-200 py-2 flex items-center gap-1.5"><span>服务</span><span className="text-xs opacity-60">Services</span></a>
+            <a href="/about" className="text-white/80 hover:text-white transition-colors duration-200 py-2 flex items-center gap-1.5"><span>关于我们</span><span className="text-xs opacity-60">About</span></a>
           </nav>
 
-          {/* Right Side - 仅保留会员登录、顾问登录 */}
-          <div className="flex items-center gap-3">
+          {/* 右侧：会员登录、顾问登录，尽量靠右 */}
+          <div className="flex items-center justify-end gap-3 shrink-0">
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            className="lg:hidden p-2 text-white/90 hover:text-white rounded-lg hover:bg-white/10"
+            aria-label="打开菜单"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {menuOpen ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /> : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />}
+            </svg>
+          </button>
+
+          {/* 右侧：登录 / 用户 */}
+          <div className="hidden lg:flex items-center gap-3 shrink-0 min-w-0 justify-end">
             {isCheckingAuth ? (
               <div className="w-8 h-8 rounded-full bg-slate-700 animate-pulse" />
             ) : user ? (
@@ -138,7 +123,24 @@ export default function Home() {
               </>
             )}
           </div>
+          </div>
         </div>
+        {menuOpen && (
+          <div className="lg:hidden border-t border-slate-700/50 bg-[#1E293B] px-6 py-4 flex flex-col gap-2">
+            <a href="/" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>首页</a>
+            <a href={consultantLink} className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>找顾问</a>
+            <a href="/services" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>服务</a>
+            <a href="/about" className="text-white font-medium py-2" onClick={() => setMenuOpen(false)}>关于我们</a>
+            {user ? (
+              <a href="/member" className="text-white/90 hover:text-white py-2 pt-2 border-t border-white/10" onClick={() => setMenuOpen(false)}>会员中心</a>
+            ) : (
+              <div className="flex gap-2 pt-2 border-t border-white/10">
+                <a href="/auth/login" className="px-4 py-2 rounded-lg border border-white/30 text-white text-sm" onClick={() => setMenuOpen(false)}>会员登录</a>
+                <a href="/rcic/login" className="px-4 py-2 rounded-lg border border-white/30 text-white text-sm" onClick={() => setMenuOpen(false)}>顾问登录 / 注册</a>
+              </div>
+            )}
+          </div>
+        )}
       </header>
 
       {/* Hero - 白色/浅灰背景，移除大面积红色 */}
@@ -148,32 +150,38 @@ export default function Home() {
             
             {/* 主标题 */}
             <h1 className="text-4xl md:text-6xl font-bold leading-tight text-slate-900 mb-2">
-              加移 · 加拿大移民顾问平台
+              加拿大移民信息与专业服务管理系统
             </h1>
             <p className="text-xl md:text-2xl text-slate-600 mb-4">
-              Jiayi · Canadian Immigration Consultant Platform
+              Canadian Immigration Information & Professional Services Management System
             </p>
             
-            <h2 className="text-2xl md:text-3xl font-semibold text-slate-700 mb-2">
-              让选择回到你手里
+            {/* 副标题（关键） */}
+            <h2 className="text-2xl md:text-3xl font-semibold text-slate-700 mb-1">
+              为申请人提供结构化信息整理
             </h2>
+            <p className="text-lg md:text-xl text-slate-500 mb-2">
+              Structured information for applicants
+            </p>
+            <p className="text-2xl md:text-3xl font-semibold text-slate-700 mb-1">
+              为持牌顾问提供专业实践管理工具
+            </p>
             <p className="text-lg md:text-xl text-slate-500 mb-6">
-              Put the Choice Back in Your Hands
+              Practice management tools for licensed consultants
             </p>
 
-            {/* 副标题 - 红色强调 */}
-            <p className="text-lg md:text-xl text-[#C62828] font-semibold mb-1">
-              透明比价 · 顾问审核 · 平台担保
+            {/* 第二行小字 - 平台说明与免责 */}
+            <p className="text-sm md:text-base text-slate-500 mb-1 max-w-3xl mx-auto">
+              jiayi 是由加拿大科技公司开发的 SaaS 平台。
             </p>
-            <p className="text-sm md:text-base text-[#C62828]/70 mb-2">
-              Transparent Pricing · Verified Consultants · Platform Guarantee
-            </p>
-            
-            <p className="text-base md:text-lg text-slate-600 mb-1 max-w-3xl mx-auto">
-              连接中国用户与加拿大移民、留学、签证顾问
+            <p className="text-xs md:text-sm text-slate-400 mb-1 max-w-3xl mx-auto">
+              jiayi is a SaaS platform developed by a Canadian technology company.
             </p>
             <p className="text-sm md:text-base text-slate-500 mb-10 max-w-3xl mx-auto">
-              Connecting Chinese Users with Canadian Immigration, Study, and Visa Consultants
+              平台不提供移民或法律服务。
+            </p>
+            <p className="text-xs md:text-sm text-slate-400 mb-10 max-w-3xl mx-auto">
+              The platform does not provide immigration or legal services.
             </p>
 
             {/* CTA：AI初评、AI顾问、找顾问 */}
@@ -273,9 +281,10 @@ export default function Home() {
               <h3 className="text-xl font-bold text-slate-900 mb-1">安全</h3>
               <p className="text-sm text-slate-500 mb-4">Secure</p>
               <ul className="text-slate-600 space-y-2 text-sm">
-                <li>• 平台担保支付 <span className="text-xs text-slate-400">Platform-Guaranteed Payment</span></li>
-                <li>• 分阶段放款 <span className="text-xs text-slate-400">Milestone-Based Release</span></li>
-                <li>• 全程记录可追溯 <span className="text-xs text-slate-400">Full Record Traceability</span></li>
+                <li>• 数据加密传输 <span className="text-xs text-slate-400">Data encrypted in transit</span></li>
+                <li>• 权限分级访问控制 <span className="text-xs text-slate-400">Role-based access control</span></li>
+                <li>• 操作记录留存与审计 <span className="text-xs text-slate-400">Operation logs and audit trail</span></li>
+                <li>• 安全云端数据存储 <span className="text-xs text-slate-400">Secure cloud data storage</span></li>
               </ul>
             </div>
 
@@ -296,15 +305,15 @@ export default function Home() {
         </div>
       </section>
 
-      {/* How It Works - 5步流程 */}
+      {/* How It Works - 五步流程 */}
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-              只需5步
+              五个步骤开始专业咨询
             </h2>
             <p className="text-lg md:text-xl text-slate-600">
-              从评估到递交 · From Assessment to Submission
+              From Structured Intake to Professional Engagement
             </p>
           </div>
 
@@ -312,42 +321,44 @@ export default function Home() {
             {[
               {
                 step: "1",
-                title: "AI移民评估报告",
-                titleEn: "AI Assessment Report",
-                desc: "填写基本信息，获取可行性评估报告",
-                descEn: "Fill in basic info for feasibility report",
+                title: "AI 信息整理",
+                titleEn: "Structured AI Intake",
+                desc: "填写基础信息，生成结构化摘要。",
+                descEn: "Fill in basic info, get a structured summary.",
                 icon: "📊",
               },
               {
                 step: "2",
-                title: "咨询AI助理",
-                titleEn: "AI Consultation",
-                desc: "与 AI 对话，进一步了解政策与路径",
-                descEn: "Chat with AI for policy and path guidance",
+                title: "风险提示与路径分析",
+                titleEn: "Risk Indicators & Path Overview",
+                desc: "识别潜在风险与可能路径。",
+                descEn: "Identify risks and possible paths.",
                 icon: "💬",
               },
               {
                 step: "3",
-                title: "对比顾问",
-                titleEn: "Compare Consultants",
-                desc: "按经验、价格、评价，自主选择适合你的顾问",
-                descEn: "Choose by experience, price, and reviews",
+                title: "预约专业咨询",
+                titleEn: "Engage a Licensed Consultant",
+                desc: "通过平台预约持牌顾问进行咨询。",
+                descEn: "Book a licensed consultant through the platform.",
+                extra: "查看顾问资料",
+                extraEn: "View Licensed Profiles",
                 icon: "👥",
               },
               {
                 step: "4",
-                title: "平台担保下单",
-                titleEn: "Guaranteed Payment",
-                desc: "分阶段付款，服务未完成，资金不放行",
-                descEn: "Milestone payments, funds held until completion",
+                title: "专业评估与方案制定",
+                titleEn: "Professional Review",
+                desc: "持牌顾问独立提供评估与建议。",
+                descEn: "Licensed consultant provides independent assessment and advice.",
                 icon: "🛡️",
               },
               {
                 step: "5",
-                title: "递交 & 跟进",
-                titleEn: "Submit & Track",
-                desc: "用户自己填表递交，流程节点清晰，进度实时可查",
-                descEn: "User submits by filling forms; clear milestones, real-time tracking",
+                title: "申请与进度管理",
+                titleEn: "Application Management",
+                desc: "顾问与客户在系统中管理流程与记录。",
+                descEn: "Consultant and client manage process and records in the system.",
                 icon: "✅",
               },
             ].map((item, i) => (
@@ -359,7 +370,13 @@ export default function Home() {
                 <h3 className="text-lg font-bold text-slate-900 mb-1">{item.title}</h3>
                 <p className="text-xs text-slate-500 mb-2">{item.titleEn}</p>
                 <p className="text-sm text-slate-600 leading-relaxed mb-1">{item.desc}</p>
-                <p className="text-xs text-slate-400 leading-relaxed">{item.descEn}</p>
+                <p className="text-xs text-slate-400 leading-relaxed mb-1">{item.descEn}</p>
+                {"extra" in item && item.extra && (
+                  <>
+                    <p className="text-sm text-slate-600 leading-relaxed mt-2">{item.extra}</p>
+                    <p className="text-xs text-slate-400 leading-relaxed">{item.extraEn}</p>
+                  </>
+                )}
               </div>
             ))}
           </div>
@@ -378,7 +395,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8">
             {/* 1. AI移民评估报告 */}
             <div className="border border-slate-200 rounded-2xl p-8 hover:border-[#C62828] transition-all duration-300">
               <h3 className="text-xl font-bold text-slate-900 mb-1">AI移民评估报告</h3>
@@ -453,26 +470,6 @@ export default function Home() {
               </ul>
               <a href={formFillLink} className="text-[#C62828] font-medium text-sm hover:underline">
                 去填写 →
-              </a>
-            </div>
-
-            {/* 平台担保与流程管理 */}
-            <div className="border border-slate-200 rounded-2xl p-8 hover:border-[#C62828] transition-all duration-300">
-              <h3 className="text-xl font-bold text-slate-900 mb-1">平台担保与流程管理</h3>
-              <p className="text-sm text-slate-500 mb-3">Platform Guarantee & Process Management</p>
-              <p className="text-slate-600 mb-1 text-sm leading-relaxed">
-                钱和流程，都在你可控范围内
-              </p>
-              <p className="text-slate-400 mb-4 text-xs leading-relaxed">
-                Money and process under your control
-              </p>
-              <ul className="text-slate-600 space-y-2 text-sm mb-6">
-                <li>• 资金平台托管 <span className="text-xs text-slate-400">Funds held by platform</span></li>
-                <li>• 关键节点确认后放款 <span className="text-xs text-slate-400">Release after milestones</span></li>
-                <li>• 所有沟通与文件留痕 <span className="text-xs text-slate-400">All records traceable</span></li>
-              </ul>
-              <a href={consultantLink} className="text-[#C62828] font-medium text-sm hover:underline">
-                了解更多 →
               </a>
             </div>
           </div>
@@ -628,7 +625,7 @@ export default function Home() {
                 <p className="text-sm text-slate-500 mb-4 text-center">I'm a User</p>
                 <p className="text-slate-600 mb-1 text-center">我想移民/留学/办理签证</p>
                 <p className="text-sm text-slate-400 mb-6 text-center">Immigration / Study / Visa</p>
-                <ul className="text-slate-600 space-y-3 mb-8">
+                <ul className="text-slate-600 space-y-3 mb-6">
                   <li className="flex items-start gap-2">
                     <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -647,7 +644,38 @@ export default function Home() {
                       <p className="text-xs text-slate-400">Secure Payment</p>
                     </div>
                   </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>梳理个人背景与条件</span>
+                      <p className="text-xs text-slate-400">Sort out personal background and conditions</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>识别潜在风险因素</span>
+                      <p className="text-xs text-slate-400">Identify potential risk factors</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>为后续专业咨询做好准备</span>
+                      <p className="text-xs text-slate-400">Prepare for subsequent professional consultation</p>
+                    </div>
+                  </li>
                 </ul>
+                <p className="text-xs text-slate-500 mb-8">
+                  AI 系统仅用于信息整理与风险提示。平台不提供法律意见。
+                  <span className="block mt-1 text-slate-400">The AI system is for information organization and risk reminders only. The platform does not provide legal advice.</span>
+                </p>
               </div>
               <a
                 href="/assessment"
@@ -666,7 +694,7 @@ export default function Home() {
                 <p className="text-sm text-slate-500 mb-4 text-center">I'm a Consultant</p>
                 <p className="text-slate-600 mb-1 text-center">我提供移民/留学/签证服务</p>
                 <p className="text-sm text-slate-400 mb-6 text-center">Immigration / Study / Visa Services</p>
-                <ul className="text-slate-600 space-y-3 mb-8">
+                <ul className="text-slate-600 space-y-3 mb-6">
                   <li className="flex items-start gap-2">
                     <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -692,6 +720,60 @@ export default function Home() {
                     <div>
                       <span>使用平台工具提升效率</span>
                       <p className="text-xs text-slate-400">Use Platform Tools</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>专业实践管理系统</span>
+                      <p className="text-xs text-slate-400">Professional practice management system</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>AI 辅助信息审阅</span>
+                      <p className="text-xs text-slate-400">AI-assisted information review</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>客户接案流程管理</span>
+                      <p className="text-xs text-slate-400">Client intake & case workflow management</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>安全文档管理</span>
+                      <p className="text-xs text-slate-400">Secure document management</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>案件进度与运营可视化</span>
+                      <p className="text-xs text-slate-400">Case progress & operations visibility</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <span>专为受监管专业环境设计</span>
+                      <p className="text-xs text-slate-400">Designed for regulated professional environments</p>
                     </div>
                   </li>
                 </ul>
@@ -768,37 +850,29 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Final CTA */}
+      {/* Final CTA - B2B */}
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-            不确定要不要移民？
-          </h2>
-          <p className="text-lg md:text-xl text-slate-500 mb-4">
-            Not Sure About Immigration?
+          <p className="text-xl md:text-2xl text-slate-700 mb-2">
+            Built for regulated professionals seeking structured practice infrastructure.
           </p>
-          <p className="text-xl text-slate-600 mb-2">
-            先做一次理性的评估。
+          <p className="text-lg font-semibold text-slate-900 mb-6">
+            Request a demo to learn more.
           </p>
-          <p className="text-lg text-slate-400 mb-10">
-            Start with a rational assessment.
+          <p className="text-lg text-slate-600 mb-2">
+            专为希望建立结构化管理体系的持牌专业人士打造。
+          </p>
+          <p className="text-base text-slate-500 mb-10">
+            了解 jiayi 如何提升您的实践效率。
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href="/assessment"
-              className="px-8 py-4 rounded-xl bg-[#C62828] text-white font-semibold text-lg
-                         hover:bg-[#B71C1C] transition-all duration-300 
-                         shadow-lg shadow-red-500/25 hover:shadow-xl
-                         hover:-translate-y-1"
+              href="/rcic/login"
+              className="px-8 py-4 rounded-xl bg-[#1E293B] text-white font-semibold text-lg
+                         hover:bg-slate-800 transition-all duration-300 
+                         shadow-lg hover:shadow-xl hover:-translate-y-1"
             >
-              免费AI移民初评
-            </a>
-            <a
-              href={consultantLink}
-              className="px-8 py-4 rounded-xl border-2 border-slate-300 text-slate-700 font-semibold text-lg
-                         hover:border-[#C62828] hover:text-[#C62828] transition-all duration-300"
-            >
-              浏览顾问
+              Join as Consultant（顾问入驻）
             </a>
           </div>
         </div>
@@ -814,12 +888,14 @@ export default function Home() {
                 <img src="/logo.png" alt="Logo" className="h-10 w-10 rounded-lg" />
                 <div>
                   <div className="font-bold text-lg">加移 (Jiayi)</div>
-                  <div className="text-sm text-white/60">Powered by MapleBridge</div>
                 </div>
               </div>
-              <p className="text-white/70 text-sm leading-relaxed max-w-md">
-                一个让中国用户透明、安全地连接加拿大移民与留学顾问的平台。
-              </p>
+              <div className="text-white/70 text-sm leading-relaxed max-w-md space-y-2 mt-2">
+                <p>jiayi 由加拿大科技公司 MapleBridge Technologies Inc. 运营。</p>
+                <p>我们专注于为受监管专业行业构建软件基础设施。</p>
+                <p>我们构建系统。</p>
+                <p>专业人士提供服务。</p>
+              </div>
             </div>
 
             {/* Links */}
@@ -843,8 +919,14 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="border-t border-white/10 mt-12 pt-8 text-center text-sm text-white/50">
-            © {new Date().getFullYear()} 加移（Jiayi）· Powered by MapleBridge · AI 辅助信息平台，不构成移民或法律建议
+          <div className="border-t border-white/10 mt-12 pt-8 space-y-3">
+            <p className="text-center text-sm text-white/60 leading-relaxed max-w-2xl mx-auto">
+              jiayi is operated by MapleBridge Technologies Inc., a Canadian technology company.
+              The platform provides software infrastructure only and does not offer immigration or legal services.
+            </p>
+            <p className="text-center text-sm text-white/50">
+              © {new Date().getFullYear()} 加移（Jiayi）· Powered by MapleBridge · AI 辅助信息平台，不构成移民或法律建议
+            </p>
           </div>
         </div>
       </footer>
