@@ -1,7 +1,14 @@
 "use client";
 
+import type { Metadata } from "next";
 import Link from "next/link";
 import { useState } from "react";
+
+export const metadata: Metadata = {
+  title: "关于我们 | 加移 Jiayi 加拿大移民 SaaS 平台",
+  description:
+    "了解加移（Jiayi）及背后团队 MapleBridge Technologies Inc.，专注为加拿大移民顾问与中国用户提供合规、安全的 C2C SaaS 管理系统。",
+};
 
 export default function AboutPage() {
   const [menuOpen, setMenuOpen] = useState(false);

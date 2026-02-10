@@ -53,8 +53,41 @@ export default function Home() {
   /** 自助填写官方表格：须经会员登录后进入会员中心申请列表 */
   const formFillLink = user ? "/member/applications" : `/auth/login?redirect=${encodeURIComponent("/member/applications")}`;
 
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "加移 Jiayi",
+    url: "https://www.jiayi.co",
+    logo: "https://www.jiayi.co/logo.png",
+    description:
+      "加移（Jiayi）是面向中国用户与加拿大持牌移民顾问的 C2C 移民 SaaS 管理系统，提供评估、顾问匹配与案件管理功能。",
+    email: "support@jiayi.co",
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: "support@jiayi.co",
+        availableLanguage: ["zh-CN", "en-CA"],
+      },
+    ],
+  };
+
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "加移 Jiayi Immigration SaaS",
+    url: "https://www.jiayi.co",
+  };
+
   return (
     <main className="bg-white text-slate-900">
+      <script
+        type="application/ld+json"
+        // 仅供搜索引擎使用，不影响前端布局
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([organizationJsonLd, websiteJsonLd]),
+        }}
+      />
       {/* Top Nav - 专业导航栏 */}
       <header className="sticky top-0 z-50 bg-[#1E293B] border-b border-slate-700/50 shadow-lg">
         <div className="relative w-full max-w-7xl mx-auto px-6 md:px-12 py-4 flex items-center justify-between">
@@ -915,7 +948,17 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4">联系我们</h4>
               <ul className="space-y-2 text-sm text-white/70">
-                <li>微信 / 小红书</li>
+                <li>
+                  微信 / 小红书：
+                  <a
+                    href="https://www.xiaohongshu.com/user/profile/695e834f0000000014014e39"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline underline-offset-2 hover:text-white"
+                  >
+                    AI_Canada_DIY
+                  </a>
+                </li>
                 <li>邮箱: support@jiayi.co</li>
               </ul>
             </div>
