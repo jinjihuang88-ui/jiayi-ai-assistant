@@ -26,6 +26,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 签约/填写资料前须完善个人资料（至少姓、名）
+    let profile: { familyName?: string; givenName?: string } | null = null;
+    if (user.profileJson) {
+      try {
+        profile = JSON.parse(user.profileJson) as { familyName?: string; givenName?: string };
+      } catch {
+        profile = null;
+      }
+    }
+    const familyName = (profile?.familyName ?? "").trim();
+    const givenName = (profile?.givenName ?? "").trim();
+    if (!familyName || !givenName) {
+      return NextResponse.json(
+        { success: false, message: "请先完善个人资料（至少填写姓、名）后再提交申请。请前往「个人资料」完善。" },
+        { status: 400 }
+      );
+    }
+
     const body = await request.json();
     const { type, title, applicationData } = body as {
       type: string;

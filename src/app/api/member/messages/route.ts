@@ -39,8 +39,20 @@ export async function GET(request: NextRequest) {
         });
         caseIds = casesForContact.map((c) => c.id);
       }
+      if (caseIds.length === 0 && prefix === 'rcic' && id) {
+        // 已选顾问、尚未发过消息：创建 consultation case 并返回其 id，以便前端显示视频/语音按钮
+        const consultationCase = await prisma.case.create({
+          data: {
+            userId: user.id,
+            rcicId: id,
+            type: 'consultation',
+            title: '与顾问沟通',
+            status: 'pending',
+          },
+        });
+        caseIds = [consultationCase.id];
+      }
       if (caseIds.length === 0) {
-        // 已选顾问、尚未发过消息时：仍返回该顾问信息，便于右侧显示「您的持牌顾问：XXX」
         let consultantForContact: unknown = null;
         if (prefix === 'rcic' && id) {
           const rcic = await prisma.rCIC.findUnique({

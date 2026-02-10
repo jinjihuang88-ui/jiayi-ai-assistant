@@ -410,18 +410,15 @@ function MessagesContent() {
                         )}
                         <p className="whitespace-pre-wrap">{msg.content}</p>
                         
-                        {/* 附件显示 */}
+                        {/* 附件显示与下载按钮 */}
                         {msg.attachments && (() => {
                           try {
                             const attachments = JSON.parse(msg.attachments);
                             return (
                               <div className="mt-2 space-y-2">
                                 {attachments.map((file: any, idx: number) => (
-                                  <a
+                                  <div
                                     key={idx}
-                                    href={file.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
                                     className={`flex items-center gap-2 p-2 rounded-lg ${
                                       msg.senderType === "user"
                                         ? "bg-white/20 hover:bg-white/30"
@@ -432,8 +429,16 @@ function MessagesContent() {
                                       {file.type?.startsWith("image/") ? "🖼️" : "📄"}
                                     </span>
                                     <span className="text-sm truncate flex-1">{file.name}</span>
-                                    <span className="text-xs opacity-70">⬇️</span>
-                                  </a>
+                                    <a
+                                      href={file.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      download={file.name}
+                                      className="shrink-0 text-xs font-medium px-2 py-1 rounded bg-white/50 hover:bg-white/70"
+                                    >
+                                      下载
+                                    </a>
+                                  </div>
                                 ))}
                               </div>
                             );

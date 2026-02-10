@@ -12,6 +12,15 @@ export async function GET() {
       );
     }
 
+    let profile: { familyName?: string | null; givenName?: string | null } | null = null;
+    const raw = (user as { profileJson?: string | null }).profileJson;
+    if (raw) {
+      try {
+        profile = JSON.parse(raw) as { familyName?: string | null; givenName?: string | null };
+      } catch {
+        profile = null;
+      }
+    }
     return NextResponse.json({
       success: true,
       user: {
@@ -21,6 +30,7 @@ export async function GET() {
         phone: user.phone,
         emailVerified: user.emailVerified,
         createdAt: user.createdAt,
+        profile: profile ? { familyName: profile.familyName ?? null, givenName: profile.givenName ?? null } : null,
       },
     });
   } catch (error) {

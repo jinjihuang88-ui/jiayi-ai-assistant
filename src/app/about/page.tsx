@@ -274,7 +274,7 @@ export default function AboutPage() {
               <ul className="space-y-2 text-sm text-white/70">
                 <li><Link href="/about" className="hover:text-white transition-colors">关于 MapleBridge</Link></li>
                 <li><a href="#" className="hover:text-white transition-colors">平台规则</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">隐私政策</a></li>
+                <li><a href="/privacy" className="hover:text-white transition-colors">隐私政策</a></li>
               </ul>
             </div>
             <div>

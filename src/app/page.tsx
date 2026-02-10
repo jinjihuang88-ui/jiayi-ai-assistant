@@ -900,12 +900,14 @@ export default function Home() {
 
             {/* Links */}
             <div>
-              <h4 className="font-semibold mb-4">关于我们</h4>
+              <h4 className="font-semibold mb-4">
+                <a href="/about" className="hover:text-white transition-colors">关于我们</a>
+              </h4>
               <ul className="space-y-2 text-sm text-white/70">
                 <li><a href="#" className="hover:text-white transition-colors">平台规则</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">顾问审核规范</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">隐私政策</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">服务条款</a></li>
+                <li><a href="/consultant-standards" className="hover:text-white transition-colors">顾问审核规范</a></li>
+                <li><a href="/privacy" className="hover:text-white transition-colors">隐私政策</a></li>
+                <li><a href="/terms" className="hover:text-white transition-colors">服务条款</a></li>
               </ul>
             </div>
 

@@ -157,16 +157,23 @@ export default function MemberDashboard() {
             </a>
           </nav>
 
-          <div className="flex items-center gap-4">
-            <a href="/member/profile" className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-orange-500 flex items-center justify-center text-white font-medium">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 rounded-full pl-1 pr-3 py-1.5 text-sm text-slate-600">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-red-500 to-orange-500 flex items-center justify-center text-white font-medium shrink-0">
                 {displayName.charAt(0).toUpperCase()}
               </div>
-              <span className="hidden md:inline">{displayName}</span>
+              <span className="hidden md:inline font-medium">{displayName}</span>
+            </div>
+            <a
+              href="/member/profile"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-slate-500 bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200/80 hover:border-red-200 transition-colors"
+            >
+              <span aria-hidden className="text-sm">✏️</span>
+              <span>完善资料</span>
             </a>
             <button
               onClick={handleLogout}
-              className="text-sm text-slate-500 hover:text-red-600"
+              className="text-sm text-slate-500 hover:text-red-600 px-2 py-1"
             >
               退出
             </button>

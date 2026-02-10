@@ -23,6 +23,7 @@ model User {
   emailVerifiedAt DateTime?
   lastLoginAt     DateTime? // 新增：最后登录时间
   assignedRcicId  String?   // 分配的顾问ID（用于咨询）
+  profileJson     String?   @db.LongText // 个人资料 JSON（姓、名、性别、出生日期等）
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
