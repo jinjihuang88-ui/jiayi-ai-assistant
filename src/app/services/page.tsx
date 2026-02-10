@@ -1,14 +1,7 @@
 "use client";
 
-import type { Metadata } from "next";
 import Link from "next/link";
 import { useState } from "react";
-
-export const metadata: Metadata = {
-  title: "服务 | 加移 Jiayi C2C 加拿大移民服务与工具",
-  description:
-    "加移（Jiayi）为中国用户与加拿大持牌移民顾问提供在线评估、顾问匹配、案件管理、文档协作等一体化 SaaS 服务。",
-};
 
 export default function ServicesPage() {
   const [menuOpen, setMenuOpen] = useState(false);

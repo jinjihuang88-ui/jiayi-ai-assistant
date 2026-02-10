@@ -1,14 +1,7 @@
 "use client";
 
-import type { Metadata } from "next";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
-export const metadata: Metadata = {
-  title: "选择加拿大持牌移民顾问 | 加移 Jiayi 顾问列表",
-  description:
-    "在加移（Jiayi）平台浏览并选择加拿大持牌移民顾问（RCIC），支持中国用户在线匹配顾问并进行案件管理与沟通。",
-};
 
 interface Consultant {
   id: string;
