@@ -50,7 +50,7 @@ WECHAT_ENCODING_AES_KEY="上一步的 43 位 EncodingAESKey"
 回复会写入「最近收到过离线通知」的案件会话。需让系统知道「企业微信里的谁 = 网站里的哪位顾问」：
 
 - **方式 A（推荐）**：在数据库 RCIC 表为该顾问填写 **wechatUserId**（企业微信成员账号，管理后台/通讯录可见）。
-- **方式 B**：在 Vercel / `.env` 配置 `WECHAT_USERID_RCIC_ID=企业微信userid:RCIC的id`（如 `ZhangSan:clxxxxxxxx`），仅适合单顾问或临时测试。
+- **方式 B**：在 Vercel / `.env` 配置 `WECHAT_USERID_RCIC_ID`，多组用英文逗号分隔：`userid1:rcicId1,userid2:rcicId2`（如 `ZhangSan:clxxx,LiSi:clyyy`），方便多顾问无需改库即可绑定。
 
 会员发消息且跟进人不在线时，系统会往群发通知，并记录该案件的顾问为「最近被通知人」；该顾问在企业微信应用内回复的**文本消息**会写入该案件会话，会员在网站消息页即可看到。
 

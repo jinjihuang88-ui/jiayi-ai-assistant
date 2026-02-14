@@ -12,12 +12,18 @@ const TOKEN = process.env.WECHAT_CALLBACK_TOKEN || "";
 const ENCODING_AES_KEY = process.env.WECHAT_ENCODING_AES_KEY || "";
 const CORP_ID = process.env.WECHAT_CORP_ID || "";
 
-/** 可选：环境变量配置 企业微信userid:RCIC的id，用于未在 DB 填写 wechatUserId 时（如 WECHAT_USERID_RCIC_ID=ZhangSan:clxxx） */
+/**
+ * 可选：环境变量配置多组 企业微信userid:RCIC的id，用于未在 DB 填写 wechatUserId 时。
+ * 格式：多组用英文逗号分隔，如 WECHAT_USERID_RCIC_ID=ZhangSan:clxxx,LiSi:clyyy,WangWu:clzzz
+ */
 function getRcicIdByWechatUserId(wechatUserId: string): string | null {
   const raw = process.env.WECHAT_USERID_RCIC_ID?.trim();
   if (!raw) return null;
-  const part = raw.split(":").map((s) => s.trim());
-  if (part.length >= 2 && part[0] === wechatUserId) return part[1];
+  const pairs = raw.split(",").map((s) => s.trim()).filter(Boolean);
+  for (const pair of pairs) {
+    const [uid, rcicId] = pair.split(":").map((s) => s.trim());
+    if (uid && rcicId && uid === wechatUserId) return rcicId;
+  }
   return null;
 }
 
