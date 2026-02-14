@@ -44,6 +44,7 @@ export async function GET(request: NextRequest) {
         approvalNotes: true,
         emailVerified: true,
         createdAt: true,
+        wechatUserId: true,
       },
     });
 

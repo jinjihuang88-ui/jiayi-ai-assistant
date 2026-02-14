@@ -12,21 +12,6 @@ const TOKEN = process.env.WECHAT_CALLBACK_TOKEN || "";
 const ENCODING_AES_KEY = process.env.WECHAT_ENCODING_AES_KEY || "";
 const CORP_ID = process.env.WECHAT_CORP_ID || "";
 
-/**
- * 可选：环境变量配置多组 企业微信userid:RCIC的id，用于未在 DB 填写 wechatUserId 时。
- * 格式：多组用英文逗号分隔，如 WECHAT_USERID_RCIC_ID=ZhangSan:clxxx,LiSi:clyyy,WangWu:clzzz
- */
-function getRcicIdByWechatUserId(wechatUserId: string): string | null {
-  const raw = process.env.WECHAT_USERID_RCIC_ID?.trim();
-  if (!raw) return null;
-  const pairs = raw.split(",").map((s) => s.trim()).filter(Boolean);
-  for (const pair of pairs) {
-    const [uid, rcicId] = pair.split(":").map((s) => s.trim());
-    if (uid && rcicId && uid === wechatUserId) return rcicId;
-  }
-  return null;
-}
-
 export async function GET(request: NextRequest) {
   if (!TOKEN || !ENCODING_AES_KEY) {
     return NextResponse.json(
@@ -98,23 +83,10 @@ export async function POST(request: NextRequest) {
       return new NextResponse("", { status: 200 });
     }
 
-    let rcic: { id: string; lastWechatNotifiedCaseId: string | null } | null = null;
-    const byWechatUserId = await prisma.rCIC.findFirst({
+    const rcic = await prisma.rCIC.findFirst({
       where: { wechatUserId: fromUserName!, isActive: true },
       select: { id: true, lastWechatNotifiedCaseId: true },
     });
-    if (byWechatUserId) {
-      rcic = byWechatUserId;
-    } else {
-      const rcicIdFromEnv = getRcicIdByWechatUserId(fromUserName!);
-      if (rcicIdFromEnv) {
-        const row = await prisma.rCIC.findUnique({
-          where: { id: rcicIdFromEnv },
-          select: { id: true, lastWechatNotifiedCaseId: true },
-        });
-        rcic = row;
-      }
-    }
 
     if (!rcic) {
       console.log("[WeChat receive] no RCIC for wechat userid:", fromUserName);

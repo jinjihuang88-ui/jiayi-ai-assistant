@@ -23,6 +23,7 @@ interface RCICConsultant {
   approvalNotes: string | null;
   emailVerified: boolean;
   createdAt: string;
+  wechatUserId: string | null;
 }
 
 export default function AdminReviewPage() {
@@ -33,10 +34,16 @@ export default function AdminReviewPage() {
   const [reviewAction, setReviewAction] = useState<"approve" | "reject" | null>(null);
   const [reviewNotes, setReviewNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [wechatUserIdEdit, setWechatUserIdEdit] = useState("");
+  const [savingWechat, setSavingWechat] = useState(false);
 
   useEffect(() => {
     fetchConsultants();
   }, []);
+
+  useEffect(() => {
+    setWechatUserIdEdit("");
+  }, [selectedConsultant?.id]);
 
   const fetchConsultants = async () => {
     try {
@@ -286,6 +293,51 @@ export default function AdminReviewPage() {
                       {selectedConsultant.emailVerified ? "✅ 已验证" : "❌ 未验证"}
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* 企业微信账号：群回复同步到网站 */}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">企业微信账号</h3>
+                <p className="text-sm text-gray-500 mb-2">
+                  填写顾问在企业微信的成员账号（通讯录可见），该顾问在应用内回复的文本会同步到网站对应案件会话。
+                </p>
+                <div className="flex gap-2 items-center flex-wrap">
+                  <input
+                    type="text"
+                    value={wechatUserIdEdit === "" ? (selectedConsultant.wechatUserId ?? "") : wechatUserIdEdit}
+                    onChange={(e) => setWechatUserIdEdit(e.target.value)}
+                    placeholder="如 ZhangSan"
+                    className="px-3 py-2 border border-gray-300 rounded-lg w-48 max-w-full"
+                  />
+                  <button
+                    type="button"
+                    disabled={savingWechat}
+                    onClick={async () => {
+                      const value = (wechatUserIdEdit === "" ? selectedConsultant.wechatUserId ?? "" : wechatUserIdEdit).trim();
+                      setSavingWechat(true);
+                      try {
+                        const res = await fetch(`/api/admin/rcic/${selectedConsultant.id}`, {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ wechatUserId: value || null }),
+                        });
+                        const data = await res.json();
+                        if (data.success) {
+                          setWechatUserIdEdit("");
+                          fetchConsultants();
+                          setSelectedConsultant((c) => (c ? { ...c, wechatUserId: value || null } : null));
+                        } else alert(data.message || "保存失败");
+                      } catch (e) {
+                        alert("保存失败");
+                      } finally {
+                        setSavingWechat(false);
+                      }
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {savingWechat ? "保存中..." : "保存"}
+                  </button>
                 </div>
               </div>
 
