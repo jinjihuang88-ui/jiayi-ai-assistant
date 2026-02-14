@@ -10,6 +10,9 @@ const WECHAT_WEBHOOK_URL = process.env.WECHAT_WEBHOOK_URL || "";
  */
 export async function sendWechatText(content: string): Promise<{ success: boolean; error?: string }> {
   if (!WECHAT_WEBHOOK_URL.trim()) {
+    if (process.env.NODE_ENV === "production") {
+      console.warn("[WeChat] WECHAT_WEBHOOK_URL 未配置，跳过发送");
+    }
     return { success: false, error: "WECHAT_WEBHOOK_URL 未配置" };
   }
   const maxLen = 2048;
@@ -34,10 +37,14 @@ export async function sendWechatText(content: string): Promise<{ success: boolea
   }
 }
 
-/** 新会员注册：发送到微信群（不阻塞注册流程） */
-export function notifyWechatNewUser(payload: { email: string; name: string; phone?: string | null }) {
+/** 新会员注册：发送到微信群，返回发送结果（失败不影响注册） */
+export async function notifyWechatNewUser(payload: {
+  email: string;
+  name: string;
+  phone?: string | null;
+}): Promise<{ success: boolean; error?: string }> {
   const text = `【加移】新会员注册\n姓名：${payload.name}\n邮箱：${payload.email}${payload.phone ? `\n电话：${payload.phone}` : ""}`;
-  sendWechatText(text).catch((err) => console.error("[WeChat] notifyWechatNewUser failed:", err));
+  return sendWechatText(text);
 }
 
 /** 新顾问注册：发送到微信群（不阻塞注册流程） */

@@ -84,8 +84,13 @@ export async function POST(request: NextRequest) {
       // 即使邮件发送失败，用户也已创建成功
     }
 
-    // 新用户注册通知到微信群（不阻塞响应）
-    notifyWechatNewUser({ email, name, phone: phone || null });
+    // 新用户注册通知到微信群（失败不影响注册，仅打日志便于排查）
+    const wechatResult = await notifyWechatNewUser({ email, name, phone: phone || null });
+    if (wechatResult.success) {
+      console.log('[WeChat] 新会员注册通知已发送:', email);
+    } else {
+      console.warn('[WeChat] 新会员注册通知未发送:', wechatResult.error, 'email:', email);
+    }
 
     return NextResponse.json({
       message: '注册成功！请查收验证邮件以激活账户',
