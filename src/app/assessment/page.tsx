@@ -128,7 +128,7 @@ export default function AssessmentPage() {
               </div>
               <div>
                 <div className="text-xs text-slate-500 uppercase tracking-wider">问题 {step + 1}/{steps.length}</div>
-                <div className="text-sm font-medium text-slate-700">AI 移民评估</div>
+                <div className="text-sm font-medium text-slate-700">加拿大移民评估 · 学签/工签/EE</div>
               </div>
             </div>
             {step > 0 && (

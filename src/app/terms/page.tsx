@@ -69,7 +69,7 @@ export default function TermsPage() {
                 <ul className="space-y-3 text-slate-600">
                   <li><strong className="text-slate-800">独立性：</strong>入驻顾问是独立的服务提供者，非本公司雇员。</li>
                   <li><strong className="text-slate-800">服务协议：</strong>当您通过平台聘请顾问时，您将与该顾问建立直接的服务关系。平台会自动生成三方协议以明确各方权责。</li>
-                  <li><strong className="text-slate-800">责任切分：</strong>因顾问提供的专业意见或服务质量产生的纠纷，由顾问自行承担责任。本公司作为平台方，将提供必要的调解支持和支付担保。</li>
+                  <li><strong className="text-slate-800">责任切分：</strong>因顾问提供的专业意见或服务质量产生的纠纷，由顾问自行承担责任。本公司作为平台方，将提供必要的调解支持。</li>
                 </ul>
               </section>
 
@@ -153,7 +153,7 @@ export default function TermsPage() {
                 <ul className="space-y-3 text-slate-600">
                   <li><strong className="text-slate-800">Independence:</strong> Consultants on the platform are independent service providers, not employees of the Company.</li>
                   <li><strong className="text-slate-800">Service agreement:</strong> When you engage a consultant through the platform, you enter a direct service relationship with that consultant. The platform may generate a tripartite agreement to clarify the rights and obligations of each party.</li>
-                  <li><strong className="text-slate-800">Liability:</strong> Disputes arising from a consultant’s advice or service quality are the responsibility of the consultant. The Company, as the platform operator, will provide mediation support and payment safeguards where appropriate.</li>
+                  <li><strong className="text-slate-800">Liability:</strong> Disputes arising from a consultant’s advice or service quality are the responsibility of the consultant. The Company, as the platform operator, will provide mediation support where appropriate.</li>
                 </ul>
               </section>
 

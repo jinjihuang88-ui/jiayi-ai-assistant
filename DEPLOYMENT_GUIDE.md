@@ -205,7 +205,7 @@ npm run build
 - [ ] .gitignore 没有忽略这些文件
 - [ ] Vercel 已触发新的部署
 - [ ] Vercel 构建成功（没有红色错误）
-- [ ] 环境变量已配置（DATABASE_URL）
+- [ ] 环境变量已配置（DATABASE_URL、WECHAT_WEBHOOK_URL 等，见 .env.example）
 
 部署后请测试：
 

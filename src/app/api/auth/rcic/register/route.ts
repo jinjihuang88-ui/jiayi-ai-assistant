@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { sendVerificationEmail } from '@/lib/email';
+import { notifyWechatNewRCIC } from '@/lib/wechat';
 
 export async function POST(request: NextRequest) {
   try {
@@ -117,6 +118,13 @@ export async function POST(request: NextRequest) {
     if (!emailResult.success) {
       console.error('Failed to send verification email:', emailResult.error);
     }
+
+    notifyWechatNewRCIC({
+      email: rcic.email,
+      name: rcic.name,
+      phone: rcic.phone ?? null,
+      consultantType: rcic.consultantType,
+    });
 
     return NextResponse.json({
       message: '注册成功！请查收验证邮件，验证后需等待平台审核',

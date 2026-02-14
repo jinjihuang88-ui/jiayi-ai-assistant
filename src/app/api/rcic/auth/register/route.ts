@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import * as bcrypt from "bcryptjs";
 import { sendRCICVerificationEmail } from "@/lib/email";
+import { notifyWechatNewRCIC } from "@/lib/wechat";
 import * as crypto from "crypto";
 
 export async function POST(request: NextRequest) {
@@ -133,6 +134,14 @@ export async function POST(request: NextRequest) {
     if (!emailResult.success) {
       console.error('[RCIC Register] Failed to send verification email:', emailResult.error);
     }
+
+    // 新顾问注册通知到微信群（不阻塞响应）
+    notifyWechatNewRCIC({
+      email: rcic.email,
+      name: rcic.name,
+      phone: rcic.phone ?? null,
+      consultantType: rcic.consultantType,
+    });
 
     return NextResponse.json({
       success: true,

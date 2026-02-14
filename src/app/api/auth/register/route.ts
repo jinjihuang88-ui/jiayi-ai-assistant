@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { sendVerificationEmail } from '@/lib/email';
+import { notifyWechatNewUser } from '@/lib/wechat';
 
 export async function POST(request: NextRequest) {
   try {
@@ -82,6 +83,9 @@ export async function POST(request: NextRequest) {
       console.error('Failed to send verification email:', emailResult.error);
       // 即使邮件发送失败，用户也已创建成功
     }
+
+    // 新用户注册通知到微信群（不阻塞响应）
+    notifyWechatNewUser({ email, name, phone: phone || null });
 
     return NextResponse.json({
       message: '注册成功！请查收验证邮件以激活账户',

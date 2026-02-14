@@ -118,7 +118,7 @@ export default function ConsultantStandardsPage() {
                 <ul className="space-y-3 text-slate-600">
                   <li><strong className="text-slate-800">禁止虚假承诺：</strong>严禁在个人主页或咨询中使用“100%成功”、“保证获批”等字眼。</li>
                   <li><strong className="text-slate-800">禁止材料造假：</strong>严禁教唆、协助用户伪造任何申请材料。</li>
-                  <li><strong className="text-slate-800">禁止私下交易：</strong>为保障用户资金安全，所有通过平台建立的关系必须在平台内完成交易，否则平台不予提供支付担保和纠纷调解。</li>
+                  <li><strong className="text-slate-800">禁止私下交易：</strong>为保障用户资金安全，所有通过平台建立的关系必须在平台内完成交易，否则平台不予提供纠纷调解支持。</li>
                   <li><strong className="text-slate-800">禁止超范围执业：</strong>B/C 类顾问若发现提供移民法律建议或冒充持牌顾问，将永久封号。</li>
                 </ul>
               </section>
@@ -229,7 +229,7 @@ export default function ConsultantStandardsPage() {
                 <ul className="space-y-3 text-slate-600">
                   <li><strong className="text-slate-800">No false promises:</strong> Prohibited language includes “100% success” or “guaranteed approval” on profiles or in consultations.</li>
                   <li><strong className="text-slate-800">No document fraud:</strong> Consultants must not encourage or assist users to forge any application materials.</li>
-                  <li><strong className="text-slate-800">No off-platform deals:</strong> To protect users, all relationships formed through the platform must transact on the platform; otherwise the platform will not provide payment protection or dispute mediation.</li>
+                  <li><strong className="text-slate-800">No off-platform deals:</strong> To protect users, all relationships formed through the platform must transact on the platform; otherwise the platform will not provide dispute mediation support.</li>
                   <li><strong className="text-slate-800">No scope overreach:</strong> Tier B/C consultants who provide immigration legal advice or pose as licensed consultants will be permanently banned.</li>
                 </ul>
               </section>

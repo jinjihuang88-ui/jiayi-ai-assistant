@@ -28,11 +28,12 @@ export default function ServicesPage() {
               <span className="font-bold text-white">加移</span>
             </Link>
           </div>
-          <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:flex items-center gap-6 md:gap-8 text-[15px] font-medium">
-            <Link href="/" className="text-white/80 hover:text-white transition-colors py-2 flex items-center gap-1.5"><span>首页</span><span className="text-xs opacity-60">Home</span></Link>
-            <Link href="/auth/login?redirect=/member/consultants" className="text-white/80 hover:text-white transition-colors py-2 flex items-center gap-1.5"><span>找顾问</span><span className="text-xs opacity-60">Find Consultants</span></Link>
-            <Link href="/services" className="text-white font-medium py-2 flex items-center gap-1.5"><span>服务</span><span className="text-xs opacity-60">Services</span></Link>
-            <Link href="/about" className="text-white/80 hover:text-white transition-colors py-2 flex items-center gap-1.5"><span>关于我们</span><span className="text-xs opacity-60">About</span></Link>
+          <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:flex items-center gap-5 md:gap-7 text-[15px] font-medium shrink-0">
+            <Link href="/" className="text-white/80 hover:text-white transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>首页</span><span className="text-[10px] md:text-xs opacity-60 font-normal">Home</span></Link>
+            <Link href="/ircc-news" className="text-white/80 hover:text-white transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>IRCC信息</span><span className="text-[10px] md:text-xs opacity-60 font-normal">IRCC News</span></Link>
+            <Link href="/auth/login?redirect=/member/consultants" className="text-white/80 hover:text-white transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>找顾问</span><span className="text-[10px] md:text-xs opacity-60 font-normal">Find Consultants</span></Link>
+            <Link href="/services" className="text-white font-medium py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>服务</span><span className="text-[10px] md:text-xs opacity-60 font-normal">Services</span></Link>
+            <Link href="/about" className="text-white/80 hover:text-white transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>关于我们</span><span className="text-[10px] md:text-xs opacity-60 font-normal">About</span></Link>
           </nav>
           <div className="flex items-center justify-end gap-2 md:gap-3 shrink-0">
             <button
@@ -54,6 +55,7 @@ export default function ServicesPage() {
         {menuOpen && (
           <div className="lg:hidden border-t border-slate-700/50 bg-[#1E293B] px-6 py-4 flex flex-col gap-2">
             <Link href="/" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>首页</Link>
+            <Link href="/ircc-news" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>IRCC信息</Link>
             <Link href="/auth/login?redirect=/member/consultants" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>找顾问</Link>
             <Link href="/services" className="text-white font-medium py-2" onClick={() => setMenuOpen(false)}>服务</Link>
             <Link href="/about" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>关于我们</Link>
@@ -69,19 +71,19 @@ export default function ServicesPage() {
       <section className="py-20 md:py-28 bg-white border-b border-slate-100">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-2 tracking-tight">
-            服务
+            加拿大移民与签证服务
           </h1>
           <p className="text-xl md:text-2xl text-slate-500 mb-6">
-            Services
+            学签、工签、访客签证、EE移民、省提名 · Services
           </p>
           <p className="text-xl md:text-2xl text-slate-700 mb-2">
-            为移民决策提供结构化技术支持
+            为移民与签证决策提供结构化技术支持
           </p>
           <p className="text-lg text-slate-500 mb-10">
-            Technology Infrastructure for Immigration Decision-Making
+            Technology for Immigration & Visa Decision-Making
           </p>
           <p className="text-slate-600 mb-1">
-            jiayi 提供软件基础设施，用于支持信息整理与专业实践管理。
+            jiayi 为加拿大移民、学签、工签、访客签证等申请提供信息整理与持牌顾问实践管理支持。
           </p>
           <p className="text-sm text-slate-500 mb-1">
             jiayi provides software infrastructure for information organization and professional practice management.

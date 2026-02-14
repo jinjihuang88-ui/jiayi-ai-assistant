@@ -60,7 +60,7 @@ export default function Home() {
     url: "https://www.jiayi.co",
     logo: "https://www.jiayi.co/logo.png",
     description:
-      "加移（Jiayi）是面向中国用户与加拿大持牌移民顾问的 C2C 移民 SaaS 管理系统，提供评估、顾问匹配与案件管理功能。",
+      "加移（Jiayi）加拿大移民与持牌顾问服务平台，提供学签、工签、访客签证、EE移民、省提名等移民评估与签证申请支持、顾问匹配与案件管理。",
     email: "support@jiayi.co",
     contactPoint: [
       {
@@ -75,8 +75,9 @@ export default function Home() {
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "加移 Jiayi Immigration SaaS",
+    name: "加移 Jiayi 加拿大移民学签工签顾问平台",
     url: "https://www.jiayi.co",
+    description: "加拿大移民、留学、学签、工签、访客签证、Express Entry、省提名专业评估与持牌移民顾问(RCIC)服务。",
   };
 
   return (
@@ -102,12 +103,13 @@ export default function Home() {
             </a>
           </div>
 
-          {/* 中间：仅导航链接，居中；每项中文在左、英文在右 */}
-          <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:flex items-center gap-6 md:gap-8 text-[15px] font-medium">
-            <a href="/" className="text-white hover:text-white/80 transition-colors duration-200 py-2 flex items-center gap-1.5"><span>首页</span><span className="text-xs opacity-60">Home</span></a>
-            <a href={consultantLink} className="text-white/80 hover:text-white transition-colors duration-200 py-2 flex items-center gap-1.5"><span>找顾问</span><span className="text-xs opacity-60">Find Consultants</span></a>
-            <a href="/services" className="text-white/80 hover:text-white transition-colors duration-200 py-2 flex items-center gap-1.5"><span>服务</span><span className="text-xs opacity-60">Services</span></a>
-            <a href="/about" className="text-white/80 hover:text-white transition-colors duration-200 py-2 flex items-center gap-1.5"><span>关于我们</span><span className="text-xs opacity-60">About</span></a>
+          {/* 中间：导航链接，每项上下排列中文+英文，不换行防重叠 */}
+          <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:flex items-center gap-5 md:gap-7 text-[15px] font-medium shrink-0">
+            <a href="/" className="text-white hover:text-white/80 transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>首页</span><span className="text-[10px] md:text-xs opacity-60 font-normal">Home</span></a>
+            <a href="/ircc-news" className="text-white/80 hover:text-white transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>IRCC信息</span><span className="text-[10px] md:text-xs opacity-60 font-normal">IRCC News</span></a>
+            <a href={consultantLink} className="text-white/80 hover:text-white transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>找顾问</span><span className="text-[10px] md:text-xs opacity-60 font-normal">Find Consultants</span></a>
+            <a href="/services" className="text-white/80 hover:text-white transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>服务</span><span className="text-[10px] md:text-xs opacity-60 font-normal">Services</span></a>
+            <a href="/about" className="text-white/80 hover:text-white transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>关于我们</span><span className="text-[10px] md:text-xs opacity-60 font-normal">About</span></a>
           </nav>
 
           {/* 右侧：会员登录、顾问登录，尽量靠右 */}
@@ -161,6 +163,7 @@ export default function Home() {
         {menuOpen && (
           <div className="lg:hidden border-t border-slate-700/50 bg-[#1E293B] px-6 py-4 flex flex-col gap-2">
             <a href="/" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>首页</a>
+            <a href="/ircc-news" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>IRCC信息</a>
             <a href={consultantLink} className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>找顾问</a>
             <a href="/services" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>服务</a>
             <a href="/about" className="text-white font-medium py-2" onClick={() => setMenuOpen(false)}>关于我们</a>
@@ -183,15 +186,15 @@ export default function Home() {
             
             {/* 主标题 */}
             <h1 className="text-4xl md:text-6xl font-bold leading-tight text-slate-900 mb-2">
-              加拿大移民信息与专业服务管理系统
+              加拿大移民、学签、工签与签证信息管理系统
             </h1>
             <p className="text-xl md:text-2xl text-slate-600 mb-4">
-              Canadian Immigration Information & Professional Services Management System
+              涵盖访客签证、Express Entry、省提名 · 持牌移民顾问(RCIC)平台
             </p>
             
             {/* 副标题（关键） */}
             <h2 className="text-2xl md:text-3xl font-semibold text-slate-700 mb-1">
-              为申请人提供结构化信息整理
+              为学签、工签、移民申请人提供结构化信息整理
             </h2>
             <p className="text-lg md:text-xl text-slate-500 mb-2">
               Structured information for applicants

@@ -640,7 +640,7 @@ function ProvincialNomineeApplicationPageContent() {
       { value: "oinp-french-speaking", label: "法语技术工人 French-Speaking Skilled Worker" },
       { value: "oinp-masters", label: "硕士毕业生 Masters Graduate" },
       { value: "oinp-phd", label: "博士毕业生 PhD Graduate" },
-      { value: "oinp-employer-job-offer", label: "雇主担保 Employer Job Offer" },
+      { value: "oinp-employer-job-offer", label: "雇主聘用 Employer Job Offer" },
       { value: "oinp-international-student", label: "国际学生 International Student" },
       { value: "oinp-in-demand-skills", label: "紧缺技能 In-Demand Skills" },
     ],
@@ -661,7 +661,7 @@ function ProvincialNomineeApplicationPageContent() {
     ],
     SK: [
       { value: "sinp-international-skilled-worker", label: "国际技术工人 International Skilled Worker" },
-      { value: "sinp-employment-offer", label: "雇主担保 Employment Offer" },
+      { value: "sinp-employment-offer", label: "雇主聘用 Employment Offer" },
       { value: "sinp-occupation-in-demand", label: "紧缺职业 Occupation In-Demand" },
       { value: "sinp-express-entry", label: "快速通道 Express Entry" },
       { value: "sinp-hard-to-fill", label: "难以填补技能试点 Hard-to-Fill Skills Pilot" },

@@ -28,12 +28,13 @@ export default function AboutPage() {
               <span className="font-bold text-white">加移</span>
             </Link>
           </div>
-          {/* 中间：仅导航链接，居中；每项中文在左、英文在右 */}
-          <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:flex items-center gap-6 md:gap-8 text-[15px] font-medium">
-            <Link href="/" className="text-white/80 hover:text-white transition-colors py-2 flex items-center gap-1.5"><span>首页</span><span className="text-xs opacity-60">Home</span></Link>
-            <Link href="/auth/login?redirect=/member/consultants" className="text-white/80 hover:text-white transition-colors py-2 flex items-center gap-1.5"><span>找顾问</span><span className="text-xs opacity-60">Find Consultants</span></Link>
-            <Link href="/services" className="text-white/80 hover:text-white transition-colors py-2 flex items-center gap-1.5"><span>服务</span><span className="text-xs opacity-60">Services</span></Link>
-            <Link href="/about" className="text-white font-medium py-2 flex items-center gap-1.5"><span>关于我们</span><span className="text-xs opacity-60">About</span></Link>
+          {/* 中间：导航链接，每项上下排列中文+英文，不换行防重叠 */}
+          <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:flex items-center gap-5 md:gap-7 text-[15px] font-medium shrink-0">
+            <Link href="/" className="text-white/80 hover:text-white transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>首页</span><span className="text-[10px] md:text-xs opacity-60 font-normal">Home</span></Link>
+            <Link href="/ircc-news" className="text-white/80 hover:text-white transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>IRCC信息</span><span className="text-[10px] md:text-xs opacity-60 font-normal">IRCC News</span></Link>
+            <Link href="/auth/login?redirect=/member/consultants" className="text-white/80 hover:text-white transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>找顾问</span><span className="text-[10px] md:text-xs opacity-60 font-normal">Find Consultants</span></Link>
+            <Link href="/services" className="text-white/80 hover:text-white transition-colors py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>服务</span><span className="text-[10px] md:text-xs opacity-60 font-normal">Services</span></Link>
+            <Link href="/about" className="text-white font-medium py-2 flex flex-col items-center gap-0 whitespace-nowrap"><span>关于我们</span><span className="text-[10px] md:text-xs opacity-60 font-normal">About</span></Link>
           </nav>
           {/* 右侧：会员登录、顾问登录，尽量靠右 */}
           <div className="flex items-center justify-end gap-2 md:gap-3 shrink-0">
@@ -57,6 +58,7 @@ export default function AboutPage() {
         {menuOpen && (
           <div className="lg:hidden border-t border-slate-700/50 bg-[#1E293B] px-6 py-4 flex flex-col gap-2">
             <Link href="/" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>首页</Link>
+            <Link href="/ircc-news" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>IRCC信息</Link>
             <Link href="/auth/login?redirect=/member/consultants" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>找顾问</Link>
             <Link href="/services" className="text-white/90 hover:text-white py-2" onClick={() => setMenuOpen(false)}>服务</Link>
             <Link href="/about" className="text-white font-medium py-2" onClick={() => setMenuOpen(false)}>关于我们</Link>
@@ -82,10 +84,10 @@ export default function AboutPage() {
       <section className="py-16 md:py-20 bg-gradient-to-b from-white to-slate-50/50">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1 className="text-3xl md:text-4xl font-bold text-[#0B1F3B] mb-2 tracking-tight">
-            加移 · SaaS 加拿大移民信息与专业服务管理系统
+            加移 · 加拿大移民、学签、工签与持牌顾问专业服务
           </h1>
           <p className="text-xl text-[#1F2937]/80">
-            jiayi · SaaS Canadian Immigration Information & Professional Services Management System
+            学签、工签、访客签证、EE移民、省提名 · 持牌移民顾问(RCIC)平台
           </p>
         </div>
       </section>
@@ -96,11 +98,11 @@ export default function AboutPage() {
           <h2 className="text-2xl font-bold text-[#0B1F3B] mb-10">公司简介</h2>
           <div className="grid md:grid-cols-2 gap-10 md:gap-16">
             <div className="space-y-4 text-[#1F2937] leading-relaxed">
-              <p>jiayi 是由加拿大科技公司开发并运营的专业 SaaS 平台，提供面向移民决策与实践管理的技术基础设施。</p>
+              <p>jiayi 是由加拿大科技公司开发并运营的专业平台，为加拿大移民、学签、工签、访客签证、EE移民、省提名等决策与申请提供技术基础设施。</p>
               <p className="font-medium">我们致力于为：</p>
               <ul className="list-disc pl-5 space-y-2">
-                <li>有移民意向的个人用户提供结构化信息整理工具</li>
-                <li>持牌移民顾问提供专业实践管理系统</li>
+                <li>有移民、留学、签证申请意向的用户提供结构化信息整理与移民评估工具</li>
+                <li>持牌移民顾问(RCIC)提供专业实践管理系统</li>
               </ul>
               <p>平台不提供移民咨询或法律服务。所有专业服务均由受监管的持牌顾问独立提供。</p>
             </div>

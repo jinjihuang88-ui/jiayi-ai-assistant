@@ -1,4 +1,12 @@
 {
   "buildCommand": "prisma generate && prisma db push --accept-data-loss && next build",
-  "installCommand": "pnpm install || npm install"
+  "installCommand": "pnpm install || npm install",
+  "headers": [
+    {
+      "source": "/favicon.ico",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    }
+  ]
 }

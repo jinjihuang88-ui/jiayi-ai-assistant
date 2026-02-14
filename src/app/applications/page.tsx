@@ -111,9 +111,9 @@ function ApplicationsContent() {
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Page Header */}
         <div className={`mb-12 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">我的申请</h1>
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">学签、工签、访客签证与移民申请</h1>
           <p className="text-lg text-slate-600">
-            选择您需要办理的移民申请类型，AI 将全程引导您完成
+            选择学签、工签、访客签证、EE技术移民或省提名等类型，AI 全程引导填写
           </p>
         </div>
 

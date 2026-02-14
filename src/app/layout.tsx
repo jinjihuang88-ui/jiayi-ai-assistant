@@ -1,6 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,28 +18,39 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const defaultDescription =
+  "加移(Jiayi) - 加拿大移民AI评估与持牌顾问服务平台，提供学签、工签、访客签证、EE移民等专业咨询服务";
+const defaultKeywords = [
+  "加拿大移民",
+  "加拿大留学",
+  "学签",
+  "工签",
+  "访客签证",
+  "旅游签证",
+  "Express Entry",
+  "省提名",
+  "移民顾问",
+  "持牌移民顾问",
+  "RCIC",
+  "移民评估",
+  "签证申请",
+];
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.jiayi.co"),
   title: {
-    default: "加移AI助理 | 加拿大移民 C2C SaaS 管理系统",
-    template: "%s | 加移 Jiayi",
+    default: "加移jiayi | 加拿大移民 C2C SaaS 管理系统",
+    template: "%s | 加移jiayi",
   },
-  description:
-    "加移（Jiayi）是面向中国用户和加拿大持牌移民顾问的 C2C SaaS 管理系统，提供移民评估、顾问匹配和案件管理等功能。",
-  keywords: [
-    "加移",
-    "Jiayi",
-    "加拿大移民",
-    "加拿大留学",
-    "RCIC",
-    "移民顾问",
-    "SaaS 管理系统",
-    "C2C 平台",
-  ],
+  description: defaultDescription,
+  keywords: defaultKeywords,
+  robots: {
+    index: true,
+    follow: true,
+  },
   openGraph: {
-    title: "加移AI助理 | 加拿大移民 C2C SaaS 管理系统",
-    description:
-      "加移（Jiayi）连接中国用户与加拿大持牌移民顾问，提供评估、沟通与案件管理的一体化平台。",
+    title: "加移jiayi | 加拿大移民 C2C SaaS 管理系统",
+    description: defaultDescription,
     url: "/",
     siteName: "加移 Jiayi",
     locale: "zh_CN",
@@ -41,6 +58,11 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "https://www.jiayi.co",
+  },
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
   },
 };
 
@@ -52,6 +74,11 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
+        {/* 优先使用网站 logo 作为标签页图标，?v= 避免浏览器强缓存旧图标 */}
+        <link rel="icon" type="image/png" href="/logo.png?v=jiayi" />
+        <link rel="shortcut icon" type="image/png" href="/logo.png?v=jiayi" />
+        {/* 百度站长验证 */}
+        <meta name="baidu-site-verification" content="codeva-5vKXoNIMS2" />
         {/* ✅ Coze Chat SDK 样式（必须全局） */}
         <link
           rel="stylesheet"

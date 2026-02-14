@@ -37,13 +37,12 @@ export default function ChatPage() {
                 </span>
               </h1>
               <p className="text-lg text-slate-500 mb-6">
-                AI-Powered Canadian Immigration Consultation
+                学签、工签、访客签证、EE移民、省提名 · AI 智能咨询
               </p>
 
               {/* Description */}
               <p className="text-slate-600 leading-relaxed mb-6">
-                基于加拿大移民局（IRCC）官方公开数据的智能咨询服务，
-                帮助您理解可行路径、关键条件以及下一步方向。
+                基于加拿大移民局（IRCC）官方数据的智能咨询，覆盖学签、工签、访客签证、Express Entry、省提名等路径与条件，帮助您理解可行方向。
               </p>
 
               {/* Features */}
