@@ -328,48 +328,44 @@ export async function POST(request: NextRequest) {
         return false;
       }
     })();
-    if (hasAttachments) {
-      getCaseFollowerWithStatus(prisma, actualCaseId)
-        .then(async (follower) => {
-          if (process.env.NODE_ENV === 'production') {
-            console.log('[Send Message] follower (file):', follower ? { email: follower.email, isOnline: follower.isOnline, role: follower.role } : null);
-          }
-          if (follower?.email) {
-            await sendCaseFollowerFileNotification(follower.email, { caseTitle: follower.caseTitle }).catch((e) =>
-              console.error('[Send Message] Notify follower file:', e)
-            );
-            if (!follower.isOnline) {
-              const result = await sendCaseFollowerOfflineNotification({
-                caseTitle: follower.caseTitle,
-                followerName: follower.name,
-                type: 'file',
-              });
-              if (process.env.NODE_ENV === 'production') {
-                console.log('[Send Message] WeChat offline notify (file) result:', result.success ? 'ok' : result.error);
-              }
-            }
-          }
-        })
-        .catch((e) => console.error('[Send Message] getCaseFollowerWithStatus:', e));
-    } else {
-      // 会员发送纯文字消息且跟进人不在线时，发企业微信通知（不新增邮件，保持原有逻辑）
-      getCaseFollowerWithStatus(prisma, actualCaseId)
-        .then(async (follower) => {
-          if (process.env.NODE_ENV === 'production') {
-            console.log('[Send Message] follower:', follower ? { email: follower.email, isOnline: follower.isOnline, role: follower.role } : null);
-          }
-          if (follower && !follower.isOnline) {
-            const result = await sendCaseFollowerOfflineNotification({
-              caseTitle: follower.caseTitle,
-              followerName: follower.name,
-              type: 'message',
-            });
-            if (process.env.NODE_ENV === 'production') {
-              console.log('[Send Message] WeChat offline notify result:', result.success ? 'ok' : result.error);
-            }
-          }
-        })
-        .catch((e) => console.error('[Send Message] getCaseFollowerWithStatus:', e));
+    const forceWechatNotify = process.env.WECHAT_NOTIFY_ALWAYS === 'true';
+
+    let follower: Awaited<ReturnType<typeof getCaseFollowerWithStatus>> = null;
+    try {
+      follower = await getCaseFollowerWithStatus(prisma, actualCaseId);
+    } catch (e) {
+      console.error('[Send Message] getCaseFollowerWithStatus:', e);
+    }
+
+    console.log('[Send Message] actualCaseId:', actualCaseId, 'follower:', follower ? { email: follower.email, isOnline: follower.isOnline, role: follower.role } : null);
+
+    if (hasAttachments && follower?.email) {
+      await sendCaseFollowerFileNotification(follower.email, { caseTitle: follower.caseTitle }).catch((e) =>
+        console.error('[Send Message] Notify follower file:', e)
+      );
+      const shouldWechatFile = forceWechatNotify || !follower.isOnline;
+      if (shouldWechatFile) {
+        const result = await sendCaseFollowerOfflineNotification({
+          caseTitle: follower.caseTitle,
+          followerName: follower.name,
+          type: 'file',
+        });
+        console.log('[Send Message] WeChat (file) result:', result.success ? 'ok' : result.error);
+      }
+    } else if (!hasAttachments && follower) {
+      const shouldWechat = forceWechatNotify || !follower.isOnline;
+      if (shouldWechat) {
+        const result = await sendCaseFollowerOfflineNotification({
+          caseTitle: follower.caseTitle,
+          followerName: follower.name,
+          type: 'message',
+        });
+        console.log('[Send Message] WeChat (message) result:', result.success ? 'ok' : result.error);
+      } else {
+        console.log('[Send Message] WeChat skip: follower isOnline=true');
+      }
+    } else if (!hasAttachments && !follower) {
+      console.log('[Send Message] WeChat skip: no follower');
     }
 
     return NextResponse.json({

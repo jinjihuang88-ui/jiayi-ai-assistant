@@ -10,9 +10,7 @@ const WECHAT_WEBHOOK_URL = process.env.WECHAT_WEBHOOK_URL || "";
  */
 export async function sendWechatText(content: string): Promise<{ success: boolean; error?: string }> {
   if (!WECHAT_WEBHOOK_URL.trim()) {
-    if (process.env.NODE_ENV === "production") {
-      console.warn("[WeChat] WECHAT_WEBHOOK_URL 未配置，跳过发送");
-    }
+    console.warn("[WeChat] WECHAT_WEBHOOK_URL 未配置，跳过发送");
     return { success: false, error: "WECHAT_WEBHOOK_URL 未配置" };
   }
   const maxLen = 2048;
@@ -28,11 +26,15 @@ export async function sendWechatText(content: string): Promise<{ success: boolea
     });
     const data = (await res.json()) as { errcode?: number; errmsg?: string };
     if (res.ok && (data.errcode === 0 || data.errcode === undefined)) {
+      console.log("[WeChat] send ok");
       return { success: true };
     }
-    return { success: false, error: data.errmsg || `HTTP ${res.status}` };
+    const err = data.errmsg || `HTTP ${res.status}`;
+    console.warn("[WeChat] send failed:", err);
+    return { success: false, error: err };
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    console.warn("[WeChat] send error:", msg);
     return { success: false, error: msg };
   }
 }
