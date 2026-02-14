@@ -7,6 +7,8 @@ export type CaseFollowerInfo = {
   isOnline: boolean;
   name?: string;
   role: "rcic" | "team_member";
+  /** 跟进人 ID：role=rcic 时为 RCIC.id，role=team_member 时为 RCICTeamMember.id */
+  followerId?: string;
 };
 
 /**
@@ -50,6 +52,7 @@ export async function getCaseFollowerWithStatus(
         isOnline: false,
         name: member.name,
         role: "team_member",
+        followerId: caseItem.assignedTeamMemberId ?? undefined,
       };
     }
   }
@@ -67,6 +70,7 @@ export async function getCaseFollowerWithStatus(
         isOnline: effectiveOnline,
         name: rcic.name,
         role: "rcic",
+        followerId: caseItem.rcicId,
       };
     }
   }

@@ -1,15 +1,25 @@
 /**
  * 企业微信自建应用「接收消息」回调 URL。
- * 在企业微信管理后台 → 自建应用 → 接收消息 → 设置此 URL（如 https://www.jiayi.co/api/wechat/receive）。
- * GET：URL 验证（企业微信会带 msg_signature, timestamp, nonce, echostr，需验签并解密 echostr 原样返回）。
- * POST：接收成员发到应用的消息（当前仅返回 200，后续可在此解密并写入站内会话实现「企业微信→网站」）。
+ * GET：URL 验证。
+ * POST：接收成员发到应用的消息，解析后写入对应案件会话，会员端消息页可见。
  */
 import { NextRequest, NextResponse } from "next/server";
+import { XMLParser } from "fast-xml-parser";
 import { verifySignature, decrypt } from "@/lib/wechat-callback";
+import { prisma } from "@/lib/prisma";
 
 const TOKEN = process.env.WECHAT_CALLBACK_TOKEN || "";
 const ENCODING_AES_KEY = process.env.WECHAT_ENCODING_AES_KEY || "";
 const CORP_ID = process.env.WECHAT_CORP_ID || "";
+
+/** 可选：环境变量配置 企业微信userid:RCIC的id，用于未在 DB 填写 wechatUserId 时（如 WECHAT_USERID_RCIC_ID=ZhangSan:clxxx） */
+function getRcicIdByWechatUserId(wechatUserId: string): string | null {
+  const raw = process.env.WECHAT_USERID_RCIC_ID?.trim();
+  if (!raw) return null;
+  const part = raw.split(":").map((s) => s.trim());
+  if (part.length >= 2 && part[0] === wechatUserId) return part[1];
+  return null;
+}
 
 export async function GET(request: NextRequest) {
   if (!TOKEN || !ENCODING_AES_KEY) {
@@ -70,10 +80,76 @@ export async function POST(request: NextRequest) {
   }
   try {
     const plain = decrypt(ENCODING_AES_KEY, msgEncrypt, CORP_ID);
-    console.log("[WeChat receive] POST decrypted (length):", plain?.length);
-    // TODO: 解析 XML 得到 FromUserName、MsgType、Content，根据 userid 查顾问/文案，写入对应案件 Message，实现企业微信→网站
+    const parser = new XMLParser({ ignoreDeclaration: true });
+    const parsed = parser.parse(plain) as Record<string, Record<string, string> | undefined>;
+    const xml = parsed?.xml ?? parsed?.XML ?? {};
+    const fromUserName = (xml.FromUserName ?? xml.fromusername ?? "").trim();
+    const msgType = (xml.MsgType ?? xml.msgtype ?? "").trim();
+    const content = (xml.Content ?? xml.content ?? "").trim();
+
+    if (msgType !== "text" || !content) {
+      if (fromUserName) console.log("[WeChat receive] skip non-text or empty:", msgType, !!content);
+      return new NextResponse("", { status: 200 });
+    }
+
+    let rcic: { id: string; lastWechatNotifiedCaseId: string | null } | null = null;
+    const byWechatUserId = await prisma.rCIC.findFirst({
+      where: { wechatUserId: fromUserName!, isActive: true },
+      select: { id: true, lastWechatNotifiedCaseId: true },
+    });
+    if (byWechatUserId) {
+      rcic = byWechatUserId;
+    } else {
+      const rcicIdFromEnv = getRcicIdByWechatUserId(fromUserName!);
+      if (rcicIdFromEnv) {
+        const row = await prisma.rCIC.findUnique({
+          where: { id: rcicIdFromEnv },
+          select: { id: true, lastWechatNotifiedCaseId: true },
+        });
+        rcic = row;
+      }
+    }
+
+    if (!rcic) {
+      console.log("[WeChat receive] no RCIC for wechat userid:", fromUserName);
+      return new NextResponse("", { status: 200 });
+    }
+
+    let caseId = rcic.lastWechatNotifiedCaseId;
+    if (!caseId) {
+      const lastCase = await prisma.case.findFirst({
+        where: { rcicId: rcic.id },
+        orderBy: { updatedAt: "desc" },
+        select: { id: true },
+      });
+      caseId = lastCase?.id ?? null;
+    }
+
+    if (!caseId) {
+      console.log("[WeChat receive] no case for rcic:", rcic.id);
+      return new NextResponse("", { status: 200 });
+    }
+
+    const caseRow = await prisma.case.findFirst({
+      where: { id: caseId, rcicId: rcic.id },
+      select: { id: true },
+    });
+    if (!caseRow) {
+      console.log("[WeChat receive] case not found or not owned by rcic:", caseId, rcic.id);
+      return new NextResponse("", { status: 200 });
+    }
+
+    await prisma.message.create({
+      data: {
+        caseId: caseRow.id,
+        senderId: rcic.id,
+        senderType: "rcic",
+        content,
+      },
+    });
+    console.log("[WeChat receive] message saved caseId:", caseRow.id, "rcicId:", rcic.id);
   } catch (e) {
-    console.error("[WeChat receive] POST decrypt:", e);
+    console.error("[WeChat receive] POST decrypt or save:", e);
   }
   return new NextResponse("", { status: 200 });
 }

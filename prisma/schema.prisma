@@ -99,6 +99,10 @@ model RCIC {
   certifications    String?   // 证书和荣誉（JSON数组）
   isAcceptingCases  Boolean   @default(true) // 是否接收新案件
   
+  // 企业微信：成员 userid，用于接收群/应用回复并同步到站内消息
+  wechatUserId            String?  // 企业微信成员账号（管理后台或通讯录可见）
+  lastWechatNotifiedCaseId String?  // 最近一次收到「跟进人不在线」通知的案件 ID，群回复会写入该案件会话
+  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

@@ -351,6 +351,9 @@ export async function POST(request: NextRequest) {
           type: 'file',
         });
         console.log('[Send Message] WeChat (file) result:', result.success ? 'ok' : result.error);
+        if (follower.role === 'rcic' && follower.followerId) {
+          await prisma.rCIC.update({ where: { id: follower.followerId }, data: { lastWechatNotifiedCaseId: actualCaseId } }).catch((e) => console.error('[Send Message] update lastWechatNotifiedCaseId:', e));
+        }
       }
     } else if (!hasAttachments && follower) {
       const shouldWechat = forceWechatNotify || !follower.isOnline;
@@ -361,6 +364,9 @@ export async function POST(request: NextRequest) {
           type: 'message',
         });
         console.log('[Send Message] WeChat (message) result:', result.success ? 'ok' : result.error);
+        if (follower.role === 'rcic' && follower.followerId) {
+          await prisma.rCIC.update({ where: { id: follower.followerId }, data: { lastWechatNotifiedCaseId: actualCaseId } }).catch((e) => console.error('[Send Message] update lastWechatNotifiedCaseId:', e));
+        }
       } else {
         console.log('[Send Message] WeChat skip: follower isOnline=true');
       }
