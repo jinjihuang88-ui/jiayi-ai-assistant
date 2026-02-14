@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { isRcicEffectivelyOnline } from "@/lib/rcic-online";
 
 /**
  * 会员端消息：左侧联系人列表。
@@ -44,6 +45,7 @@ export async function GET() {
             profilePhoto: true,
             consultantType: true,
             isOnline: true,
+            lastActiveAt: true,
           },
         },
       },
@@ -79,7 +81,7 @@ export async function GET() {
                 : "顾问",
           caseIds: [contractedCase.id],
           avatar: contractedCase.rcic.avatar ?? contractedCase.rcic.profilePhoto,
-          isOnline: contractedCase.rcic.isOnline ?? false,
+          isOnline: isRcicEffectivelyOnline(contractedCase.rcic.isOnline ?? false, contractedCase.rcic.lastActiveAt ?? null),
         });
       }
       // 若有多条已签约案件（同一顾问），把 caseIds 都归到同一联系人
@@ -113,6 +115,7 @@ export async function GET() {
             profilePhoto: true,
             consultantType: true,
             isOnline: true,
+            lastActiveAt: true,
           },
         });
         if (rcic) {
@@ -140,7 +143,7 @@ export async function GET() {
                   : "顾问",
             caseIds,
             avatar: rcic.avatar ?? rcic.profilePhoto,
-            isOnline: rcic.isOnline ?? false,
+            isOnline: isRcicEffectivelyOnline(rcic.isOnline ?? false, rcic.lastActiveAt ?? null),
           });
         }
       }

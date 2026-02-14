@@ -4,8 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
 import { getCurrentRCIC } from "@/lib/rcic-auth";
 import { getRoom, endRoom } from "@/lib/call-store";
-import { getCaseFollowerEmail } from "@/lib/case-follower";
+import { getCaseFollowerWithStatus } from "@/lib/case-follower";
 import { sendCaseFollowerMissedCallNotification } from "@/lib/email";
+import { sendCaseFollowerOfflineNotification } from "@/lib/wechat";
 
 /** 结束通话。若为会员发起且未接听（仍 ringing），则发邮件通知该案件跟进人。 */
 export async function POST(
@@ -33,15 +34,23 @@ export async function POST(
     if (user && caseItem.userId === user.id) {
       // 会员结束：若未接听则通知跟进人
       if (room.initiatorRole === "member" && room.status === "ringing") {
-        getCaseFollowerEmail(prisma, room.caseId)
-          .then((follower) => {
+        getCaseFollowerWithStatus(prisma, room.caseId)
+          .then(async (follower) => {
             if (follower?.email) {
-              sendCaseFollowerMissedCallNotification(follower.email, room.type, {
+              await sendCaseFollowerMissedCallNotification(follower.email, room.type, {
                 caseTitle: follower.caseTitle,
               }).catch((e) => console.error("[call/end] Notify missed call:", e));
+              if (!follower.isOnline) {
+                sendCaseFollowerOfflineNotification({
+                  caseTitle: follower.caseTitle,
+                  followerName: follower.name,
+                  type: "missed_call",
+                  callType: room.type === "video" ? "video" : "voice",
+                }).catch((e) => console.error("[call/end] WeChat offline notify:", e));
+              }
             }
           })
-          .catch((e) => console.error("[call/end] getCaseFollowerEmail:", e));
+          .catch((e) => console.error("[call/end] getCaseFollowerWithStatus:", e));
       }
       endRoom(roomId);
       return NextResponse.json({ success: true });

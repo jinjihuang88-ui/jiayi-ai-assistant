@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
+import { isRcicEffectivelyOnline } from '@/lib/rcic-online';
 
 export async function GET(request: NextRequest) {
   try {
@@ -55,9 +56,10 @@ export async function GET(request: NextRequest) {
       ],
     });
 
-    // 解析JSON字段
+    // 解析JSON字段；在线状态按“真实在线”（最近 5 分钟有活跃）展示
     const formattedConsultants = consultants.map(consultant => ({
       ...consultant,
+      isOnline: isRcicEffectivelyOnline(consultant.isOnline, consultant.lastActiveAt),
       specialties: consultant.specialties ? JSON.parse(consultant.specialties) : [],
       serviceRegions: consultant.serviceRegions ? JSON.parse(consultant.serviceRegions) : [],
       languages: consultant.languages ? JSON.parse(consultant.languages) : [],

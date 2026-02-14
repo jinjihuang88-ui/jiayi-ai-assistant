@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
-import { getCaseFollowerEmail } from '@/lib/case-follower';
+import { getCaseFollowerWithStatus } from '@/lib/case-follower';
 import { sendCaseFollowerFileNotification } from '@/lib/email';
+import { sendCaseFollowerOfflineNotification } from '@/lib/wechat';
+import { isRcicEffectivelyOnline } from '@/lib/rcic-online';
 
 // 获取消息列表
 export async function GET(request: NextRequest) {
@@ -186,6 +188,12 @@ export async function GET(request: NextRequest) {
       where: { approvalStatus: 'approved' },
     });
 
+    // 返回给前端的顾问在线状态按“真实在线”（最近 5 分钟有活跃）计算
+    if (consultant && typeof consultant === 'object' && 'isOnline' in consultant && 'lastActiveAt' in consultant) {
+      const c = consultant as { isOnline: boolean; lastActiveAt: Date | null };
+      consultant = { ...consultant, isOnline: isRcicEffectivelyOnline(c.isOnline, c.lastActiveAt) };
+    }
+
     return NextResponse.json({
       success: true,
       messages,
@@ -310,7 +318,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // 会员发送文件/图片时，发邮件通知该案件跟进人
+    // 会员发送文件/图片时，发邮件通知该案件跟进人；若跟进人不在线则同时发企业微信
     const hasAttachments = (() => {
       if (!attachments) return false;
       try {
@@ -321,15 +329,47 @@ export async function POST(request: NextRequest) {
       }
     })();
     if (hasAttachments) {
-      getCaseFollowerEmail(prisma, actualCaseId)
-        .then((follower) => {
+      getCaseFollowerWithStatus(prisma, actualCaseId)
+        .then(async (follower) => {
+          if (process.env.NODE_ENV === 'production') {
+            console.log('[Send Message] follower (file):', follower ? { email: follower.email, isOnline: follower.isOnline, role: follower.role } : null);
+          }
           if (follower?.email) {
-            sendCaseFollowerFileNotification(follower.email, { caseTitle: follower.caseTitle }).catch((e) =>
+            await sendCaseFollowerFileNotification(follower.email, { caseTitle: follower.caseTitle }).catch((e) =>
               console.error('[Send Message] Notify follower file:', e)
             );
+            if (!follower.isOnline) {
+              const result = await sendCaseFollowerOfflineNotification({
+                caseTitle: follower.caseTitle,
+                followerName: follower.name,
+                type: 'file',
+              });
+              if (process.env.NODE_ENV === 'production') {
+                console.log('[Send Message] WeChat offline notify (file) result:', result.success ? 'ok' : result.error);
+              }
+            }
           }
         })
-        .catch((e) => console.error('[Send Message] getCaseFollowerEmail:', e));
+        .catch((e) => console.error('[Send Message] getCaseFollowerWithStatus:', e));
+    } else {
+      // 会员发送纯文字消息且跟进人不在线时，发企业微信通知（不新增邮件，保持原有逻辑）
+      getCaseFollowerWithStatus(prisma, actualCaseId)
+        .then(async (follower) => {
+          if (process.env.NODE_ENV === 'production') {
+            console.log('[Send Message] follower:', follower ? { email: follower.email, isOnline: follower.isOnline, role: follower.role } : null);
+          }
+          if (follower && !follower.isOnline) {
+            const result = await sendCaseFollowerOfflineNotification({
+              caseTitle: follower.caseTitle,
+              followerName: follower.name,
+              type: 'message',
+            });
+            if (process.env.NODE_ENV === 'production') {
+              console.log('[Send Message] WeChat offline notify result:', result.success ? 'ok' : result.error);
+            }
+          }
+        })
+        .catch((e) => console.error('[Send Message] getCaseFollowerWithStatus:', e));
     }
 
     return NextResponse.json({

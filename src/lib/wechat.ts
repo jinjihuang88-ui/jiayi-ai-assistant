@@ -57,3 +57,32 @@ export function notifyWechatNewRCIC(payload: {
   const text = `【加移】新顾问注册（待审核）\n姓名：${payload.name}\n邮箱：${payload.email}\n类型：${payload.consultantType}${payload.phone ? `\n电话：${payload.phone}` : ""}`;
   sendWechatText(text).catch((err) => console.error("[WeChat] notifyWechatNewRCIC failed:", err));
 }
+
+/** 案件跟进人不在线时：除邮件外，同步发企业微信，便于在群里沟通 */
+export async function sendCaseFollowerOfflineNotification(payload: {
+  caseTitle?: string;
+  followerName?: string;
+  type: "message" | "file" | "missed_call";
+  memberName?: string;
+  callType?: "video" | "voice";
+}): Promise<{ success: boolean; error?: string }> {
+  const appUrl =
+    process.env.APP_URL?.trim()?.startsWith("http")
+      ? process.env.APP_URL.trim()
+      : process.env.NEXT_PUBLIC_APP_URL?.trim()?.startsWith("http")
+        ? process.env.NEXT_PUBLIC_APP_URL.trim()
+        : "https://www.jiayi.co";
+  const messagesUrl = `${appUrl}/rcic/messages`;
+  const caseLabel = payload.caseTitle ? `案件「${payload.caseTitle}」` : "案件";
+  const followerLabel = payload.followerName ? `（跟进人：${payload.followerName}）` : "";
+  let content: string;
+  if (payload.type === "missed_call") {
+    const callLabel = payload.callType === "video" ? "视频通话" : "语音通话";
+    content = `【加移】${caseLabel}有会员发起了${callLabel}未接听${followerLabel}，当前跟进人不在线。请登录后台查看并回复：${messagesUrl}`;
+  } else if (payload.type === "file") {
+    content = `【加移】${caseLabel}有会员发送了文件/图片${followerLabel}，当前跟进人不在线。请登录后台查看：${messagesUrl}`;
+  } else {
+    content = `【加移】${caseLabel}有会员发送了消息${followerLabel}，当前跟进人不在线。请登录后台查看：${messagesUrl}`;
+  }
+  return sendWechatText(content);
+}
