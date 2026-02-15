@@ -44,7 +44,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  console.log("[WeChat receive] POST received");
   if (!TOKEN || !ENCODING_AES_KEY) {
+    console.log("[WeChat receive] missing TOKEN or ENCODING_AES_KEY");
     return new NextResponse("", { status: 200 });
   }
   const { searchParams } = new URL(request.url);
@@ -52,6 +54,7 @@ export async function POST(request: NextRequest) {
   const timestamp = searchParams.get("timestamp");
   const nonce = searchParams.get("nonce");
   if (!msgSignature || !timestamp || !nonce) {
+    console.log("[WeChat receive] missing query params");
     return new NextResponse("", { status: 200 });
   }
   const body = await request.text();
@@ -60,36 +63,49 @@ export async function POST(request: NextRequest) {
     const match = body.match(/<Encrypt><!\[CDATA\[([\s\S]*?)\]\]><\/Encrypt>/);
     msgEncrypt = match ? match[1] : "";
   } catch {
+    console.log("[WeChat receive] body parse error");
     return new NextResponse("", { status: 200 });
   }
   if (!msgEncrypt) {
+    console.log("[WeChat receive] no Encrypt in body, bodyLen:", body?.length, "bodyPreview:", body?.slice(0, 200));
     return new NextResponse("", { status: 200 });
   }
   const ok = verifySignature(TOKEN, timestamp, nonce, msgEncrypt, msgSignature);
   if (!ok) {
+    console.log("[WeChat receive] signature verify fail");
     return new NextResponse("", { status: 200 });
   }
   try {
     const plain = decrypt(ENCODING_AES_KEY, msgEncrypt, CORP_ID);
+    console.log("[WeChat receive] decrypted plain len:", plain?.length, "preview:", plain?.slice(0, 300));
     const parser = new XMLParser({ ignoreDeclaration: true });
     const parsed = parser.parse(plain) as Record<string, Record<string, string> | undefined>;
-    const xml = parsed?.xml ?? parsed?.XML ?? {};
+    const xml =
+      parsed?.xml ??
+      parsed?.XML ??
+      (typeof parsed === "object" && parsed !== null
+        ? (Object.values(parsed).find((v) => v && typeof v === "object") as Record<string, string>)
+        : {}) ??
+      {};
+    console.log("[WeChat receive] xml keys:", Object.keys(xml));
     const fromUserName = (xml.FromUserName ?? xml.fromusername ?? "").trim();
     const msgType = (xml.MsgType ?? xml.msgtype ?? "").trim();
     const content = (xml.Content ?? xml.content ?? "").trim();
 
+    console.log("[WeChat receive] from:", JSON.stringify(fromUserName), "msgType:", msgType, "contentLen:", content.length);
+
     if (msgType !== "text" || !content) {
-      if (fromUserName) console.log("[WeChat receive] skip non-text or empty:", msgType, !!content);
+      if (fromUserName) console.log("[WeChat receive] skip non-text or empty");
       return new NextResponse("", { status: 200 });
     }
 
     const rcic = await prisma.rCIC.findFirst({
-      where: { wechatUserId: fromUserName!, isActive: true },
-      select: { id: true, lastWechatNotifiedCaseId: true },
+      where: { wechatUserId: fromUserName, isActive: true },
+      select: { id: true, name: true, lastWechatNotifiedCaseId: true },
     });
 
     if (!rcic) {
-      console.log("[WeChat receive] no RCIC for wechat userid:", fromUserName);
+      console.log("[WeChat receive] no RCIC for wechat userid:", JSON.stringify(fromUserName), "- 请确认管理后台该顾问的企业微信账号与通讯录完全一致");
       return new NextResponse("", { status: 200 });
     }
 
@@ -125,7 +141,7 @@ export async function POST(request: NextRequest) {
         content,
       },
     });
-    console.log("[WeChat receive] message saved caseId:", caseRow.id, "rcicId:", rcic.id);
+    console.log("[WeChat receive] message saved -> caseId:", caseRow.id, "rcic:", rcic.name, "content:", content.slice(0, 50));
   } catch (e) {
     console.error("[WeChat receive] POST decrypt or save:", e);
   }

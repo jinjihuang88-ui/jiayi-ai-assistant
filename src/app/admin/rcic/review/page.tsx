@@ -298,11 +298,20 @@ export default function AdminReviewPage() {
                 </div>
               </div>
 
-              {/* 企业微信账号：群回复同步到网站 */}
+              {/* 企业微信账号：顾问不在线时用企业微信回复 → 同步到网站会员消息 */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">企业微信账号</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">企业微信账号（顾问不在线时回复用）</h3>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4 text-sm text-amber-900">
+                  <div className="font-medium mb-2">使用步骤（顾问不在线时，用企业微信把回复同步到网站）：</div>
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>把<strong>接收消息用的自建应用</strong>加到企业微信群（和发「跟进人不在线」通知的群可以是同一个）。</li>
+                    <li>会员发消息后，群会收到通知；顾问在群里<strong>@ 该自建应用</strong>发一条文字，即会同步到网站该会员的消息栏（或顾问在工作台打开该应用发文字也可）。</li>
+                    <li>此处填写的<strong>企业微信账号必须与通讯录中显示的成员账号完全一致</strong>（含空格、大小写），否则无法识别是谁发的。</li>
+                    <li>目前仅支持<strong>文字</strong>同步，图片/文件后续可扩展。</li>
+                  </ol>
+                </div>
                 <p className="text-sm text-gray-500 mb-2">
-                  填写或修改顾问在企业微信的成员账号（通讯录可见），该顾问在应用内回复的文本会同步到网站对应案件会话。
+                  填写或修改顾问在企业微信的成员账号（通讯录可见）。
                 </p>
                 {(selectedConsultant.wechatUserId ?? "").trim() !== "" && (
                   <p className="text-sm text-green-700 mb-2">
@@ -310,7 +319,7 @@ export default function AdminReviewPage() {
                   </p>
                 )}
                 <p className="text-sm text-gray-500 mb-2">
-                  下方输入框可新增或修改，改完后点击「保存」即可；留空并保存可清空该顾问的企业微信账号。
+                  下方输入框可新增或修改，改完后点击「保存」即可；留空并保存可清空。
                 </p>
                 <div className="flex gap-2 items-center flex-wrap">
                   <input
