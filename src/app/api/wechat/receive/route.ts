@@ -99,13 +99,16 @@ export async function POST(request: NextRequest) {
       return new NextResponse("", { status: 200 });
     }
 
-    const rcic = await prisma.rCIC.findFirst({
-      where: { wechatUserId: fromUserName, isActive: true },
-      select: { id: true, name: true, lastWechatNotifiedCaseId: true },
+    const normalize = (s: string) => s.replace(/\s+/g, "").toLowerCase();
+    const fromNorm = normalize(fromUserName);
+    const rcics = await prisma.rCIC.findMany({
+      where: { wechatUserId: { not: null }, isActive: true },
+      select: { id: true, name: true, lastWechatNotifiedCaseId: true, wechatUserId: true },
     });
+    const rcic = rcics.find((r) => r.wechatUserId && normalize(r.wechatUserId) === fromNorm) ?? null;
 
     if (!rcic) {
-      console.log("[WeChat receive] no RCIC for wechat userid:", JSON.stringify(fromUserName), "- 请确认管理后台该顾问的企业微信账号与通讯录完全一致");
+      console.log("[WeChat receive] no RCIC for wechat userid:", JSON.stringify(fromUserName), "- 请确认管理后台该顾问的企业微信账号已填写（匹配时已忽略空格与大小写）");
       return new NextResponse("", { status: 200 });
     }
 
