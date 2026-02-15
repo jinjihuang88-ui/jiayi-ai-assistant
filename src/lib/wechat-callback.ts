@@ -27,10 +27,12 @@ export function decrypt(
   msgEncrypt: string,
   _receiveId: string
 ): string {
-  let key = Buffer.from(encodingAESKey.trim() + "=", "base64");
+  const keyBase64 = encodingAESKey.trim().replace(/=+$/, "") + "=";
+  let key = Buffer.from(keyBase64, "base64");
   if (key.length > 32) key = key.subarray(0, 32);
   const iv = key.subarray(0, 16);
-  const cipher = Buffer.from(msgEncrypt.replace(/ /g, "+"), "base64");
+  const cipherText = msgEncrypt.trim().replace(/ /g, "+");
+  const cipher = Buffer.from(cipherText, "base64");
   const dec = crypto.createDecipheriv("aes-256-cbc", key, iv);
   dec.setAutoPadding(true);
   const buf = Buffer.concat([dec.update(cipher), dec.final()]);

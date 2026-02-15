@@ -76,6 +76,9 @@ export async function POST(request: NextRequest) {
     return new NextResponse("", { status: 200 });
   }
   try {
+    if (ENCODING_AES_KEY.length !== 43) {
+      console.warn("[WeChat receive] WECHAT_ENCODING_AES_KEY 长度应为 43，当前:", ENCODING_AES_KEY.length);
+    }
     const plain = decrypt(ENCODING_AES_KEY, msgEncrypt, CORP_ID);
     console.log("[WeChat receive] decrypted plain len:", plain?.length, "preview:", plain?.slice(0, 300));
     const parser = new XMLParser({ ignoreDeclaration: true });
@@ -146,7 +149,13 @@ export async function POST(request: NextRequest) {
     });
     console.log("[WeChat receive] message saved -> caseId:", caseRow.id, "rcic:", rcic.name, "content:", content.slice(0, 50));
   } catch (e) {
+    const isDecrypt = (e as Error)?.message?.includes("bad decrypt") || (e as Error)?.message?.includes("decrypt");
     console.error("[WeChat receive] POST decrypt or save:", e);
+    if (isDecrypt) {
+      console.error(
+        "[WeChat receive] 解密失败：请检查 Vercel 环境变量 WECHAT_ENCODING_AES_KEY 是否与「企业微信管理后台 → 该自建应用 → 接收消息」里的 EncodingAESKey 完全一致（43 位，无空格/换行/引号）。若曾重新获取过 EncodingAESKey，必须把新值更新到 Vercel 并重新部署。"
+      );
+    }
   }
   return new NextResponse("", { status: 200 });
 }
