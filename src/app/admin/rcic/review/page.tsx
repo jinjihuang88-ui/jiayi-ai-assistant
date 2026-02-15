@@ -302,13 +302,16 @@ export default function AdminReviewPage() {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">企业微信账号</h3>
                 <p className="text-sm text-gray-500 mb-2">
-                  填写顾问在企业微信的成员账号（通讯录可见），该顾问在应用内回复的文本会同步到网站对应案件会话。
+                  填写或修改顾问在企业微信的成员账号（通讯录可见），该顾问在应用内回复的文本会同步到网站对应案件会话。
                 </p>
                 {(selectedConsultant.wechatUserId ?? "").trim() !== "" && (
                   <p className="text-sm text-green-700 mb-2">
                     当前已保存：<span className="font-medium">{selectedConsultant.wechatUserId}</span>
                   </p>
                 )}
+                <p className="text-sm text-gray-500 mb-2">
+                  下方输入框可新增或修改，改完后点击「保存」即可；留空并保存可清空该顾问的企业微信账号。
+                </p>
                 <div className="flex gap-2 items-center flex-wrap">
                   <input
                     type="text"
