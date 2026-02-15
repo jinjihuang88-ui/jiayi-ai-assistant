@@ -30,6 +30,7 @@ export async function PATCH(
     return NextResponse.json({ success: true });
   } catch (e) {
     console.error("[admin rcic PATCH]", e);
-    return NextResponse.json({ success: false, message: "更新失败" }, { status: 500 });
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ success: false, message: `更新失败：${msg}` }, { status: 500 });
   }
 }

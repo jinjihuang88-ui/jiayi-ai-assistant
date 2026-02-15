@@ -36,6 +36,7 @@ export default function AdminReviewPage() {
   const [submitting, setSubmitting] = useState(false);
   const [wechatUserIdEdit, setWechatUserIdEdit] = useState("");
   const [savingWechat, setSavingWechat] = useState(false);
+  const [wechatSaveMsg, setWechatSaveMsg] = useState<"ok" | "err" | null>(null);
 
   useEffect(() => {
     fetchConsultants();
@@ -43,6 +44,7 @@ export default function AdminReviewPage() {
 
   useEffect(() => {
     setWechatUserIdEdit("");
+    setWechatSaveMsg(null);
   }, [selectedConsultant?.id]);
 
   const fetchConsultants = async () => {
@@ -302,13 +304,21 @@ export default function AdminReviewPage() {
                 <p className="text-sm text-gray-500 mb-2">
                   填写顾问在企业微信的成员账号（通讯录可见），该顾问在应用内回复的文本会同步到网站对应案件会话。
                 </p>
+                {(selectedConsultant.wechatUserId ?? "").trim() !== "" && (
+                  <p className="text-sm text-green-700 mb-2">
+                    当前已保存：<span className="font-medium">{selectedConsultant.wechatUserId}</span>
+                  </p>
+                )}
                 <div className="flex gap-2 items-center flex-wrap">
                   <input
                     type="text"
                     value={wechatUserIdEdit === "" ? (selectedConsultant.wechatUserId ?? "") : wechatUserIdEdit}
-                    onChange={(e) => setWechatUserIdEdit(e.target.value)}
-                    placeholder="如 ZhangSan"
-                    className="px-3 py-2 border border-gray-300 rounded-lg w-48 max-w-full"
+                    onChange={(e) => {
+                      setWechatUserIdEdit(e.target.value);
+                      setWechatSaveMsg(null);
+                    }}
+                    placeholder="如 ZhangSan 或 Jia Yi jiayi"
+                    className="px-3 py-2 border border-gray-300 rounded-lg w-56 max-w-full"
                   />
                   <button
                     type="button"
@@ -316,20 +326,27 @@ export default function AdminReviewPage() {
                     onClick={async () => {
                       const value = (wechatUserIdEdit === "" ? selectedConsultant.wechatUserId ?? "" : wechatUserIdEdit).trim();
                       setSavingWechat(true);
+                      setWechatSaveMsg(null);
                       try {
                         const res = await fetch(`/api/admin/rcic/${selectedConsultant.id}`, {
                           method: "PATCH",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({ wechatUserId: value || null }),
                         });
-                        const data = await res.json();
-                        if (data.success) {
+                        const data = await res.json().catch(() => ({}));
+                        if (res.ok && data.success) {
                           setWechatUserIdEdit("");
-                          fetchConsultants();
                           setSelectedConsultant((c) => (c ? { ...c, wechatUserId: value || null } : null));
-                        } else alert(data.message || "保存失败");
+                          setWechatSaveMsg("ok");
+                          fetchConsultants();
+                          setTimeout(() => setWechatSaveMsg(null), 3000);
+                        } else {
+                          setWechatSaveMsg("err");
+                          alert(data.message || `保存失败（${res.status}）`);
+                        }
                       } catch (e) {
-                        alert("保存失败");
+                        setWechatSaveMsg("err");
+                        alert("保存失败，请检查网络或稍后重试");
                       } finally {
                         setSavingWechat(false);
                       }
@@ -339,6 +356,9 @@ export default function AdminReviewPage() {
                     {savingWechat ? "保存中..." : "保存"}
                   </button>
                 </div>
+                {wechatSaveMsg === "ok" && (
+                  <p className="text-sm text-green-600 mt-2">已保存，上方会显示当前已保存的账号。</p>
+                )}
               </div>
 
               {/* A类顾问信息 */}
