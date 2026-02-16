@@ -117,6 +117,30 @@ function RCICMessagesContent() {
     return () => clearInterval(t);
   }, [primaryCaseId]);
 
+  // 轮询新消息：每 5 秒静默拉取，有新消息才更新
+  useEffect(() => {
+    if (!selectedContactId) return;
+    const pollMessages = async () => {
+      try {
+        const res = await fetch(`/api/rcic/messages?contactId=${encodeURIComponent(selectedContactId)}`);
+        const data = await res.json();
+        if (data.success && data.messages) {
+          const incoming = data.messages as Message[];
+          setMessages((prev) => {
+            if (incoming.length !== prev.length || (incoming.length > 0 && prev.length > 0 && incoming[incoming.length - 1].id !== prev[prev.length - 1].id)) {
+              return incoming;
+            }
+            return prev;
+          });
+        }
+      } catch {
+        // 静默忽略轮询错误
+      }
+    };
+    const timer = setInterval(pollMessages, 5000);
+    return () => clearInterval(timer);
+  }, [selectedContactId]);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
