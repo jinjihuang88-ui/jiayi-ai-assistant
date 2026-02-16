@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { getCaseFollowerWithStatus } from '@/lib/case-follower';
 import { sendCaseFollowerFileNotification } from '@/lib/email';
-import { sendCaseFollowerOfflineNotification } from '@/lib/wechat';
+import { sendCaseFollowerOfflineNotification, sendMemberReplyToWechatApp } from '@/lib/wechat';
 import { isRcicEffectivelyOnline } from '@/lib/rcic-online';
 
 // 获取消息列表
@@ -362,6 +362,7 @@ export async function POST(request: NextRequest) {
           caseTitle: follower.caseTitle,
           followerName: follower.name,
           type: 'message',
+          memberContent: content?.trim() || '',
         });
         console.log('[Send Message] WeChat (message) result:', result.success ? 'ok' : result.error);
         if (follower.role === 'rcic' && follower.followerId) {
@@ -369,6 +370,18 @@ export async function POST(request: NextRequest) {
         }
       } else {
         console.log('[Send Message] WeChat skip: follower isOnline=true');
+      }
+      // 同时推送到顾问的自建应用（带会员回复内容），顾问在应用里收+回，与群通知分开
+      if (follower.role === 'rcic' && follower.wechatUserId && (content?.trim() || '').length > 0) {
+        const appResult = await sendMemberReplyToWechatApp(
+          follower.wechatUserId,
+          content?.trim() || '',
+          follower.caseTitle
+        ).catch((e) => {
+          console.error('[Send Message] WeChat app message:', e);
+          return { success: false, error: String(e) };
+        });
+        console.log('[Send Message] WeChat app (member reply):', appResult.success ? 'ok' : appResult.error);
       }
     } else if (!hasAttachments && !follower) {
       console.log('[Send Message] WeChat skip: no follower');

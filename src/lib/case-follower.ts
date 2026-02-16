@@ -9,6 +9,8 @@ export type CaseFollowerInfo = {
   role: "rcic" | "team_member";
   /** 跟进人 ID：role=rcic 时为 RCIC.id，role=team_member 时为 RCICTeamMember.id */
   followerId?: string;
+  /** 仅 role=rcic 时有值，用于发送应用消息到该顾问企业微信 */
+  wechatUserId?: string | null;
 };
 
 /**
@@ -60,7 +62,7 @@ export async function getCaseFollowerWithStatus(
   if (caseItem.rcicId) {
     const rcic = await prisma.rCIC.findUnique({
       where: { id: caseItem.rcicId },
-      select: { email: true, name: true, isOnline: true, lastActiveAt: true },
+      select: { email: true, name: true, isOnline: true, lastActiveAt: true, wechatUserId: true },
     });
     if (rcic?.email) {
       const effectiveOnline = isRcicEffectivelyOnline(rcic.isOnline ?? false, rcic.lastActiveAt);
@@ -71,6 +73,7 @@ export async function getCaseFollowerWithStatus(
         name: rcic.name,
         role: "rcic",
         followerId: caseItem.rcicId,
+        wechatUserId: rcic.wechatUserId ?? undefined,
       };
     }
   }
