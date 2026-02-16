@@ -11,6 +11,9 @@ importers:
       '@prisma/client':
         specifier: ^5.22.0
         version: 5.22.0(prisma@5.22.0)
+      '@wecom/crypto':
+        specifier: ^1.0.1
+        version: 1.0.1
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
@@ -819,6 +822,9 @@ packages:
     resolution: {integrity: sha512-lrW200hZdbfRtztbygyaq/6jP6AKE8qQN2KvPcJ+x7wiD038YtnYtZ82IMNJ69GJibV7bwL3y9FgK+5w/pYt6g==}
     cpu: [x64]
     os: [win32]
+
+  '@wecom/crypto@1.0.1':
+    resolution: {integrity: sha512-K4Ilkl1l64ceJDbj/kflx8ND/J88pcl8tKx4Ivp7IiCrshRJU+Uo5uWCjAa+PjUiLIdcQSZ4m4d0t1npMPCX5A==}
 
   '@zone-eu/mailsplit@5.4.8':
     resolution: {integrity: sha512-eEyACj4JZ7sjzRvy26QhLgKEMWwQbsw1+QZnlLX+/gihcNH07lVPOcnwf5U6UAL7gkc//J3jVd76o/WS+taUiA==}
@@ -2972,6 +2978,8 @@ snapshots:
 
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
+
+  '@wecom/crypto@1.0.1': {}
 
   '@zone-eu/mailsplit@5.4.8':
     dependencies:

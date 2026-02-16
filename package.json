@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
+    "@wecom/crypto": "^1.0.1",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.9.0",
     "fast-xml-parser": "^5.3.5",
