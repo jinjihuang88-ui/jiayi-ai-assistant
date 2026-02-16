@@ -7,12 +7,13 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { XMLParser } from "fast-xml-parser";
-import { verifySignature, decrypt } from "@/lib/wechat-callback";
+import { verifySignature, decrypt, normalizeEncodingAESKey } from "@/lib/wechat-callback";
 import { prisma } from "@/lib/prisma";
 
-const TOKEN = process.env.WECHAT_CALLBACK_TOKEN || "";
-const ENCODING_AES_KEY = process.env.WECHAT_ENCODING_AES_KEY || "";
-const CORP_ID = process.env.WECHAT_CORP_ID || "";
+// 规范化环境变量，避免 Vercel 中粘贴时带入首尾引号/空格/换行
+const TOKEN = (process.env.WECHAT_CALLBACK_TOKEN || "").trim().replace(/^["']|["']$/g, "").trim();
+const ENCODING_AES_KEY = normalizeEncodingAESKey(process.env.WECHAT_ENCODING_AES_KEY || "");
+const CORP_ID = (process.env.WECHAT_CORP_ID || "").trim().replace(/^["']|["']$/g, "").trim();
 
 export async function GET(request: NextRequest) {
   console.log("[WeChat receive] GET received (URL 校验)");
@@ -84,13 +85,19 @@ export async function POST(request: NextRequest) {
     return new NextResponse("success", { status: 200, headers: { "Content-Type": "text/plain" } });
   }
   try {
-    const keyLen = ENCODING_AES_KEY.trim().length;
-    const keyStart = ENCODING_AES_KEY.trim().slice(0, 2);
-    console.log("[WeChat receive] WECHAT_ENCODING_AES_KEY 长度:", keyLen, "前2位:", keyStart, "(正确应为 43 位且前2位 7K)");
+    const keyLen = ENCODING_AES_KEY.length;
+    const keyStart = ENCODING_AES_KEY.slice(0, 2);
+    const keyEnd = ENCODING_AES_KEY.slice(-2);
+    console.log("[WeChat receive] KEY 长度:", keyLen, "前2位:", keyStart, "后2位:", keyEnd, "| 若与后台不一致请检查 Vercel 环境变量");
     if (keyLen !== 43) {
-      console.warn("[WeChat receive] 密钥长度不对，请检查 Vercel 环境变量");
+      console.warn("[WeChat receive] 密钥长度不对，当前", keyLen, "位");
     }
-    const cipherForDecrypt = msgEncrypt.replace(/%2B/gi, "+").replace(/%2b/gi, "+").replace(/ /g, "+").trim();
+    // 密文：先 URL 解码再去掉所有空白（避免 CDATA 内换行/空格导致 base64 解码错误）
+    const cipherForDecrypt = msgEncrypt
+      .replace(/%2B/gi, "+")
+      .replace(/%2b/gi, "+")
+      .replace(/\s/g, "")
+      .trim();
     console.log("[WeChat receive] msgEncrypt len:", msgEncrypt.length, "cipherForDecrypt len:", cipherForDecrypt.length);
     const plain = decrypt(ENCODING_AES_KEY, cipherForDecrypt, CORP_ID);
     console.log("[WeChat receive] decrypted plain len:", plain?.length, "preview:", plain?.slice(0, 300));

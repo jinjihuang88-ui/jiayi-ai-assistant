@@ -22,6 +22,11 @@ export function verifySignature(
   return sha1(str) === signature;
 }
 
+/** 规范化 EncodingAESKey：去除首尾空白和首尾引号，避免环境变量粘贴问题 */
+export function normalizeEncodingAESKey(raw: string): string {
+  return raw.trim().replace(/^["']|["']$/g, "").trim();
+}
+
 /**
  * AES 解密（企业微信方案：AESKey=Base64Decode(EncodingAESKey+"=")，IV=前16字节）。
  * 企业应用回调时 receiveId 为 CorpID，校验通过才返回 msg，否则抛错。
@@ -31,13 +36,14 @@ export function decrypt(
   msgEncrypt: string,
   receiveId: string
 ): string {
-  const keyBase64 = encodingAESKey.trim().replace(/=+$/, "") + "=";
-  let key = Buffer.from(keyBase64, "base64");
-  if (key.length > 32) key = key.subarray(0, 32);
-  const iv = key.subarray(0, 16);
+  const keyStr = normalizeEncodingAESKey(encodingAESKey);
+  const keyBase64 = keyStr.replace(/=+$/, "") + "=";
+  let keyBuf = Buffer.from(keyBase64, "base64");
+  if (keyBuf.length > 32) keyBuf = keyBuf.subarray(0, 32);
+  const iv = keyBuf.subarray(0, 16);
   const cipherText = msgEncrypt.trim().replace(/ /g, "+");
   const cipher = Buffer.from(cipherText, "base64");
-  const dec = crypto.createDecipheriv("aes-256-cbc", key, iv);
+  const dec = crypto.createDecipheriv("aes-256-cbc", keyBuf, iv);
   dec.setAutoPadding(true);
   const buf = Buffer.concat([dec.update(cipher), dec.final()]);
   // 结构：16 随机字节 + 4 字节 msg 长度(大端) + msg + receiveid
