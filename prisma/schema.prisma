@@ -179,14 +179,15 @@ model Case {
 
 // 消息表
 model Message {
-  id         String   @id @default(cuid())
-  caseId     String
-  senderId   String
-  senderType String // user or rcic
-  content    String   @db.LongText
-  attachments String? @db.LongText // JSON array of file URLs (可能包含 data URL/base64)
-  read       Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id          String   @id @default(cuid())
+  caseId      String
+  senderId    String
+  senderType  String // user or rcic
+  content     String   @db.LongText
+  attachments String?  @db.LongText // JSON array of file URLs (可能包含 data URL/base64)
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  wechatMsgId String?  // 企业微信 MsgId，用于去重（企业微信重试最多 3 次）
 
   // 关系
   case Case  @relation(fields: [caseId], references: [id], onDelete: Cascade)
@@ -195,6 +196,7 @@ model Message {
 
   @@index([caseId])
   @@index([senderId])
+  @@index([wechatMsgId])
   @@map("messages")
 }
 
