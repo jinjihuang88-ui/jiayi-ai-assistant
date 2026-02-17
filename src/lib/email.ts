@@ -2,7 +2,18 @@
 
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendClient: Resend | null | undefined;
+
+function getResendClient(): Resend | null {
+  if (resendClient !== undefined) return resendClient;
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  if (!apiKey) {
+    resendClient = null;
+    return resendClient;
+  }
+  resendClient = new Resend(apiKey);
+  return resendClient;
+}
 
 const EMAIL_FROM = process.env.EMAIL_FROM || 'noreply@jiayi.co';
 const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || '加移顾问平台';
@@ -29,6 +40,10 @@ export async function sendVerificationEmail(email: string, token: string) {
   const verificationUrl = `${baseUrl}/auth/verify?token=${token}`;
 
   try {
+    const resend = getResendClient();
+    if (!resend) {
+      return { success: false, error: new Error('RESEND_API_KEY is not set') };
+    }
     const { data, error } = await resend.emails.send({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
       to: [email],
@@ -117,6 +132,10 @@ export async function sendVerificationEmail(email: string, token: string) {
 // 发送欢迎邮件
 export async function sendWelcomeEmail(email: string, name: string) {
   try {
+    const resend = getResendClient();
+    if (!resend) {
+      return { success: false, error: new Error('RESEND_API_KEY is not set') };
+    }
     const { data, error } = await resend.emails.send({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
       to: [email],
@@ -195,6 +214,10 @@ export async function sendPasswordResetEmail(email: string, token: string) {
   const resetUrl = `${getAppUrl()}/auth/reset-password?token=${token}`;
 
   try {
+    const resend = getResendClient();
+    if (!resend) {
+      return { success: false, error: new Error('RESEND_API_KEY is not set') };
+    }
     const { data, error } = await resend.emails.send({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
       to: [email],
@@ -283,6 +306,10 @@ export async function sendCaseFollowerFileNotification(
   const caseTitle = options?.caseTitle ? `「${options.caseTitle}」` : '';
 
   try {
+    const resend = getResendClient();
+    if (!resend) {
+      return { success: false, error: new Error('RESEND_API_KEY is not set') };
+    }
     const { data, error } = await resend.emails.send({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
       to: [email],
@@ -342,6 +369,10 @@ export async function sendCaseFollowerMissedCallNotification(
   const callLabel = callType === 'video' ? '视频通话' : '语音通话';
 
   try {
+    const resend = getResendClient();
+    if (!resend) {
+      return { success: false, error: new Error('RESEND_API_KEY is not set') };
+    }
     const { data, error } = await resend.emails.send({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
       to: [email],
@@ -394,6 +425,10 @@ export async function sendRCICVerificationEmail(email: string, token: string, na
   const verificationUrl = `${getAppUrl()}/rcic/verify?token=${token}`;
 
   try {
+    const resend = getResendClient();
+    if (!resend) {
+      return { success: false, error: new Error('RESEND_API_KEY is not set') };
+    }
     const { data, error } = await resend.emails.send({
       from: `${EMAIL_FROM_NAME} <${EMAIL_FROM}>`,
       to: [email],
