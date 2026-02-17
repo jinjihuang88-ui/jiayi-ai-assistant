@@ -1,0 +1,13 @@
+# robots.txt for www.jiayi.co
+
+User-agent: *
+Allow: /
+Allow: /blog
+Allow: /blog/*
+
+# Disallow admin and API routes
+Disallow: /admin
+Disallow: /api
+
+# Sitemap location
+Sitemap: https://www.jiayi.co/sitemap.xml
