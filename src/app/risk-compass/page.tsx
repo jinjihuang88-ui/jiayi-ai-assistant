@@ -352,6 +352,37 @@ export default function RiskCompassPage() {
       </header>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        {/* 顶部：分享 + 进入首页 */}
+        <section className="text-center mb-8 sm:mb-10 space-y-4">
+          <p className="text-white/50 text-xs sm:text-sm">觉得有用？分享给朋友 / Share with friends</p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              className="min-h-[40px] px-4 py-2 rounded-lg border border-white/30 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm touch-manipulation"
+            >
+              {copyDone ? "已复制 ✓" : "复制链接 Copy Link"}
+            </button>
+            {canNativeShare && (
+              <button
+                type="button"
+                onClick={handleNativeShare}
+                className="min-h-[40px] px-4 py-2 rounded-lg bg-[#00FF88]/20 border border-[#00FF88]/50 text-[#00FF88] hover:bg-[#00FF88]/30 transition-all text-sm touch-manipulation"
+              >
+                分享 Share
+              </button>
+            )}
+          </div>
+          <div>
+            <Link
+              href="/"
+              className="inline-block px-5 py-3 min-h-[44px] rounded-xl border border-white/30 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm touch-manipulation"
+            >
+              进入加移网站首页 Enter Jiayi Homepage
+            </Link>
+          </div>
+        </section>
+
         {/* Promo hero: two cards - AI 顾问 | 风险指南针 */}
         <section className="mb-10 sm:mb-16">
           <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-2">
@@ -393,37 +424,6 @@ export default function RiskCompassPage() {
                 使用风险指南针 Use Risk Compass
               </button>
             </GlassCard>
-          </div>
-
-          <div className="text-center mt-6 sm:mt-8 space-y-4">
-            <p className="text-white/50 text-xs sm:text-sm">觉得有用？分享给朋友 / Share with friends</p>
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={handleCopyLink}
-                className="min-h-[40px] px-4 py-2 rounded-lg border border-white/30 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm touch-manipulation"
-              >
-                {copyDone ? "已复制 ✓" : "复制链接 Copy Link"}
-              </button>
-              {canNativeShare && (
-                <button
-                  type="button"
-                  onClick={handleNativeShare}
-                  className="min-h-[40px] px-4 py-2 rounded-lg bg-[#00FF88]/20 border border-[#00FF88]/50 text-[#00FF88] hover:bg-[#00FF88]/30 transition-all text-sm touch-manipulation"
-                >
-                  分享 Share
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="text-center mt-6 sm:mt-8">
-            <Link
-              href="/"
-              className="inline-block px-5 py-3 min-h-[44px] rounded-xl border border-white/30 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm touch-manipulation"
-            >
-              进入加移网站首页 Enter Jiayi Homepage
-            </Link>
           </div>
         </section>
 
