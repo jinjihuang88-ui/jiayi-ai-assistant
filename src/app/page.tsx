@@ -223,19 +223,27 @@ export default function Home() {
             {/* CTA：AI初评、AI顾问、找顾问 */}
             <div className="flex flex-wrap justify-center gap-4 mb-8">
               <a
-                href="/assessment"
+                href="/risk-compass"
                 className="px-8 py-4 rounded-xl bg-[#C62828] text-white font-semibold text-lg
                            hover:bg-[#B71C1C] transition-all duration-300 
                            shadow-lg shadow-red-500/25 hover:shadow-xl
                            hover:-translate-y-1 active:translate-y-0"
               >
+                Risk Compass
+              </a>
+              <a
+                href="/assessment"
+                className="px-8 py-4 rounded-xl bg-slate-800 text-white font-semibold text-lg
+                           hover:bg-slate-700 transition-all duration-300 
+                           shadow-lg hover:shadow-xl hover:-translate-y-1 active:translate-y-0"
+              >
                 AI初评
               </a>
               <a
                 href="/chat"
-                className="px-8 py-4 rounded-xl bg-slate-800 text-white font-semibold text-lg
-                           hover:bg-slate-700 transition-all duration-300 
-                           shadow-lg hover:shadow-xl hover:-translate-y-1 active:translate-y-0"
+                className="px-8 py-4 rounded-xl border-2 border-slate-300 text-slate-700 font-semibold text-lg
+                           hover:border-slate-500 hover:text-slate-900 transition-all duration-300
+                           hover:-translate-y-1 active:translate-y-0"
               >
                 AI顾问
               </a>

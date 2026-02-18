@@ -278,6 +278,58 @@ body {
   background: #94a3b8;
 }
 
+/* ── Risk Compass Slider ── */
+.risk-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: #1a1a3e;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.risk-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #00AAFF;
+  border: 2px solid #000;
+  box-shadow: 0 0 12px rgba(0, 170, 255, 0.5);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+.risk-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 20px rgba(0, 170, 255, 0.8);
+}
+
+.risk-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #00AAFF;
+  border: 2px solid #000;
+  box-shadow: 0 0 12px rgba(0, 170, 255, 0.5);
+  cursor: pointer;
+}
+
+.risk-slider-green::-webkit-slider-thumb {
+  background: #00FF88;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+}
+
+.risk-slider-green::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+}
+
+.risk-slider-green::-moz-range-thumb {
+  background: #00FF88;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+}
+
 /* Print styles */
 @media print {
   body {
