@@ -39,7 +39,7 @@ export function PromoChatFab() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-6 right-6 z-[100] flex h-14 w-14 items-center justify-center rounded-full border-2 border-[#00FF88]/60 bg-black shadow-[0_0_24px_rgba(0,255,136,0.35)] transition-all hover:scale-105 hover:shadow-[0_0_32px_rgba(0,255,136,0.5)] focus:outline-none focus:ring-2 focus:ring-[#00FF88]"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[100] flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full border-2 border-[#00FF88]/60 bg-black shadow-[0_0_24px_rgba(0,255,136,0.35)] transition-all hover:scale-105 hover:shadow-[0_0_32px_rgba(0,255,136,0.5)] focus:outline-none focus:ring-2 focus:ring-[#00FF88] touch-manipulation"
         style={{ color: "#00FF88" }}
         aria-label={open ? "关闭 AI 顾问" : "打开 AI 顾问"}
       >
@@ -55,7 +55,7 @@ export function PromoChatFab() {
             onClick={() => setOpen(false)}
           />
           <div
-            className="fixed bottom-20 right-6 z-[100] flex w-[min(400px,calc(100vw-48px))] flex-col overflow-hidden rounded-xl border border-white/10 bg-black/95 shadow-[0_0_40px_rgba(0,255,136,0.15)]"
+            className="fixed bottom-16 right-4 left-4 sm:left-auto sm:right-6 sm:w-[min(400px,calc(100vw-48px))] z-[100] flex w-auto flex-col overflow-hidden rounded-xl border border-white/10 bg-black/95 shadow-[0_0_40px_rgba(0,255,136,0.15)]"
             style={{ maxHeight: "min(560px, 70vh)" }}
           >
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3" style={{ borderColor: "rgba(0,255,136,0.2)" }}>

@@ -112,6 +112,8 @@ export function RadarChart({ data, size = 280 }: RadarChartProps) {
         const p = labelPoints[i];
         const d = data[i];
         const label = (d?.label && d.label.trim()) ? d.label : axis.label;
+        const labelFs = size <= 250 ? 11 : 14;
+        const valueFs = size <= 250 ? 14 : 18;
         return (
           <div
             key={axis.key + i}
@@ -124,13 +126,13 @@ export function RadarChart({ data, size = 280 }: RadarChartProps) {
           >
             <div
               className="font-semibold text-white whitespace-nowrap"
-              style={{ fontSize: "14px", marginBottom: "2px" }}
+              style={{ fontSize: `${labelFs}px`, marginBottom: "2px" }}
             >
               {label}
             </div>
             <div
               className="font-bold whitespace-nowrap"
-              style={{ color: "#00FF88", fontSize: "18px" }}
+              style={{ color: "#00FF88", fontSize: `${valueFs}px` }}
             >
               {Math.round(d?.value ?? 0)}
             </div>

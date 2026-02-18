@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { GlassCard } from "./components/GlassCard";
 import { StatusIndicator } from "./components/StatusIndicator";
@@ -143,6 +143,53 @@ export default function RiskCompassPage() {
   const [hasCanadaWorkBefore, setHasCanadaWorkBefore] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const compassSectionRef = useRef<HTMLDivElement>(null);
+
+  const [chartSize, setChartSize] = useState({ gauge: 220, radar: 280 });
+  const [copyDone, setCopyDone] = useState(false);
+  const [canNativeShare, setCanNativeShare] = useState(false);
+
+  useEffect(() => {
+    setCanNativeShare(typeof navigator !== "undefined" && !!navigator.share);
+  }, []);
+
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "https://www.jiayi.co/risk-compass";
+  const shareTitle = "加移 · 风险指南针与 AI 顾问 | Jiayi Risk Compass & AI";
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopyDone(true);
+      setTimeout(() => setCopyDone(false), 2000);
+    } catch {
+      setCopyDone(false);
+    }
+  };
+
+  const handleNativeShare = async () => {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: shareTitle,
+          url: shareUrl,
+          text: "用加移风险指南针快速评估学签/工签/访客/EE/省提名风险，还有 AI 顾问可聊。",
+        });
+      } catch (e) {
+        if ((e as Error).name !== "AbortError") handleCopyLink();
+      }
+    } else {
+      handleCopyLink();
+    }
+  };
+
+  useEffect(() => {
+    const update = () => {
+      const w = typeof window !== "undefined" ? window.innerWidth : 640;
+      setChartSize(w < 640 ? { gauge: 180, radar: 240 } : { gauge: 220, radar: 280 });
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   const handleNext = () => {
     if (step === 1 && goal) setStep(2);
@@ -291,34 +338,34 @@ export default function RiskCompassPage() {
     <main className="min-h-screen bg-black text-white font-mono">
       <PromoChatFab />
       <header className="border-b border-white/10 bg-black/90 sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
           <Link
             href="/"
-            className="text-white/70 hover:text-[#00FF88] transition-colors text-sm"
+            className="text-white/70 hover:text-[#00FF88] transition-colors text-xs sm:text-sm shrink-0"
           >
-            ← 进入网站首页 Enter Jiayi
+            ← 进入网站首页
           </Link>
-          <span className="text-[#00FF88] text-sm tracking-widest">
+          <span className="text-[#00FF88] text-xs sm:text-sm tracking-widest truncate">
             JIAYI · RISK COMPASS & AI
           </span>
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* Promo hero: two cards - AI 顾问 | 风险指南针 */}
-        <section className="mb-16">
-          <h1 className="text-3xl md:text-4xl font-bold text-white text-center mb-2">
+        <section className="mb-10 sm:mb-16">
+          <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-2">
             加移 · 风险指南针与 AI 顾问
           </h1>
-          <p className="text-white/50 text-sm text-center mb-10">
+          <p className="text-white/50 text-xs sm:text-sm text-center mb-6 sm:mb-10">
             Jiayi · Risk Compass & AI Consultant · 推广页
           </p>
-          <div className="grid md:grid-cols-2 gap-6">
-            <GlassCard className="p-6 flex flex-col">
-              <h2 className="text-lg font-semibold mb-2" style={{ color: "#00FF88" }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            <GlassCard className="p-4 sm:p-6 flex flex-col">
+              <h2 className="text-base sm:text-lg font-semibold mb-2" style={{ color: "#00FF88" }}>
                 AI 顾问 / AI Consultant
               </h2>
-              <p className="text-white/70 text-sm mb-4 flex-1">
+              <p className="text-white/70 text-xs sm:text-sm mb-4 flex-1">
                 与 AI 对话，获取学签、工签、移民路径的初步整理与信息建议。仅供参考，不替代持牌顾问。
                 <span className="block mt-2 text-white/50 text-xs">
                   Chat with AI for study/work/immigration path overview. For reference only; not a substitute for an RCIC.
@@ -328,11 +375,11 @@ export default function RiskCompassPage() {
                 点击页面右下角 AI 机器人图标打开对话 · Click the AI icon at bottom-right to chat
               </p>
             </GlassCard>
-            <GlassCard className="p-6 flex flex-col">
-              <h2 className="text-lg text-[#00FF88] font-semibold mb-2">
+            <GlassCard className="p-4 sm:p-6 flex flex-col">
+              <h2 className="text-base sm:text-lg text-[#00FF88] font-semibold mb-2">
                 风险指南针 / Risk Compass
               </h2>
-              <p className="text-white/70 text-sm mb-4 flex-1">
+              <p className="text-white/70 text-xs sm:text-sm mb-4 flex-1">
                 选择目标、填写年龄与预算及语言成绩，获取风险概览与五维评估。结果仅供参考。
                 <span className="block mt-2 text-white/50 text-xs">
                   Select goal, age, budget and IELTS to get a risk overview and five-dimension assessment. Results are for reference only.
@@ -341,17 +388,39 @@ export default function RiskCompassPage() {
               <button
                 type="button"
                 onClick={scrollToCompass}
-                className="w-full text-center px-4 py-3 rounded-lg bg-[#00FF88]/20 border border-[#00FF88]/50 text-[#00FF88] font-semibold hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] transition-all text-sm"
+                className="w-full text-center px-4 py-3 min-h-[44px] rounded-lg bg-[#00FF88]/20 border border-[#00FF88]/50 text-[#00FF88] font-semibold hover:shadow-[0_0_20px_rgba(0,255,136,0.3)] transition-all text-sm touch-manipulation"
               >
                 使用风险指南针 Use Risk Compass
               </button>
             </GlassCard>
           </div>
 
-          <div className="text-center mt-10">
+          <div className="text-center mt-6 sm:mt-8 space-y-4">
+            <p className="text-white/50 text-xs sm:text-sm">觉得有用？分享给朋友 / Share with friends</p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={handleCopyLink}
+                className="min-h-[40px] px-4 py-2 rounded-lg border border-white/30 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm touch-manipulation"
+              >
+                {copyDone ? "已复制 ✓" : "复制链接 Copy Link"}
+              </button>
+              {canNativeShare && (
+                <button
+                  type="button"
+                  onClick={handleNativeShare}
+                  className="min-h-[40px] px-4 py-2 rounded-lg bg-[#00FF88]/20 border border-[#00FF88]/50 text-[#00FF88] hover:bg-[#00FF88]/30 transition-all text-sm touch-manipulation"
+                >
+                  分享 Share
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="text-center mt-6 sm:mt-8">
             <Link
               href="/"
-              className="inline-block px-6 py-3 rounded-xl border border-white/30 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm"
+              className="inline-block px-5 py-3 min-h-[44px] rounded-xl border border-white/30 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm touch-manipulation"
             >
               进入加移网站首页 Enter Jiayi Homepage
             </Link>
@@ -362,16 +431,16 @@ export default function RiskCompassPage() {
         <section ref={compassSectionRef}>
           {!showResult ? (
             <>
-              <div className="text-center mb-10">
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+              <div className="text-center mb-6 sm:mb-10">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">
                   风险指南针 / Risk Compass
                 </h2>
-                <p className="text-white/50 text-sm">
-                  选择目标 · 年龄与预算 · 语言成绩 · 获取风险概览 / Select goal, age & budget, language score
+                <p className="text-white/50 text-xs sm:text-sm px-1">
+                  选择目标 · 年龄与预算 · 语言成绩 · 获取风险概览
                 </p>
               </div>
 
-              <div className="flex justify-center gap-2 mb-10">
+              <div className="flex justify-center gap-2 mb-6 sm:mb-10">
                 {[1, 2, 3, 4].map((s) => (
                   <div
                     key={s}
@@ -382,19 +451,19 @@ export default function RiskCompassPage() {
                 ))}
               </div>
 
-              <GlassCard className="p-8 md:p-10">
+              <GlassCard className="p-4 sm:p-6 md:p-10">
                 {step === 1 && (
-                  <div className="space-y-6">
-                    <h3 className="text-lg text-[#00FF88] font-semibold">
+                  <div className="space-y-4 sm:space-y-6">
+                    <h3 className="text-base sm:text-lg text-[#00FF88] font-semibold">
                       第一步 Step 1：选择目标 Select Goal
                     </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                       {GOALS.map((g) => (
                         <button
                           key={g.id}
                           type="button"
                           onClick={() => setGoal(g.id)}
-                          className={`px-4 py-3 rounded-lg border text-left transition-all ${
+                          className={`px-3 sm:px-4 py-3 min-h-[48px] rounded-lg border text-left transition-all touch-manipulation ${
                             goal === g.id
                               ? "border-[#00FF88] bg-[#00FF88]/10 text-[#00FF88]"
                               : "border-white/20 hover:border-white/40 text-white/80"
@@ -465,12 +534,12 @@ export default function RiskCompassPage() {
                       />
                     </div>
                     {(goal === "ee" || goal === "pnp") && (
-                      <div className="flex items-center justify-between rounded-lg border border-white/20 px-4 py-3">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-white/20 px-4 py-3">
                         <span className="text-sm text-white/80">有法语成绩 TEF/TCF French</span>
                         <button
                           type="button"
                           onClick={() => setHasFrench((v) => !v)}
-                          className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${
+                          className={`shrink-0 rounded-lg px-4 py-2 min-h-[40px] text-sm font-medium transition-all touch-manipulation ${
                             hasFrench ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"
                           }`}
                         >
@@ -511,10 +580,10 @@ export default function RiskCompassPage() {
                             ))}
                           </div>
                         </div>
-                        <div className="flex items-center justify-between rounded-lg border border-white/20 px-4 py-3">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-white/20 px-4 py-3">
                           <span className="text-sm text-white/80">曾有加拿大学习经历 Canada Study Before</span>
                           <button type="button" onClick={() => setHasCanadaStudyBefore((v) => !v)}
-                            className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${hasCanadaStudyBefore ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
+                            className={`shrink-0 rounded-lg px-4 py-2 min-h-[40px] text-sm font-medium transition-all touch-manipulation ${hasCanadaStudyBefore ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
                             {hasCanadaStudyBefore ? "有 Yes" : "无 No"}
                           </button>
                         </div>
@@ -535,17 +604,17 @@ export default function RiskCompassPage() {
                           </div>
                         </div>
                         <div className="flex flex-col gap-3">
-                          <div className="flex items-center justify-between rounded-lg border border-white/20 px-4 py-3">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-white/20 px-4 py-3">
                             <span className="text-sm text-white/80">加拿大雇主 offer Job Offer</span>
                             <button type="button" onClick={() => setHasJobOffer((v) => !v)}
-                              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${hasJobOffer ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
+                              className={`shrink-0 rounded-lg px-4 py-2 min-h-[40px] text-sm font-medium transition-all touch-manipulation ${hasJobOffer ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
                               {hasJobOffer ? "有 Yes" : "无 No"}
                             </button>
                           </div>
-                          <div className="flex items-center justify-between rounded-lg border border-white/20 px-4 py-3">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-white/20 px-4 py-3">
                             <span className="text-sm text-white/80">曾有加拿大工作经历 Canada Work Before</span>
                             <button type="button" onClick={() => setHasCanadaWorkBefore((v) => !v)}
-                              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${hasCanadaWorkBefore ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
+                              className={`shrink-0 rounded-lg px-4 py-2 min-h-[40px] text-sm font-medium transition-all touch-manipulation ${hasCanadaWorkBefore ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
                               {hasCanadaWorkBefore ? "有 Yes" : "无 No"}
                             </button>
                           </div>
@@ -567,17 +636,17 @@ export default function RiskCompassPage() {
                           </div>
                         </div>
                         <div className="flex flex-col gap-3">
-                          <div className="flex items-center justify-between rounded-lg border border-white/20 px-4 py-3">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-white/20 px-4 py-3">
                             <span className="text-sm text-white/80">有稳定收入/工作 Stable Income / Job</span>
                             <button type="button" onClick={() => setHasStableIncome((v) => !v)}
-                              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${hasStableIncome ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
+                              className={`shrink-0 rounded-lg px-4 py-2 min-h-[40px] text-sm font-medium transition-all touch-manipulation ${hasStableIncome ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
                               {hasStableIncome ? "有 Yes" : "无 No"}
                             </button>
                           </div>
-                          <div className="flex items-center justify-between rounded-lg border border-white/20 px-4 py-3">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-white/20 px-4 py-3">
                             <span className="text-sm text-white/80">曾访问过加拿大 Previous Canada Visit</span>
                             <button type="button" onClick={() => setPreviousCanadaVisit((v) => !v)}
-                              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${previousCanadaVisit ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
+                              className={`shrink-0 rounded-lg px-4 py-2 min-h-[40px] text-sm font-medium transition-all touch-manipulation ${previousCanadaVisit ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
                               {previousCanadaVisit ? "有 Yes" : "无 No"}
                             </button>
                           </div>
@@ -610,17 +679,17 @@ export default function RiskCompassPage() {
                           </div>
                         </div>
                         <div className="flex flex-col gap-3">
-                          <div className="flex items-center justify-between rounded-lg border border-white/20 px-4 py-3">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-white/20 px-4 py-3">
                             <span className="text-sm text-white/80">加拿大雇主 offer Job Offer</span>
                             <button type="button" onClick={() => setHasJobOffer((v) => !v)}
-                              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${hasJobOffer ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
+                              className={`shrink-0 rounded-lg px-4 py-2 min-h-[40px] text-sm font-medium transition-all touch-manipulation ${hasJobOffer ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
                               {hasJobOffer ? "有 Yes" : "无 No"}
                             </button>
                           </div>
-                          <div className="flex items-center justify-between rounded-lg border border-white/20 px-4 py-3">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-white/20 px-4 py-3">
                             <span className="text-sm text-white/80">加拿大学习/工作/访问经历 Canada Experience</span>
                             <button type="button" onClick={() => setHasCanadaExperience((v) => !v)}
-                              className={`rounded-lg px-4 py-2 text-sm font-medium transition-all ${hasCanadaExperience ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
+                              className={`shrink-0 rounded-lg px-4 py-2 min-h-[40px] text-sm font-medium transition-all touch-manipulation ${hasCanadaExperience ? "bg-[#00FF88]/20 text-[#00FF88] border border-[#00FF88]/50" : "bg-white/5 text-white/60 border border-white/20"}`}>
                               {hasCanadaExperience ? "有 Yes" : "无 No"}
                             </button>
                           </div>
@@ -630,11 +699,11 @@ export default function RiskCompassPage() {
                   </div>
                 )}
 
-                <div className="flex justify-between mt-10 pt-6 border-t border-white/10">
+                <div className="flex justify-between gap-3 mt-8 sm:mt-10 pt-6 border-t border-white/10">
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="px-5 py-2 rounded-lg border border-white/30 text-white/80 hover:bg-white/10 transition-colors text-sm"
+                    className="min-h-[44px] px-4 sm:px-5 py-2.5 rounded-lg border border-white/30 text-white/80 hover:bg-white/10 transition-colors text-sm touch-manipulation"
                   >
                     上一步 Back
                   </button>
@@ -642,7 +711,7 @@ export default function RiskCompassPage() {
                     type="button"
                     onClick={handleNext}
                     disabled={!canNext}
-                    className="px-6 py-2 rounded-lg bg-[#00FF88] text-black font-semibold hover:shadow-[0_0_20px_#00FF88] disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm"
+                    className="min-h-[44px] px-5 sm:px-6 py-2.5 rounded-lg bg-[#00FF88] text-black font-semibold hover:shadow-[0_0_20px_#00FF88] disabled:opacity-50 disabled:cursor-not-allowed transition-all text-sm touch-manipulation"
                   >
                     {step === 4 ? "生成报告 Generate Report" : "下一步 Next"}
                   </button>
@@ -650,26 +719,26 @@ export default function RiskCompassPage() {
               </GlassCard>
             </>
           ) : (
-            <div className="space-y-8 animate-fade-in">
+            <div className="space-y-6 sm:space-y-8 animate-fade-in">
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-white mb-2">
+                <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">
                   风险概览 Risk Overview
                 </h2>
                 <StatusIndicator status={status} />
               </div>
 
-              <GlassCard className="p-8 flex flex-col items-center">
-                <RiskGauge value={clampedRisk} size={220} />
+              <GlassCard className="p-4 sm:p-8 flex flex-col items-center">
+                <RiskGauge value={clampedRisk} size={chartSize.gauge} />
               </GlassCard>
 
-              <GlassCard className="p-8 flex flex-col items-center">
-                <p className="text-white/60 text-sm mb-4">五维评估 Five Dimensions</p>
-                <RadarChart data={radarData} size={280} />
+              <GlassCard className="p-4 sm:p-8 flex flex-col items-center overflow-hidden">
+                <p className="text-white/60 text-xs sm:text-sm mb-3 sm:mb-4">五维评估 Five Dimensions</p>
+                <RadarChart data={radarData} size={chartSize.radar} />
               </GlassCard>
 
-              <GlassCard className="p-6">
-                <h3 className="text-[#00FF88] font-semibold mb-4">系统建议 Recommendations</h3>
-                <ul className="space-y-3 text-white/80 text-sm">
+              <GlassCard className="p-4 sm:p-6">
+                <h3 className="text-[#00FF88] font-semibold mb-3 sm:mb-4 text-sm sm:text-base">系统建议 Recommendations</h3>
+                <ul className="space-y-3 text-white/80 text-xs sm:text-sm">
                   {getRecommendationsForGoal(goal).map((rec, i) => (
                     <li key={i} className="flex gap-2">
                       <span className="text-[#00FF88] shrink-0">•</span>
@@ -683,11 +752,11 @@ export default function RiskCompassPage() {
               </GlassCard>
 
               {/* 评估依据与数据来源 */}
-              <GlassCard className="p-6">
-                <h3 className="text-[#00FF88] font-semibold mb-3">
+              <GlassCard className="p-4 sm:p-6">
+                <h3 className="text-[#00FF88] font-semibold mb-3 text-sm sm:text-base">
                   评估依据与数据来源 / Assessment Basis & Data Sources
                 </h3>
-                <div className="space-y-4 text-white/80 text-sm">
+                <div className="space-y-4 text-white/80 text-xs sm:text-sm">
                   <div>
                     <p className="font-medium text-white/90 mb-1">综合风险指数如何得出 How the overall risk score is calculated</p>
                     <p className="text-white/70">
@@ -722,25 +791,46 @@ export default function RiskCompassPage() {
                 <button
                   type="button"
                   onClick={handleDownloadPdf}
-                  className="px-8 py-4 rounded-xl bg-[#00FF88]/20 border-2 border-[#00FF88] text-[#00FF88] font-semibold hover:shadow-[0_0_24px_rgba(0,255,136,0.4)] transition-all"
+                  className="w-full sm:w-auto min-h-[48px] px-6 sm:px-8 py-4 rounded-xl bg-[#00FF88]/20 border-2 border-[#00FF88] text-[#00FF88] font-semibold hover:shadow-[0_0_24px_rgba(0,255,136,0.4)] transition-all text-sm sm:text-base touch-manipulation"
                 >
                   下载 PDF 报告 Download PDF Report
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowResult(false)}
-                  className="text-white/50 hover:text-white/80 text-sm"
+                  className="text-white/50 hover:text-white/80 text-xs sm:text-sm py-2 touch-manipulation"
                 >
                   重新评估 Re-assess
                 </button>
+                <div className="pt-6 border-t border-white/10 w-full max-w-sm mx-auto">
+                  <p className="text-white/50 text-xs sm:text-sm mb-3">分享风险指南针 / Share Risk Compass</p>
+                  <div className="flex flex-wrap items-center justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={handleCopyLink}
+                      className="min-h-[40px] px-4 py-2 rounded-lg border border-white/30 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm touch-manipulation"
+                    >
+                      {copyDone ? "已复制 ✓" : "复制链接"}
+                    </button>
+                    {canNativeShare && (
+                      <button
+                        type="button"
+                        onClick={handleNativeShare}
+                        className="min-h-[40px] px-4 py-2 rounded-lg bg-[#00FF88]/20 border border-[#00FF88]/50 text-[#00FF88] hover:bg-[#00FF88]/30 transition-all text-sm touch-manipulation"
+                      >
+                        分享 Share
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}
         </section>
 
         {/* Legal & risk disclaimer - 法律风险提示 */}
-        <footer className="mt-20 pt-10 border-t border-white/10">
-          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-6 text-sm">
+        <footer className="mt-12 sm:mt-20 pt-8 sm:pt-10 border-t border-white/10">
+          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 sm:p-6 text-xs sm:text-sm">
             <h3 className="font-semibold text-amber-400 mb-3">
               法律与风险提示 / Legal & Risk Disclaimer
             </h3>
