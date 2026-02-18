@@ -15,6 +15,7 @@ const staticPages: [string, MetadataRoute.Sitemap[0]["changeFrequency"], number]
   ["/applications/express-entry", "monthly", 0.8],
   ["/applications/provincial-nominee", "monthly", 0.8],
   ["/assessment", "monthly", 0.8],
+  ["/risk-compass", "monthly", 0.8],
   ["/chat", "weekly", 0.8],
   ["/ircc-news", "daily", 0.8],
   ["/consultant-standards", "yearly", 0.6],
