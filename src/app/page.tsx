@@ -27,6 +27,11 @@ export default function Home() {
   const checkAuth = async () => {
     try {
       const res = await fetch("/api/auth/me");
+      const contentType = res.headers.get("content-type") || "";
+      if (!res.ok || !contentType.includes("application/json")) {
+        // Server returned non-JSON (e.g. HTML error page) – treat as not logged in
+        return;
+      }
       const data = await res.json();
       if (data.success) {
         setUser(data.user);
@@ -445,7 +450,7 @@ export default function Home() {
               <h3 className="text-xl font-bold text-slate-900 mb-1">AI移民评估报告</h3>
               <p className="text-sm text-slate-500 mb-3">AI Immigration Assessment</p>
               <p className="text-slate-600 mb-1 text-sm leading-relaxed">
-                第一步：理性评估，不是“成功率承诺”
+                第一步：理性评估，不是“成功率承���”
               </p>
               <p className="text-slate-400 mb-4 text-xs leading-relaxed">
                 Step 1: Rational assessment
@@ -570,7 +575,7 @@ export default function Home() {
                 <p className="text-slate-600 text-sm mb-4">Visitor Visa (IMM 5257)</p>
                 <ul className="text-sm text-slate-500 space-y-1">
                   <li>• 旅游 / 探亲 / 商务</li>
-                  <li>• 超级签证 Super Visa</li>
+                  <li>• 超级���证 Super Visa</li>
                   <li>• 全程 AI 辅助填写</li>
                 </ul>
                 <div className="mt-4 text-[#C62828] font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
