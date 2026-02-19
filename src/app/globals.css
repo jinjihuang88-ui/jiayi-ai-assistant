@@ -278,6 +278,39 @@ body {
   background: #94a3b8;
 }
 
+/* Risk Compass – cyberpunk slider */
+.risk-compass-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  outline: none;
+}
+.risk-compass-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #00FF88;
+  cursor: pointer;
+  box-shadow: 0 0 12px #00FF88;
+  transition: box-shadow 0.2s;
+}
+.risk-compass-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 20px #00FF88;
+}
+.risk-compass-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #00FF88;
+  cursor: pointer;
+  box-shadow: 0 0 12px #00FF88;
+  border: none;
+}
+
 /* Print styles */
 @media print {
   body {

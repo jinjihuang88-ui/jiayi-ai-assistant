@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { PageViewTracker } from "@/components/PageViewTracker";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -89,6 +90,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
+        <PageViewTracker />
         {children}
       </body>
     </html>

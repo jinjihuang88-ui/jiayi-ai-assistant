@@ -106,6 +106,8 @@ export default function ConsultantsPage() {
   const handleSelectConsultant = (consultant: Consultant) => {
     setSelectedConsultant(consultant);
     setShowModal(true);
+    // 上报查看次数（管理后台可看点击率）
+    fetch(`/api/member/consultants/${consultant.id}/view`, { method: "POST" }).catch(() => {});
   };
 
   const handleConfirmSelection = async () => {

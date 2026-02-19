@@ -95,6 +95,7 @@ model RCIC {
   successfulCases   Int?      @default(0) // 成功案件数
   averageRating     Float?    @default(0) // 平均评分（0-5）
   totalReviews      Int?      @default(0) // 评价数量
+  profileViewCount  Int       @default(0) // 顾问主页被查看次数（管理后台可看点击率）
   languages         String?   // 语言能力（JSON数组），如: ["English", "Mandarin", "French"]
   certifications    String?   // 证书和荣誉（JSON数组）
   isAcceptingCases  Boolean   @default(true) // 是否接收新案件
@@ -308,4 +309,14 @@ model InternalMessage {
   conversation   InternalConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@map("internal_messages")
+}
+
+// 全站页面访问统计（首页、risk-compass 等，管理后台可查点击率）
+model PageViewStat {
+  id        String   @id @default(cuid())
+  path      String   @unique // 如 "/", "/risk-compass"
+  viewCount Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@map("page_view_stats")
 }

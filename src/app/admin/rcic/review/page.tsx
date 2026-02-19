@@ -24,6 +24,7 @@ interface RCICConsultant {
   emailVerified: boolean;
   createdAt: string;
   wechatUserId: string | null;
+  profileViewCount?: number;
 }
 
 export default function AdminReviewPage() {
@@ -146,12 +147,20 @@ export default function AdminReviewPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">RCIC 顾问审核</h1>
-            <button
-              onClick={() => router.push("/")}
-              className="text-gray-600 hover:text-gray-900"
-            >
-              返回首页
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => router.push("/admin/page-stats")}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                页面点击率
+              </button>
+              <button
+                onClick={() => router.push("/")}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                返回首页
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -196,6 +205,9 @@ export default function AdminReviewPage() {
                   状态
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  查看次数
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   提交时间
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -217,6 +229,9 @@ export default function AdminReviewPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(consultant.approvalStatus)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                    {consultant.profileViewCount ?? 0}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(consultant.createdAt).toLocaleString("zh-CN")}
@@ -293,6 +308,12 @@ export default function AdminReviewPage() {
                     <div className="text-sm text-gray-600">邮箱验证</div>
                     <div className="text-base font-medium">
                       {selectedConsultant.emailVerified ? "✅ 已验证" : "❌ 未验证"}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-600">查看次数（点击率）</div>
+                    <div className="text-base font-medium">
+                      {selectedConsultant.profileViewCount ?? 0} 次
                     </div>
                   </div>
                 </div>

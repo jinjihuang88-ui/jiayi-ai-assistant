@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 获取所有顾问，按创建时间倒序
+    // 获取所有顾问，按创建时间倒序（profileViewCount 用 raw 查，兼容未 regenerate 的情况）
     const consultants = await prisma.rCIC.findMany({
       orderBy: {
         createdAt: "desc",
@@ -48,9 +48,27 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    let viewCountMap: Record<string, number> = {};
+    try {
+      const rows = await prisma.$queryRaw<{ id: string; profileViewCount?: number; profileviewcount?: number }[]>`
+        SELECT id, profileViewCount FROM rcics
+      `;
+      rows.forEach((r) => {
+        const count = r.profileViewCount ?? (r as Record<string, unknown>).profileviewcount;
+        viewCountMap[r.id] = Number(count) || 0;
+      });
+    } catch (_) {
+      // 表尚未有 profileViewCount 列时忽略
+    }
+
+    const consultantsWithViews = consultants.map((c) => ({
+      ...c,
+      profileViewCount: viewCountMap[c.id] ?? 0,
+    }));
+
     return NextResponse.json({
       success: true,
-      consultants,
+      consultants: consultantsWithViews,
     });
   } catch (error) {
     console.error("Failed to fetch consultants:", error);
