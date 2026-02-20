@@ -186,7 +186,7 @@ export default function AssessmentPage() {
                   `}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <span className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-sm font-bold flex-shrink-0">{opt.icon ?? index + 1}</span>
+                  <span className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-sm font-bold flex-shrink-0">{index + 1}</span>
                   <span className="text-slate-800 font-medium">{opt.label}</span>
                   <svg 
                     className={`w-5 h-5 ml-auto transition-all duration-300 ${selectedOption === opt.label ? 'text-red-500 opacity-100' : 'text-slate-300 opacity-0 group-hover:opacity-100'}`} 
