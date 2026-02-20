@@ -78,17 +78,17 @@ export const applicationStatusMap: Record<string, { label: string; color: string
 
 // 申请类型映射
 export const applicationTypeMap: Record<string, { name: string; icon: string; color: string }> = {
-  'study-permit': { name: '学习签证', icon: '🎓', color: 'from-blue-500 to-cyan-500' },
-  'visitor-visa': { name: '访客签证', icon: '✈️', color: 'from-green-500 to-emerald-500' },
-  'work-permit': { name: '工作签证', icon: '💼', color: 'from-purple-500 to-pink-500' },
-  'express-entry': { name: 'EE技术移民', icon: '🚀', color: 'from-indigo-500 to-blue-500' },
-  'provincial-nominee': { name: '省提名项目', icon: '🏛️', color: 'from-orange-500 to-red-500' },
+  'study-permit': { name: '学习签证', icon: '', color: 'from-blue-500 to-cyan-500' },
+  'visitor-visa': { name: '访客签证', icon: '', color: 'from-green-500 to-emerald-500' },
+  'work-permit': { name: '工作签证', icon: '', color: 'from-purple-500 to-pink-500' },
+  'express-entry': { name: 'EE技术移民', icon: '', color: 'from-indigo-500 to-blue-500' },
+  'provincial-nominee': { name: '省提名项目', icon: '', color: 'from-orange-500 to-red-500' },
 };
 
 // 通知类型映射
 export const notificationTypeMap: Record<string, { icon: string; color: string }> = {
-  status_change: { icon: '📋', color: 'text-blue-500' },
-  message: { icon: '💬', color: 'text-green-500' },
-  reminder: { icon: '⏰', color: 'text-yellow-500' },
-  system: { icon: '🔔', color: 'text-gray-500' },
+  status_change: { icon: '', color: 'text-blue-500' },
+  message: { icon: '', color: 'text-green-500' },
+  reminder: { icon: '', color: 'text-yellow-500' },
+  system: { icon: '', color: 'text-gray-500' },
 };

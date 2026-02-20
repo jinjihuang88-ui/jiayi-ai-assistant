@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       const emailSubject =
         action === "approve"
           ? "🎉 您的RCIC顾问申请已通过审核"
-          : "❌ 您的RCIC顾问申请未通过审核";
+          : "您的RCIC顾问申请未通过审核";
 
       const emailContent =
         action === "approve"

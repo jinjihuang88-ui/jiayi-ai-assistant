@@ -9,7 +9,7 @@ const applications = [
     title: "学签申请",
     titleEn: "Study Permit",
     desc: "官方表格 IMM 1294 · AI 引导填写",
-    icon: "🎓",
+    icon: "",
     color: "from-blue-500 to-cyan-500",
     status: "available",
     href: "/applications/study-permit",
@@ -20,7 +20,7 @@ const applications = [
     title: "访客签证",
     titleEn: "Visitor Visa",
     desc: "官方表格 IMM 5257 · 旅游/探亲/商务",
-    icon: "✈️",
+    icon: "",
     color: "from-green-500 to-emerald-500",
     status: "available",
     href: "/applications/visitor-visa",
@@ -31,7 +31,7 @@ const applications = [
     title: "EE 技术移民",
     titleEn: "Express Entry",
     desc: "官方表格 IMM 0008/5669/5406 · FSW/CEC/FST",
-    icon: "🚀",
+    icon: "",
     color: "from-purple-500 to-pink-500",
     status: "available",
     href: "/applications/express-entry",
@@ -43,7 +43,7 @@ const applications = [
     title: "省提名项目",
     titleEn: "Provincial Nominee",
     desc: "官方表格 IMM 0008/5669/5406 · 各省移民项目",
-    icon: "🏛️",
+    icon: "",
     color: "from-orange-500 to-red-500",
     status: "available",
     href: "/applications/provincial-nominee",
@@ -55,7 +55,7 @@ const applications = [
     title: "工签申请",
     titleEn: "Work Permit",
     desc: "官方表格 IMM 1295 · LMIA/开放工签",
-    icon: "💼",
+    icon: "",
     color: "from-indigo-500 to-purple-500",
     status: "available",
     href: "/applications/work-permit",
@@ -159,8 +159,8 @@ function ApplicationsContent() {
                 <div className="p-6">
                   {/* Icon & Title */}
                   <div className="flex items-start gap-4 mb-4">
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${app.color} flex items-center justify-center text-2xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                      {app.icon}
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${app.color} flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      {app.icon || app.title.charAt(0)}
                     </div>
                     <div className="flex-1">
                       <h2 className="text-xl font-bold text-slate-900">{app.title}</h2>
@@ -216,8 +216,8 @@ function ApplicationsContent() {
         <div className={`mt-12 transition-all duration-700 delay-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <div className="bg-gradient-to-r from-slate-100 to-slate-50 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-white shadow-md flex items-center justify-center text-2xl">
-                💬
+              <div className="w-12 h-12 rounded-xl bg-white shadow-md flex items-center justify-center text-slate-600 font-bold">
+                问
               </div>
               <div>
                 <h3 className="font-semibold text-slate-900">不确定选择哪个？</h3>

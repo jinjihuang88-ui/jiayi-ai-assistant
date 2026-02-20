@@ -296,7 +296,7 @@ export default function InternalChatPage() {
         <div className="flex-1 overflow-y-auto">
           {conversations.length === 0 ? (
             <div className="p-8 text-center">
-              <div className="text-4xl mb-4">💬</div>
+              <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mb-4 text-slate-600 font-bold text-2xl">聊</div>
               <p className="text-slate-400">暂无对话</p>
               <p className="text-sm text-slate-500 mt-2">点击"新建对话"开始聊天</p>
             </div>
@@ -381,7 +381,7 @@ export default function InternalChatPage() {
                           onClick={() => handleDownloadFile(msg.fileUrl, msg.fileName)}
                           className="flex items-center gap-2 underline text-left bg-transparent border-none cursor-pointer p-0"
                         >
-                          <span>📎</span>
+                          <span>附</span>
                           <span>{msg.fileName || "文件"}</span>
                           <span className="text-xs opacity-80 ml-1">(点击下载)</span>
                         </button>
@@ -431,7 +431,7 @@ export default function InternalChatPage() {
                   className="px-4 py-2 rounded-lg bg-slate-700 text-white hover:bg-slate-600 transition-colors disabled:opacity-50"
                   title="上传文件或图片"
                 >
-                  {uploading ? "⏳" : "📎"}
+                  {uploading ? "..." : "附"}
                 </button>
                 <input
                   type="text"
@@ -453,7 +453,7 @@ export default function InternalChatPage() {
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="text-6xl mb-4">💬</div>
+              <div className="w-20 h-20 rounded-full bg-slate-200 flex items-center justify-center mb-4 text-slate-600 font-bold text-2xl">聊</div>
               <p className="text-slate-400">选择一个对话或成员开始聊天</p>
             </div>
           </div>

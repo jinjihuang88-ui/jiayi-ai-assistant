@@ -92,11 +92,11 @@ export default function RCICDashboardPage() {
   };
 
   const typeIconMap: Record<string, string> = {
-    "study-permit": "🎓",
-    "visitor-visa": "✈️",
-    "work-permit": "💼",
-    "express-entry": "🚀",
-    "provincial-nominee": "🏛️",
+    "study-permit": "",
+    "visitor-visa": "",
+    "work-permit": "",
+    "express-entry": "",
+    "provincial-nominee": "",
   };
 
   if (loading) {
@@ -119,7 +119,7 @@ export default function RCICDashboardPage() {
             </a>
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
-                <span className="text-xl">🏛️</span>
+                <span className="text-white font-bold text-sm">RCIC</span>
               </div>
               <div>
                 <h1 className="font-semibold text-white">RCIC 顾问后台</h1>
@@ -163,7 +163,7 @@ export default function RCICDashboardPage() {
           <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                <span className="text-yellow-500 text-xl">📋</span>
+                <span className="text-yellow-500 text-lg font-bold">待</span>
               </div>
               <span className="text-slate-400 text-sm">待审核</span>
             </div>
@@ -173,7 +173,7 @@ export default function RCICDashboardPage() {
           <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                <span className="text-blue-500 text-xl">🔍</span>
+                <span className="text-blue-500 text-lg font-bold">审</span>
               </div>
               <span className="text-slate-400 text-sm">审核中</span>
             </div>
@@ -183,7 +183,7 @@ export default function RCICDashboardPage() {
           <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
-                <span className="text-orange-500 text-xl">✏️</span>
+                <span className="text-orange-500 text-lg font-bold">改</span>
               </div>
               <span className="text-slate-400 text-sm">需修改</span>
             </div>
@@ -193,7 +193,7 @@ export default function RCICDashboardPage() {
           <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-                <span className="text-green-500 text-xl">✅</span>
+                <span className="text-green-500 text-lg font-bold">过</span>
               </div>
               <span className="text-slate-400 text-sm">已通过</span>
             </div>
@@ -215,7 +215,7 @@ export default function RCICDashboardPage() {
 
           {recentCases.length === 0 ? (
             <div className="p-12 text-center text-slate-500">
-              <div className="text-4xl mb-4">📭</div>
+              <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-slate-500 font-bold mb-4 mx-auto">无</div>
               <p>暂无待处理案件</p>
             </div>
           ) : (
@@ -227,7 +227,7 @@ export default function RCICDashboardPage() {
                   className="flex items-center gap-4 p-4 hover:bg-slate-700/30 transition-colors"
                 >
                   <div className="w-12 h-12 rounded-xl bg-slate-700 flex items-center justify-center text-2xl">
-                    {typeIconMap[app.type] || "📄"}
+                    {typeIconMap[app.type] || app.typeName?.charAt(0) || "申"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -262,8 +262,8 @@ export default function RCICDashboardPage() {
             href="/rcic/cases?status=submitted"
             className="bg-slate-800/50 rounded-xl border border-slate-700 p-6 hover:border-emerald-500/50 transition-colors group"
           >
-            <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center text-2xl mb-4">
-              📋
+            <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center text-yellow-500 font-bold mb-4">
+              审
             </div>
             <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors">
               审核新申请
@@ -277,8 +277,8 @@ export default function RCICDashboardPage() {
             href="/rcic/messages"
             className="bg-slate-800/50 rounded-xl border border-slate-700 p-6 hover:border-emerald-500/50 transition-colors group"
           >
-            <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-2xl mb-4">
-              💬
+            <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-500 font-bold mb-4">
+              聊
             </div>
             <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors">
               回复消息
@@ -292,8 +292,8 @@ export default function RCICDashboardPage() {
             href="/rcic/cases?status=needs_revision"
             className="bg-slate-800/50 rounded-xl border border-slate-700 p-6 hover:border-emerald-500/50 transition-colors group"
           >
-            <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-2xl mb-4">
-              ✏️
+            <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-500 font-bold mb-4">
+              改
             </div>
             <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors">
               跟进修改
@@ -307,8 +307,8 @@ export default function RCICDashboardPage() {
             href="/rcic/team"
             className="bg-slate-800/50 rounded-xl border border-slate-700 p-6 hover:border-emerald-500/50 transition-colors group"
           >
-            <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-2xl mb-4">
-              👥
+            <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-500 font-bold mb-4">
+              团
             </div>
             <h4 className="font-semibold text-white group-hover:text-emerald-400 transition-colors">
               团队管理

@@ -414,7 +414,7 @@ export async function sendRCICVerificationEmail(email: string, token: string, na
                   <!-- Header -->
                   <tr>
                     <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px 12px 0 0;">
-                      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">🎓 移民顾问注册</h1>
+                      <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">移民顾问注册</h1>
                     </td>
                   </tr>
                   

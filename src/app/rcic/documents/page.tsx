@@ -97,11 +97,11 @@ function RCICDocumentsContent() {
   };
 
   const getFileIcon = (type: string) => {
-    if (type.startsWith("image/")) return "🖼️";
-    if (type.includes("pdf")) return "📄";
-    if (type.includes("word") || type.includes("document")) return "📝";
-    if (type.includes("excel") || type.includes("spreadsheet")) return "📊";
-    return "📎";
+    if (type.startsWith("image/")) return "图";
+    if (type.includes("pdf")) return "PDF";
+    if (type.includes("word") || type.includes("document")) return "文档";
+    if (type.includes("excel") || type.includes("spreadsheet")) return "表";
+    return "附";
   };
 
   const filteredDocuments = documents.filter((doc) => {
@@ -138,7 +138,7 @@ function RCICDocumentsContent() {
             </a>
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
-                <span className="text-xl">🏛️</span>
+                <span className="text-white font-bold">RCIC</span>
               </div>
               <div>
                 <h1 className="font-semibold text-white">RCIC 顾问后台</h1>
@@ -223,7 +223,7 @@ function RCICDocumentsContent() {
           <div className="text-center py-12 text-slate-400">加载中...</div>
         ) : Object.keys(documentsByCase).length === 0 ? (
           <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-12 text-center">
-            <div className="text-5xl mb-4">📭</div>
+            <div className="w-20 h-20 rounded-full bg-slate-700 flex items-center justify-center mx-auto mb-4 text-slate-500 font-bold text-xl">无</div>
             <p className="text-slate-400">暂无文档</p>
           </div>
         ) : (
@@ -287,7 +287,7 @@ function RCICDocumentsContent() {
 
         {/* Tips */}
         <div className="mt-8 bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-6">
-          <h3 className="font-semibold text-emerald-400 mb-2">💡 温馨提示</h3>
+          <h3 className="font-semibold text-emerald-400 mb-2">温馨提示</h3>
           <ul className="text-sm text-slate-300 space-y-1">
             <li>• 这里显示的是用户通过消息功能上传的所有文档</li>
             <li>• 您可以直接在线查看图片和PDF文档</li>

@@ -5,7 +5,11 @@ import ChatBox from "@/components/ChatBox";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export default function ChatPage() {
+/**
+ * 推广页：AI 咨询合并在同一页，风格与 /chat 一致。
+ * 用于以后推广，不替代 /chat；网站其它功能与数据库不变。
+ */
+export default function ConsultPage() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -20,7 +24,7 @@ export default function ChatPage() {
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="grid lg:grid-cols-5 gap-8 items-stretch">
             {/* Left: Info Section - 2 columns */}
-            <div className={`lg:col-span-2 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <div className={`lg:col-span-2 transition-all duration-700 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 text-sm font-medium mb-6">
                 <span className="relative flex h-2 w-2">
@@ -81,7 +85,7 @@ export default function ChatPage() {
             </div>
 
             {/* Right: Chat Box - 3 columns */}
-            <div className={`lg:col-span-3 transition-all duration-700 delay-200 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+            <div className={`lg:col-span-3 transition-all duration-700 delay-200 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
               <ChatBox />
             </div>
           </div>

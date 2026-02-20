@@ -142,7 +142,7 @@ function ReportContent() {
             </div>
             <div className="p-6 bg-slate-50">
               <div className="text-sm text-slate-600">
-                🤖 本评分基于您提供的信息自动生成，仅供参考，不构成移民或法律建议。
+                本评分基于您提供的信息自动生成，仅供参考，不构成移民或法律建议。
               </div>
             </div>
           </div>
@@ -152,7 +152,7 @@ function ReportContent() {
         <section className={`mb-12 transition-all duration-700 delay-200 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-              <span className="text-xl">👤</span>
+              <span className="text-slate-600 font-bold text-lg">您</span>
             </div>
             <h2 className="text-xl font-bold text-slate-900">您的基本情况</h2>
           </div>
@@ -164,7 +164,7 @@ function ReportContent() {
                 className="bg-white rounded-xl border border-slate-200 p-4 flex items-center gap-3 hover:shadow-md transition-shadow duration-300"
               >
                 <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-lg">
-                  {['🌍', '🎂', '🎓', '💼', '🗣️'][i] || '📋'}
+                  {i + 1}
                 </div>
                 <span className="text-slate-700 font-medium">{a}</span>
               </div>
@@ -176,7 +176,7 @@ function ReportContent() {
         <section className={`mb-12 transition-all duration-700 delay-300 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-              <span className="text-xl">🔍</span>
+              <span className="text-slate-600 font-bold text-lg">析</span>
             </div>
             <h2 className="text-xl font-bold text-slate-900">AI 初步分析</h2>
           </div>
@@ -190,7 +190,7 @@ function ReportContent() {
 
             {hasIT && (
               <div className="flex items-start gap-3 p-4 bg-green-50 rounded-xl border border-green-100">
-                <span className="text-2xl">💻</span>
+                <span className="text-slate-600 font-bold">技</span>
                 <div>
                   <div className="font-semibold text-green-800">技术背景优势</div>
                   <p className="text-green-700 text-sm mt-1">
@@ -202,7 +202,7 @@ function ReportContent() {
 
             {noLanguage && (
               <div className="flex items-start gap-3 p-4 bg-amber-50 rounded-xl border border-amber-100">
-                <span className="text-2xl">⚠️</span>
+                <span className="text-amber-600 font-bold">!</span>
                 <div>
                   <div className="font-semibold text-amber-800">语言成绩待补充</div>
                   <p className="text-amber-700 text-sm mt-1">
@@ -214,7 +214,7 @@ function ReportContent() {
 
             {hasHighEducation && (
               <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
-                <span className="text-2xl">🎓</span>
+                <span className="text-blue-600 font-bold">学</span>
                 <div>
                   <div className="font-semibold text-blue-800">学历优势</div>
                   <p className="text-blue-700 text-sm mt-1">
@@ -230,7 +230,7 @@ function ReportContent() {
         <section className={`mb-12 transition-all duration-700 delay-400 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
-              <span className="text-xl">🛤️</span>
+              <span className="text-slate-600 font-bold text-lg">径</span>
             </div>
             <h2 className="text-xl font-bold text-slate-900">推荐移民路径</h2>
           </div>
@@ -239,7 +239,7 @@ function ReportContent() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-white text-xl">
-                  🚀
+                  EE
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900">Express Entry</h3>
@@ -258,7 +258,7 @@ function ReportContent() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white text-xl">
-                  🏛️
+                  省
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900">Provincial Nominee</h3>
@@ -280,7 +280,7 @@ function ReportContent() {
         <section className={`mb-12 transition-all duration-700 delay-500 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
-              <span className="text-xl">✅</span>
+              <span className="text-green-600 font-bold text-lg">步</span>
             </div>
             <h2 className="text-xl font-bold text-slate-900">建议下一步</h2>
           </div>
@@ -288,13 +288,13 @@ function ReportContent() {
           <div className="bg-white rounded-2xl border border-slate-200 p-6">
             <ul className="space-y-4">
               {[
-                { icon: "🗣️", text: "准备语言考试（雅思/思培），目标 CLB 7 以上" },
-                { icon: "📄", text: "整理学历和工作经历文件，准备 ECA 学历认证" },
-                { icon: "💬", text: "使用 AI 咨询深入了解具体项目要求" },
-                { icon: "👨‍⚖️", text: "考虑咨询持牌移民顾问（RCIC）获取专业建议" },
+                { text: "准备语言考试（雅思/思培），目标 CLB 7 以上" },
+                { text: "整理学历和工作经历文件，准备 ECA 学历认证" },
+                { text: "使用 AI 咨询深入了解具体项目要求" },
+                { text: "考虑咨询持牌移民顾问（RCIC）获取专业建议" },
               ].map((item, i) => (
                 <li key={i} className="flex items-center gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                  <span className="text-2xl">{item.icon}</span>
+                  <span className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 text-sm font-bold flex-shrink-0">{i + 1}</span>
                   <span className="text-slate-700">{item.text}</span>
                 </li>
               ))}
@@ -314,13 +314,13 @@ function ReportContent() {
                 href="/chat"
                 className="px-6 py-3 rounded-xl bg-white text-slate-900 font-semibold hover:bg-slate-100 transition-colors"
               >
-                💬 咨询 AI 助理
+                咨询 AI 助理
               </a>
               <a
                 href="/applications"
                 className="px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold hover:from-red-600 hover:to-orange-600 transition-colors"
               >
-                📋 开始申请
+                开始申请
               </a>
             </div>
           </div>

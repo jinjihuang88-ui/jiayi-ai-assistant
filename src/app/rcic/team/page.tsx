@@ -167,7 +167,7 @@ export default function TeamManagementPage() {
           <div className="bg-slate-800 rounded-2xl border border-slate-700 p-8 max-w-md w-full mx-4 shadow-2xl">
             <div className="text-center mb-6">
               <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
-                <span className="text-3xl">🔑</span>
+                <span className="text-white font-bold text-2xl">钥</span>
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">成员添加成功！</h3>
               <p className="text-slate-400">请将以下临时密码发送给团队成员</p>
@@ -194,7 +194,7 @@ export default function TeamManagementPage() {
                     }}
                     className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 text-sm transition-colors"
                   >
-                    📋 复制
+                    复制
                   </button>
                 </div>
               </div>
@@ -202,7 +202,7 @@ export default function TeamManagementPage() {
 
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
-                <span className="text-amber-500 text-xl">⚠️</span>
+                <span className="text-amber-500 text-xl font-bold">!</span>
                 <div className="flex-1">
                   <p className="text-amber-400 text-sm font-medium mb-1">重要提示</p>
                   <p className="text-amber-300/80 text-xs">
@@ -237,7 +237,7 @@ export default function TeamManagementPage() {
           >
             <div className="flex items-center gap-3">
               <span className="text-2xl">
-                {toast.type === "success" ? "✅" : "❌"}
+                {toast.type === "success" ? "成功" : "失败"}
               </span>
               <span className="text-white font-medium">{toast.message}</span>
             </div>
@@ -255,7 +255,7 @@ export default function TeamManagementPage() {
             </a>
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
-                <span className="text-xl">👥</span>
+                <span className="text-slate-600 font-bold">团队</span>
               </div>
               <div>
                 <h1 className="font-semibold text-white">团队管理</h1>
@@ -396,7 +396,7 @@ export default function TeamManagementPage() {
         {/* Members List */}
         {members.length === 0 ? (
           <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-12 text-center">
-            <div className="text-4xl mb-4">👥</div>
+            <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-4 text-slate-600 font-bold text-xl">团</div>
             <p className="text-slate-400">暂无团队成员</p>
             <p className="text-sm text-slate-500 mt-2">点击"添加成员"按钮开始添加</p>
           </div>

@@ -80,7 +80,7 @@ export default function RootLayout({
         <link rel="shortcut icon" type="image/png" href="/logo.png?v=jiayi" />
         {/* 百度站长验证 */}
         <meta name="baidu-site-verification" content="codeva-5vKXoNIMS2" />
-        {/* ✅ Coze Chat SDK 样式（必须全局） */}
+        {/* Coze Chat SDK 样式（必须全局） */}
         <link
           rel="stylesheet"
           href="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/style.css"

@@ -109,11 +109,11 @@ function RCICCasesContent() {
   };
 
   const typeIconMap: Record<string, string> = {
-    "study-permit": "🎓",
-    "visitor-visa": "✈️",
-    "work-permit": "💼",
-    "express-entry": "🚀",
-    "provincial-nominee": "🏛️",
+    "study-permit": "",
+    "visitor-visa": "",
+    "work-permit": "",
+    "express-entry": "",
+    "provincial-nominee": "",
   };
 
   const filters = [
@@ -168,8 +168,8 @@ function RCICCasesContent() {
         {/* Page Header */}
         <div className={`mb-8 transition-all duration-700 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-2xl shadow-lg">
-              📋
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold shadow-lg">
+              案
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">案件管理</h1>
@@ -181,10 +181,10 @@ function RCICCasesContent() {
         {/* Stats Cards */}
         <div className={`grid grid-cols-4 gap-4 mb-8 transition-all duration-700 delay-100 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           {[
-            { label: "待审核", value: stats?.pending || 0, color: "from-yellow-500 to-orange-500", icon: "⏳" },
-            { label: "审核中", value: stats?.underReview || 0, color: "from-blue-500 to-cyan-500", icon: "🔍" },
-            { label: "需修改", value: stats?.needsRevision || 0, color: "from-orange-500 to-red-500", icon: "✏️" },
-            { label: "已通过", value: stats?.approved || 0, color: "from-green-500 to-emerald-500", icon: "✅" },
+            { label: "待审核", value: stats?.pending || 0, color: "from-yellow-500 to-orange-500", icon: "待" },
+            { label: "审核中", value: stats?.underReview || 0, color: "from-blue-500 to-cyan-500", icon: "审" },
+            { label: "需修改", value: stats?.needsRevision || 0, color: "from-orange-500 to-red-500", icon: "改" },
+            { label: "已通过", value: stats?.approved || 0, color: "from-green-500 to-emerald-500", icon: "过" },
           ].map((stat, i) => (
             <div key={i} className="bg-slate-800/50 backdrop-blur rounded-xl p-4 border border-slate-700/50">
               <div className="flex items-center justify-between mb-2">
@@ -226,8 +226,8 @@ function RCICCasesContent() {
             </div>
           ) : applications.length === 0 ? (
             <div className="p-12 text-center">
-              <div className="w-20 h-20 rounded-full bg-slate-800 flex items-center justify-center text-4xl mx-auto mb-4">
-                📭
+              <div className="w-20 h-20 rounded-full bg-slate-800 flex items-center justify-center text-slate-500 text-2xl font-bold mx-auto mb-4">
+                无
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">暂无案件</h3>
               <p className="text-slate-400 max-w-md mx-auto">
@@ -243,7 +243,7 @@ function RCICCasesContent() {
                   className="flex items-center gap-4 p-5 hover:bg-slate-700/30 transition-colors"
                 >
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-slate-700 to-slate-600 flex items-center justify-center text-2xl">
-                    {typeIconMap[app.type] || "📄"}
+                    {typeIconMap[app.type] || app.typeName?.charAt(0) || "申"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -258,7 +258,7 @@ function RCICCasesContent() {
                       )}
                       {app.documents.length > 0 && (
                         <span className="px-2 py-0.5 rounded-full text-xs bg-slate-600 text-slate-300">
-                          📎 {app.documents.length} 个附件
+                          附 {app.documents.length} 个附件
                         </span>
                       )}
                     </div>

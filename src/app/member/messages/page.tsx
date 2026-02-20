@@ -409,7 +409,7 @@ function MessagesContent() {
                 </div>
               ) : messages.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-slate-500">
-                  <div className="text-4xl mb-4">💬</div>
+                  <div className="w-14 h-14 rounded-full bg-slate-200 flex items-center justify-center mb-4 text-slate-600 font-bold text-xl">聊</div>
                   <p>暂无消息</p>
                   <p className="text-sm">发送消息开始与顾问沟通</p>
                 </div>
@@ -450,7 +450,7 @@ function MessagesContent() {
                                     }`}
                                   >
                                     <span className="text-lg">
-                                      {file.type?.startsWith("image/") ? "🖼️" : "📄"}
+                                      {file.type?.startsWith("image/") ? "图" : "PDF"}
                                     </span>
                                     <span className="text-sm truncate flex-1">{file.name}</span>
                                     <a
@@ -496,7 +496,7 @@ function MessagesContent() {
                       key={idx}
                       className="flex items-center gap-2 px-3 py-2 bg-slate-100 rounded-lg text-sm"
                     >
-                      <span>{file.type.startsWith("image/") ? "🖼️" : "📄"}</span>
+                      <span>{file.type.startsWith("image/") ? "图" : "PDF"}</span>
                       <span className="truncate max-w-[150px]">{file.name}</span>
                       <button
                         onClick={() => handleRemoveFile(idx)}
@@ -518,14 +518,14 @@ function MessagesContent() {
                       className="px-4 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                       title="视频通话"
                     >
-                      📹 视频
+                      视频
                     </button>
                     <button
                       onClick={() => setCallModal({ type: "voice" })}
                       className="px-4 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                       title="语音通话"
                     >
-                      🎤 语音
+                      语音
                     </button>
                   </>
                 )}
@@ -544,7 +544,7 @@ function MessagesContent() {
                   className="px-4 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                   title="上传文件"
                 >
-                  📎
+                  附
                 </button>
                 
                 <input
@@ -592,7 +592,7 @@ function MessagesContent() {
             }`}
           >
             <span className="text-2xl">
-              {toast.type === 'success' ? '✅' : '❌'}
+              {toast.type === 'success' ? '成功' : '失败'}
             </span>
             <span className="font-medium">{toast.message}</span>
           </div>

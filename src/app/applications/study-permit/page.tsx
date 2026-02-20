@@ -237,17 +237,17 @@ function StudyPermitPageContent() {
   });
 
   const steps = [
-    { title: "基本信息", icon: "📋" },
-    { title: "个人信息", icon: "👤" },
-    { title: "护照信息", icon: "🛂" },
-    { title: "联系方式", icon: "📞" },
-    { title: "学习计划", icon: "🎓" },
-    { title: "资金证明", icon: "💰" },
-    { title: "教育背景", icon: "📚" },
-    { title: "工作经历", icon: "💼" },
-    { title: "背景信息", icon: "📝" },
-    { title: "家庭信息", icon: "👨‍👩‍👧" },
-    { title: "代理人", icon: "🤝" },
+    { title: "基本信息" },
+    { title: "个人信息" },
+    { title: "护照信息" },
+    { title: "联系方式" },
+    { title: "学习计划" },
+    { title: "资金证明" },
+    { title: "教育背景" },
+    { title: "工作经历" },
+    { title: "背景信息" },
+    { title: "家庭信息" },
+    { title: "代理人" },
   ];
 
   const currentFields = application.fields?.filter(f => f.section === currentStep) || [];
@@ -541,7 +541,7 @@ function StudyPermitPageContent() {
                       : "bg-white text-slate-600 hover:bg-slate-50"
                   }`}
               >
-                <span>{step.icon}</span>
+                <span className="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold flex-shrink-0">{index + 1}</span>
                 <span>{step.title}</span>
                 {index < currentStep && <span>✓</span>}
               </button>
@@ -552,7 +552,7 @@ function StudyPermitPageContent() {
         {/* Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200">
-            <span className="text-3xl">{steps[currentStep].icon}</span>
+            <span className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 font-bold flex-shrink-0">{currentStep + 1}</span>
             <div>
               <h2 className="text-xl font-semibold text-slate-900">
                 第 {currentStep + 1} 步：{steps[currentStep].title}
@@ -614,7 +614,7 @@ function StudyPermitPageContent() {
               }}
               className="px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-medium hover:bg-slate-50 transition-all"
             >
-              💾 保存草稿
+              保存草稿
             </button>
             
             {currentStep < steps.length - 1 ? (

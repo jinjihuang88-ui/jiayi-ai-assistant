@@ -133,11 +133,11 @@ export default function DocumentsPage() {
   };
 
   const getFileIcon = (type: string) => {
-    if (type.startsWith("image/")) return "🖼️";
-    if (type.includes("pdf")) return "📄";
-    if (type.includes("word") || type.includes("document")) return "📝";
-    if (type.includes("excel") || type.includes("spreadsheet")) return "📊";
-    return "📎";
+    if (type.startsWith("image/")) return "图";
+    if (type.includes("pdf")) return "PDF";
+    if (type.includes("word") || type.includes("document")) return "文档";
+    if (type.includes("excel") || type.includes("spreadsheet")) return "表";
+    return "附";
   };
 
   return (
@@ -180,13 +180,13 @@ export default function DocumentsPage() {
 
         {/* Upload Area */}
         <div className="bg-white rounded-xl border-2 border-dashed border-slate-300 p-8 mb-8 text-center hover:border-blue-500 transition-colors">
-          <div className="text-5xl mb-4">📤</div>
+          <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-4 text-slate-600 font-bold text-xl">传</div>
           <h3 className="text-lg font-semibold text-slate-900 mb-2">上传文档</h3>
           <p className="text-sm text-slate-500 mb-4">
             支持 PDF、Word、Excel、图片等格式，单个文件最大 10MB
           </p>
           <label className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium hover:from-blue-600 hover:to-blue-700 cursor-pointer">
-            <span>📁 选择文件</span>
+            <span>选择文件</span>
             <input
               type="file"
               multiple
@@ -220,7 +220,7 @@ export default function DocumentsPage() {
             <div className="p-12 text-center text-slate-500">加载中...</div>
           ) : documents.length === 0 ? (
             <div className="p-12 text-center text-slate-500">
-              <div className="text-5xl mb-4">📭</div>
+              <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-4 text-slate-500 font-bold text-xl">无</div>
               <p>还没有上传任何文档</p>
             </div>
           ) : (
@@ -267,7 +267,7 @@ export default function DocumentsPage() {
 
         {/* Tips */}
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h3 className="font-semibold text-blue-900 mb-2">💡 温馨提示</h3>
+          <h3 className="font-semibold text-blue-900 mb-2">温馨提示</h3>
           <ul className="text-sm text-blue-800 space-y-1">
             <li>• 建议上传清晰的扫描件或照片，确保文字清晰可读</li>
             <li>• 常用文档包括：护照、身份证、学历证明、工作证明、银行流水等</li>
@@ -288,7 +288,7 @@ export default function DocumentsPage() {
             }`}
           >
             <span className="text-2xl">
-              {toast.type === 'success' ? '✅' : '❌'}
+              {toast.type === 'success' ? '成功' : '失败'}
             </span>
             <span className="font-medium">{toast.message}</span>
           </div>

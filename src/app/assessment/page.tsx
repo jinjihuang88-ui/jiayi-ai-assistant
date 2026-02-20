@@ -7,54 +7,54 @@ const steps = [
   {
     question: "你目前居住在哪个国家？",
     questionEn: "Where do you currently reside?",
-    icon: "🌍",
+    icon: "",
     options: [
-      { label: "中国", icon: "🇨🇳" },
-      { label: "加拿大", icon: "🇨🇦" },
-      { label: "其他国家", icon: "🌐" },
+      { label: "中国" },
+      { label: "加拿大" },
+      { label: "其他国家" },
     ],
   },
   {
     question: "你的年龄范围是？",
     questionEn: "What is your age range?",
-    icon: "🎂",
+    icon: "",
     options: [
-      { label: "18–29", icon: "👶" },
-      { label: "30–39", icon: "👨" },
-      { label: "40–49", icon: "👨‍🦳" },
-      { label: "50+", icon: "👴" },
+      { label: "18–29" },
+      { label: "30–39" },
+      { label: "40–49" },
+      { label: "50+" },
     ],
   },
   {
     question: "你的最高学历是？",
     questionEn: "What is your highest education level?",
-    icon: "🎓",
+    icon: "",
     options: [
-      { label: "高中", icon: "📚" },
-      { label: "大专", icon: "📖" },
-      { label: "本科", icon: "🎓" },
-      { label: "硕士及以上", icon: "🏆" },
+      { label: "高中" },
+      { label: "大专" },
+      { label: "本科" },
+      { label: "硕士及以上" },
     ],
   },
   {
     question: "你最近的主要职业是？",
     questionEn: "What is your primary occupation?",
-    icon: "💼",
+    icon: "",
     options: [
-      { label: "IT / 技术", icon: "💻" },
-      { label: "金融 / 商科", icon: "📊" },
-      { label: "技工 / 蓝领", icon: "🔧" },
-      { label: "其他", icon: "📋" },
+      { label: "IT / 技术" },
+      { label: "金融 / 商科" },
+      { label: "技工 / 蓝领" },
+      { label: "其他" },
     ],
   },
   {
     question: "你是否已有英语或法语成绩？",
     questionEn: "Do you have English or French test scores?",
-    icon: "🗣️",
+    icon: "",
     options: [
-      { label: "有", icon: "✅" },
-      { label: "暂时没有", icon: "⏳" },
-      { label: "不确定", icon: "❓" },
+      { label: "有" },
+      { label: "暂时没有" },
+      { label: "不确定" },
     ],
   },
 ];
@@ -123,8 +123,8 @@ export default function AssessmentPage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-2xl shadow-lg">
-                {current.icon}
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-white font-bold shadow-lg">
+                {current.icon || step + 1}
               </div>
               <div>
                 <div className="text-xs text-slate-500 uppercase tracking-wider">问题 {step + 1}/{steps.length}</div>
@@ -186,7 +186,7 @@ export default function AssessmentPage() {
                   `}
                   style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  <span className="text-2xl">{opt.icon}</span>
+                  <span className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 text-sm font-bold flex-shrink-0">{opt.icon ?? index + 1}</span>
                   <span className="text-slate-800 font-medium">{opt.label}</span>
                   <svg 
                     className={`w-5 h-5 ml-auto transition-all duration-300 ${selectedOption === opt.label ? 'text-red-500 opacity-100' : 'text-slate-300 opacity-0 group-hover:opacity-100'}`} 

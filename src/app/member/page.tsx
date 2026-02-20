@@ -46,11 +46,11 @@ const statusMap: Record<string, { label: string; color: string; bgColor: string 
 };
 
 const typeIconMap: Record<string, { icon: string; color: string }> = {
-  "study-permit": { icon: "🎓", color: "from-blue-500 to-cyan-500" },
-  "visitor-visa": { icon: "✈️", color: "from-green-500 to-emerald-500" },
-  "work-permit": { icon: "💼", color: "from-purple-500 to-pink-500" },
-  "express-entry": { icon: "🚀", color: "from-indigo-500 to-blue-500" },
-  "provincial-nominee": { icon: "🏛️", color: "from-orange-500 to-red-500" },
+  "study-permit": { icon: "", color: "from-blue-500 to-cyan-500" },
+  "visitor-visa": { icon: "", color: "from-green-500 to-emerald-500" },
+  "work-permit": { icon: "", color: "from-purple-500 to-pink-500" },
+  "express-entry": { icon: "", color: "from-indigo-500 to-blue-500" },
+  "provincial-nominee": { icon: "", color: "from-orange-500 to-red-500" },
 };
 
 export default function MemberDashboard() {
@@ -168,7 +168,7 @@ export default function MemberDashboard() {
               href="/member/profile"
               className="hidden sm:inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-slate-500 bg-slate-100 hover:bg-red-50 hover:text-red-600 border border-slate-200/80 hover:border-red-200 transition-colors"
             >
-              <span aria-hidden className="text-sm">✏️</span>
+              <span aria-hidden className="text-sm font-bold text-slate-500">改</span>
               <span>完善资料</span>
             </a>
             <button
@@ -195,15 +195,15 @@ export default function MemberDashboard() {
         {/* Quick Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "全部申请", value: applications.length, icon: "📋", color: "from-blue-500 to-cyan-500" },
-            { label: "进行中", value: applications.filter(a => ["submitted", "under_review"].includes(a.status)).length, icon: "⏳", color: "from-yellow-500 to-orange-500" },
-            { label: "已通过", value: applications.filter(a => a.status === "approved").length, icon: "✅", color: "from-green-500 to-emerald-500" },
-            { label: "未读通知", value: unreadCount, icon: "🔔", color: "from-red-500 to-pink-500" },
+            { label: "全部申请", value: applications.length, icon: "", color: "from-blue-500 to-cyan-500" },
+            { label: "进行中", value: applications.filter(a => ["submitted", "under_review"].includes(a.status)).length, icon: "", color: "from-yellow-500 to-orange-500" },
+            { label: "已通过", value: applications.filter(a => a.status === "approved").length, icon: "", color: "from-green-500 to-emerald-500" },
+            { label: "未读通知", value: unreadCount, icon: "", color: "from-red-500 to-pink-500" },
           ].map((stat, i) => (
             <div key={i} className="bg-white rounded-xl p-4 border border-slate-200 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-lg`}>
-                  {stat.icon}
+                <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center text-white font-bold text-sm`}>
+                  {stat.icon || stat.label.charAt(0)}
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-slate-900">{stat.value}</div>
@@ -227,7 +227,7 @@ export default function MemberDashboard() {
               
               {applications.length === 0 ? (
                 <div className="p-8 text-center">
-                  <div className="text-4xl mb-4">📝</div>
+                  <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-4 text-slate-600 font-bold text-xl">申</div>
                   <p className="text-slate-500 mb-4">您还没有任何申请</p>
                   <a
                     href="/applications?from=member"
@@ -239,7 +239,7 @@ export default function MemberDashboard() {
               ) : (
                 <div className="divide-y divide-slate-100">
                   {applications.slice(0, 5).map((app) => {
-                    const typeInfo = typeIconMap[app.type] || { icon: "📄", color: "from-gray-500 to-gray-600" };
+                    const typeInfo = typeIconMap[app.type] || { icon: "", color: "from-gray-500 to-gray-600" };
                     const statusInfo = statusMap[app.status] || statusMap.draft;
                     
                     return (
@@ -249,7 +249,7 @@ export default function MemberDashboard() {
                         className="flex items-center gap-4 p-4 hover:bg-slate-50 transition-colors"
                       >
                         <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${typeInfo.color} flex items-center justify-center text-xl`}>
-                          {typeInfo.icon}
+                          {typeInfo.icon || app.typeName?.charAt(0) || "申"}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-slate-900">{app.typeName}</div>
@@ -273,20 +273,20 @@ export default function MemberDashboard() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
                   contracted
-                    ? { label: "与顾问沟通", href: "/member/messages", icon: "💬", color: "from-orange-500 to-red-500" }
-                    : { label: "选择顾问", href: "/member/consultants", icon: "👨‍⚖️", color: "from-orange-500 to-red-500" },
-                  { label: "学习签证", href: "/applications/study-permit?from=member", icon: "🎓", color: "from-blue-500 to-cyan-500" },
-                  { label: "访客签证", href: "/applications/visitor-visa?from=member", icon: "✈️", color: "from-green-500 to-emerald-500" },
-                  { label: "工作签证", href: "/applications/work-permit?from=member", icon: "💼", color: "from-purple-500 to-pink-500" },
-                  { label: "技术移民", href: "/applications/express-entry?from=member", icon: "🚀", color: "from-indigo-500 to-blue-500" },
+                    ? { label: "与顾问沟通", href: "/member/messages", icon: "", color: "from-orange-500 to-red-500" }
+                    : { label: "选择顾问", href: "/member/consultants", icon: "", color: "from-orange-500 to-red-500" },
+                  { label: "学习签证", href: "/applications/study-permit?from=member", icon: "", color: "from-blue-500 to-cyan-500" },
+                  { label: "访客签证", href: "/applications/visitor-visa?from=member", icon: "", color: "from-green-500 to-emerald-500" },
+                  { label: "工作签证", href: "/applications/work-permit?from=member", icon: "", color: "from-purple-500 to-pink-500" },
+                  { label: "技术移民", href: "/applications/express-entry?from=member", icon: "", color: "from-indigo-500 to-blue-500" },
                 ].map((action, i) => (
                   <a
                     key={i}
                     href={action.href}
                     className="flex flex-col items-center gap-2 p-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:shadow-md transition-all group"
                   >
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${action.color} flex items-center justify-center text-lg group-hover:scale-110 transition-transform`}>
-                      {action.icon}
+                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${action.color} flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-transform`}>
+                      {action.icon || action.label.charAt(0)}
                     </div>
                     <span className="text-sm text-slate-700">{action.label}</span>
                   </a>
@@ -319,7 +319,7 @@ export default function MemberDashboard() {
                     >
                       <div className="flex items-start gap-3">
                         <div className="text-lg">
-                          {notif.type === "status_change" ? "📋" : notif.type === "message" ? "💬" : "🔔"}
+                          {notif.type === "status_change" ? "状" : notif.type === "message" ? "消" : "系"}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-slate-900 text-sm">{notif.title}</div>
@@ -340,7 +340,7 @@ export default function MemberDashboard() {
 
             {/* Help Card */}
             <div className="bg-gradient-to-br from-red-500 to-orange-500 rounded-xl p-6 text-white">
-              <div className="text-2xl mb-3">💬</div>
+              <div className="text-2xl mb-3 font-bold text-white/90">问</div>
               <h3 className="font-semibold mb-2">需要帮助？</h3>
               <p className="text-sm text-white/80 mb-4">
                 我们的AI助手和持牌移民顾问随时为您服务
@@ -376,7 +376,7 @@ export default function MemberDashboard() {
 
             {/* Document Management */}
             <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
-              <h3 className="font-semibold text-slate-900 mb-3">📁 文档管理</h3>
+              <h3 className="font-semibold text-slate-900 mb-3">文档管理</h3>
               <p className="text-sm text-slate-500 mb-4">
                 上传申请相关的文档和图片，移民顾问可以查看和下载
               </p>
@@ -384,7 +384,7 @@ export default function MemberDashboard() {
                 href="/member/documents"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-medium hover:from-blue-600 hover:to-blue-700 w-full justify-center"
               >
-                📄 管理文档
+                管理文档
               </a>
             </div>
           </div>

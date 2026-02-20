@@ -91,7 +91,7 @@ export default function TeamDashboardPage() {
             </a>
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                <span className="text-xl">👥</span>
+                <span className="text-white font-bold">团</span>
               </div>
               <div>
                 <h1 className="font-semibold text-white">团队成员后台</h1>
@@ -134,7 +134,7 @@ export default function TeamDashboardPage() {
           <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-yellow-500/20 flex items-center justify-center">
-                <span className="text-yellow-500 text-xl">📋</span>
+                <span className="text-yellow-500 text-lg font-bold">待</span>
               </div>
               <span className="text-slate-400 text-sm">待审核</span>
             </div>
@@ -144,7 +144,7 @@ export default function TeamDashboardPage() {
           <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                <span className="text-blue-500 text-xl">🔍</span>
+                <span className="text-blue-500 text-lg font-bold">审</span>
               </div>
               <span className="text-slate-400 text-sm">审核中</span>
             </div>
@@ -154,7 +154,7 @@ export default function TeamDashboardPage() {
           <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
-                <span className="text-orange-500 text-xl">✏️</span>
+                <span className="text-orange-500 text-lg font-bold">改</span>
               </div>
               <span className="text-slate-400 text-sm">需修改</span>
             </div>
@@ -164,7 +164,7 @@ export default function TeamDashboardPage() {
           <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
-                <span className="text-green-500 text-xl">✅</span>
+                <span className="text-green-500 text-lg font-bold">过</span>
               </div>
               <span className="text-slate-400 text-sm">已通过</span>
             </div>
@@ -178,8 +178,8 @@ export default function TeamDashboardPage() {
             href="/team/cases?status=submitted"
             className="bg-slate-800/50 rounded-xl border border-slate-700 p-6 hover:border-purple-500/50 transition-colors group"
           >
-            <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center text-2xl mb-4">
-              📋
+            <div className="w-12 h-12 rounded-xl bg-yellow-500/20 flex items-center justify-center text-yellow-500 font-bold mb-4">
+              审
             </div>
             <h4 className="font-semibold text-white group-hover:text-purple-400 transition-colors">
               审核新申请
@@ -193,8 +193,8 @@ export default function TeamDashboardPage() {
             href="/team/messages"
             className="bg-slate-800/50 rounded-xl border border-slate-700 p-6 hover:border-purple-500/50 transition-colors group"
           >
-            <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-2xl mb-4">
-              💬
+            <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-500 font-bold mb-4">
+              聊
             </div>
             <h4 className="font-semibold text-white group-hover:text-purple-400 transition-colors">
               回复消息
@@ -209,7 +209,7 @@ export default function TeamDashboardPage() {
             className="bg-slate-800/50 rounded-xl border border-slate-700 p-6 hover:border-purple-500/50 transition-colors group"
           >
             <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center text-2xl mb-4">
-              ✏️
+              改
             </div>
             <h4 className="font-semibold text-white group-hover:text-purple-400 transition-colors">
               跟进修改

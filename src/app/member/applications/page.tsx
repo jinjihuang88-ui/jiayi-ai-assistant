@@ -27,11 +27,11 @@ const statusMap: Record<string, { label: string; color: string; bgColor: string 
 };
 
 const typeIconMap: Record<string, { icon: string; color: string; name: string }> = {
-  "study-permit": { icon: "🎓", color: "from-blue-500 to-cyan-500", name: "学习签证" },
-  "visitor-visa": { icon: "✈️", color: "from-green-500 to-emerald-500", name: "访客签证" },
-  "work-permit": { icon: "💼", color: "from-purple-500 to-pink-500", name: "工作签证" },
-  "express-entry": { icon: "🚀", color: "from-indigo-500 to-blue-500", name: "EE技术移民" },
-  "provincial-nominee": { icon: "🏛️", color: "from-orange-500 to-red-500", name: "省提名项目" },
+  "study-permit": { icon: "", color: "from-blue-500 to-cyan-500", name: "学习签证" },
+  "visitor-visa": { icon: "", color: "from-green-500 to-emerald-500", name: "访客签证" },
+  "work-permit": { icon: "", color: "from-purple-500 to-pink-500", name: "工作签证" },
+  "express-entry": { icon: "", color: "from-indigo-500 to-blue-500", name: "EE技术移民" },
+  "provincial-nominee": { icon: "", color: "from-orange-500 to-red-500", name: "省提名项目" },
 };
 
 export default function ApplicationsPage() {
@@ -167,7 +167,7 @@ export default function ApplicationsPage() {
           </div>
         ) : applications.length === 0 ? (
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-            <div className="text-6xl mb-4">📝</div>
+            <div className="w-20 h-20 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-4 text-slate-600 font-bold text-xl">申</div>
             <h2 className="text-xl font-semibold text-slate-900 mb-2">暂无申请</h2>
             <p className="text-slate-500 mb-6">
               {filter === "all" ? "您还没有任何申请记录" : `没有${filterOptions.find((o) => o.value === filter)?.label}的申请`}
@@ -182,7 +182,7 @@ export default function ApplicationsPage() {
         ) : (
           <div className="space-y-4">
             {applications.map((app) => {
-              const typeInfo = typeIconMap[app.type] || { icon: "📄", color: "from-gray-500 to-gray-600", name: app.typeName };
+              const typeInfo = typeIconMap[app.type] || { icon: "", color: "from-gray-500 to-gray-600", name: app.typeName };
               const statusInfo = statusMap[app.status] || statusMap.draft;
 
               return (
@@ -219,7 +219,7 @@ export default function ApplicationsPage() {
                         )}
                         {app.messageCount > 0 && (
                           <span className="flex items-center gap-1">
-                            💬 {app.messageCount} 条消息
+                            {app.messageCount} 条消息
                           </span>
                         )}
                       </div>

@@ -158,7 +158,7 @@ export default function Home() {
                   href="/auth/login"
                   className="px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition-all duration-200 text-sm font-medium"
                 >
-                  会员登录
+                  会员登录 / 注册
                 </a>
                 <a
                   href="/rcic/login"
@@ -182,7 +182,7 @@ export default function Home() {
               <a href="/member" className="text-white/90 hover:text-white py-2 pt-2 border-t border-white/10" onClick={() => setMenuOpen(false)}>会员中心</a>
             ) : (
               <div className="flex gap-2 pt-2 border-t border-white/10">
-                <a href="/auth/login" className="px-4 py-2 rounded-lg border border-white/30 text-white text-sm" onClick={() => setMenuOpen(false)}>会员登录</a>
+                <a href="/auth/login" className="px-4 py-2 rounded-lg border border-white/30 text-white text-sm" onClick={() => setMenuOpen(false)}>会员登录 / 注册</a>
                 <a href="/rcic/login" className="px-4 py-2 rounded-lg border border-white/30 text-white text-sm" onClick={() => setMenuOpen(false)}>顾问登录 / 注册</a>
               </div>
             )}
@@ -190,111 +190,104 @@ export default function Home() {
         )}
       </header>
 
-      {/* Hero - 白色/浅灰背景，移除大面积红色 */}
+      {/* Hero - 仿 JustAnswer/律师站：AI 咨询主视觉，描述问题 + 开始对话 */}
       <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
-        <div className="max-w-7xl mx-auto px-6 py-24 md:py-32">
-          <div className={`text-center transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
-            
-            {/* 主标题 */}
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight text-slate-900 mb-2">
-              加拿大移民、学签、工签与签证信息管理系统
+        <div className="max-w-3xl mx-auto px-6 py-16 md:py-24">
+          <div className={`transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
+            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3 text-center">
+              与 AI 移民顾问对话，在线咨询
             </h1>
-            <p className="text-xl md:text-2xl text-slate-600 mb-4">
-              涵盖访客签证、Express Entry、省提名 · 持牌移民顾问(RCIC)平台
+            <p className="text-lg md:text-xl text-slate-600 mb-1 text-center">
+              Talk to an AI immigration consultant online now
             </p>
-            
-            {/* 副标题（关键） */}
-            <h2 className="text-2xl md:text-3xl font-semibold text-slate-700 mb-1">
-              为学签、工签、移民申请人提供结构化信息整理
-            </h2>
-            <p className="text-lg md:text-xl text-slate-500 mb-2">
-              Structured information for applicants
-            </p>
-            <p className="text-2xl md:text-3xl font-semibold text-slate-700 mb-1">
-              为持牌顾问提供专业实践管理工具
-            </p>
-            <p className="text-lg md:text-xl text-slate-500 mb-6">
-              Practice management tools for licensed consultants
+            <p className="text-sm text-slate-500 mb-6 text-center">
+              描述您的问题，与 AI 对话获取学签、工签、移民路径的初步建议 · 持牌顾问(RCIC)平台
             </p>
 
-            {/* 第二行小字 - 平台说明与免责 */}
-            <p className="text-sm md:text-base text-slate-500 mb-1 max-w-3xl mx-auto">
-              jiayi 是由加拿大科技公司开发的 SaaS 平台。
-            </p>
-            <p className="text-xs md:text-sm text-slate-400 mb-1 max-w-3xl mx-auto">
-              jiayi is a SaaS platform developed by a Canadian technology company.
-            </p>
-            <p className="text-sm md:text-base text-slate-500 mb-10 max-w-3xl mx-auto">
-              平台不提供移民或法律服务。
-            </p>
-            <p className="text-xs md:text-sm text-slate-400 mb-10 max-w-3xl mx-auto">
-              The platform does not provide immigration or legal services.
-            </p>
-
-            {/* CTA：AI初评、AI顾问、找顾问 */}
-            <div className="flex flex-wrap justify-center gap-4 mb-8">
-              <a
-                href="/assessment"
-                className="px-8 py-4 rounded-xl bg-[#C62828] text-white font-semibold text-lg
-                           hover:bg-[#B71C1C] transition-all duration-300 
-                           shadow-lg shadow-red-500/25 hover:shadow-xl
-                           hover:-translate-y-1 active:translate-y-0"
-              >
-                AI初评
-              </a>
+            {/* 主入口卡片：描述问题 + 开始对话 */}
+            <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl p-6 md:p-8 mb-6">
+              <p className="text-slate-600 text-sm mb-4">
+                与 AI 一对一对话，直到您满意。学签、工签、访客签证、Express Entry、省提名等均可咨询。
+              </p>
+              <p className="text-slate-500 text-xs mb-4">
+                Chat with AI for path overview. No retainers. Then connect with a licensed consultant when you’re ready.
+              </p>
               <a
                 href="/chat"
-                className="px-8 py-4 rounded-xl bg-slate-800 text-white font-semibold text-lg
-                           hover:bg-slate-700 transition-all duration-300 
-                           shadow-lg hover:shadow-xl hover:-translate-y-1 active:translate-y-0"
+                className="block w-full py-4 px-6 rounded-xl bg-[#C62828] text-white font-semibold text-center text-lg hover:bg-[#B71C1C] transition-colors shadow-lg"
               >
-                AI顾问
+                开始对话 Start chat
               </a>
-              <a
-                href={consultantLink}
-                className="px-8 py-4 rounded-xl border-2 border-slate-300 text-slate-700 font-semibold text-lg
-                           hover:border-[#C62828] hover:text-[#C62828] transition-all duration-300"
-              >
-                找顾问
-              </a>
+              <p className="text-xs text-slate-400 mt-3 text-center">
+                点击后进入 AI 顾问对话页 · 平台不提供移民或法律服务，仅供参考
+              </p>
             </div>
 
-            {/* 信任补充 */}
-            <div className="flex flex-wrap justify-center gap-6 text-sm">
-              <div className="flex flex-col items-center gap-1">
-                <div className="flex items-center gap-1">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-slate-600">不承诺100%成功</span>
-                </div>
-                <span className="text-xs text-slate-400">No 100% Success Guarantee</span>
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <div className="flex items-center gap-1">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-slate-600">不强推方案</span>
-                </div>
-                <span className="text-xs text-slate-400">No Pushy Sales</span>
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <div className="flex items-center gap-1">
-                  <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-slate-600">所有顾问均经过平台审核</span>
-                </div>
-                <span className="text-xs text-slate-400">All Consultants Verified</span>
-              </div>
+            <div className="flex flex-wrap justify-center gap-4 text-sm text-slate-600 mb-6">
+              <span className="flex items-center gap-1">
+                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                不承诺100%成功
+              </span>
+              <span className="flex items-center gap-1">
+                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                不强推方案
+              </span>
+              <span className="flex items-center gap-1">
+                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                顾问均经平台审核
+              </span>
             </div>
+
+            <p className="text-center">
+              <a href={consultantLink} className="text-[#C62828] font-medium hover:underline">
+                需要真人持牌顾问？去 找顾问 →
+              </a>
+            </p>
           </div>
         </div>
       </section>
 
+      {/* What you get - 仿律师站 */}
+      <section className="py-12 md:py-16 bg-white border-t border-slate-100">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8 text-center">
+            What you get 您将获得
+          </h2>
+          <ul className="grid md:grid-cols-2 gap-6 text-slate-700">
+            <li className="flex gap-3">
+              <span className="text-green-500 font-bold">✓</span>
+              <div>
+                <strong>与 AI 持续对话</strong>
+                <p className="text-sm text-slate-500">Chat with AI until you’re satisfied. 学签、工签、移民路径均可问。</p>
+              </div>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-green-500 font-bold">✓</span>
+              <div>
+                <strong>无需预付、无最低消费</strong>
+                <p className="text-sm text-slate-500">No retainers or upfront fees. 先对话再决定是否找顾问。</p>
+              </div>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-green-500 font-bold">✓</span>
+              <div>
+                <strong>为您和家庭</strong>
+                <p className="text-sm text-slate-500">一人咨询，全家参考。Share the insights with your family.</p>
+              </div>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-green-500 font-bold">✓</span>
+              <div>
+                <strong>随时需要随时用</strong>
+                <p className="text-sm text-slate-500">AI 在线，持牌顾问平台对接。When you need it most.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
       {/* Trust Section - 为什么选择加移 */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
@@ -308,9 +301,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             {/* 透明 */}
             <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-16 h-16 rounded-xl bg-[#C62828] flex items-center justify-center mb-6 text-white text-3xl">
-                🔍
-              </div>
+              <div className="w-16 h-16 rounded-xl bg-[#C62828] flex items-center justify-center mb-6 text-white text-2xl font-bold">1</div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">透明</h3>
               <p className="text-sm text-slate-500 mb-4">Transparent</p>
               <ul className="text-slate-600 space-y-2 text-sm">
@@ -322,9 +313,7 @@ export default function Home() {
 
             {/* 安全 */}
             <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-16 h-16 rounded-xl bg-[#1E293B] flex items-center justify-center mb-6 text-white text-3xl">
-                🛡️
-              </div>
+              <div className="w-16 h-16 rounded-xl bg-[#1E293B] flex items-center justify-center mb-6 text-white text-2xl font-bold">2</div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">安全</h3>
               <p className="text-sm text-slate-500 mb-4">Secure</p>
               <ul className="text-slate-600 space-y-2 text-sm">
@@ -337,9 +326,7 @@ export default function Home() {
 
             {/* 智能 */}
             <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-16 h-16 rounded-xl bg-[#C62828] flex items-center justify-center mb-6 text-white text-3xl">
-                🤖
-              </div>
+              <div className="w-16 h-16 rounded-xl bg-[#C62828] flex items-center justify-center mb-6 text-white text-2xl font-bold">3</div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">智能</h3>
               <p className="text-sm text-slate-500 mb-4">Intelligent</p>
               <ul className="text-slate-600 space-y-2 text-sm">
@@ -372,7 +359,7 @@ export default function Home() {
                 titleEn: "Structured AI Intake",
                 desc: "填写基础信息，生成结构化摘要。",
                 descEn: "Fill in basic info, get a structured summary.",
-                icon: "📊",
+                icon: "",
               },
               {
                 step: "2",
@@ -380,7 +367,7 @@ export default function Home() {
                 titleEn: "Risk Indicators & Path Overview",
                 desc: "识别潜在风险与可能路径。",
                 descEn: "Identify risks and possible paths.",
-                icon: "💬",
+                icon: "",
               },
               {
                 step: "3",
@@ -390,7 +377,7 @@ export default function Home() {
                 descEn: "Book a licensed consultant through the platform.",
                 extra: "查看顾问资料",
                 extraEn: "View Licensed Profiles",
-                icon: "👥",
+                icon: "",
               },
               {
                 step: "4",
@@ -398,7 +385,7 @@ export default function Home() {
                 titleEn: "Professional Review",
                 desc: "持牌顾问独立提供评估与建议。",
                 descEn: "Licensed consultant provides independent assessment and advice.",
-                icon: "🛡️",
+                icon: "",
               },
               {
                 step: "5",
@@ -406,14 +393,14 @@ export default function Home() {
                 titleEn: "Application Management",
                 desc: "顾问与客户在系统中管理流程与记录。",
                 descEn: "Consultant and client manage process and records in the system.",
-                icon: "✅",
+                icon: "",
               },
             ].map((item, i) => (
               <div key={i} className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300">
                 <div className="w-12 h-12 rounded-full bg-[#C62828] text-white font-bold flex items-center justify-center mb-4 text-lg">
                   {item.step}
                 </div>
-                <div className="text-3xl mb-3">{item.icon}</div>
+                {item.icon ? <div className="text-3xl mb-3">{item.icon}</div> : null}
                 <h3 className="text-lg font-bold text-slate-900 mb-1">{item.title}</h3>
                 <p className="text-xs text-slate-500 mb-2">{item.titleEn}</p>
                 <p className="text-sm text-slate-600 leading-relaxed mb-1">{item.desc}</p>
@@ -430,15 +417,18 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Core Features - 核心功能 */}
+      {/* What can the experts do - 仿律师站 */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-              核心功能
+              移民与签证专家能为您做什么？
             </h2>
-            <p className="text-lg md:text-xl text-slate-600">
-              Core Features
+            <p className="text-lg text-slate-600">
+              What can the immigration experts do for you?
+            </p>
+            <p className="text-sm text-slate-500 mt-2 max-w-2xl mx-auto">
+              保护您的权益、理清下一步、确保材料准确、对接持牌顾问，随时为您服务。
             </p>
           </div>
 
@@ -546,9 +536,6 @@ export default function Home() {
             <a href="/applications/study-permit" onClick={(e) => handleApplyClick(e, '/applications/study-permit')} className="group">
               <div className="bg-white rounded-2xl p-6 border border-slate-200 
                               hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
-                  <span className="text-2xl">🎓</span>
-                </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">学习签证</h3>
                 <p className="text-slate-600 text-sm mb-4">Study Permit (IMM 1294)</p>
                 <ul className="text-sm text-slate-500 space-y-1">
@@ -566,9 +553,6 @@ export default function Home() {
             <a href="/applications/visitor-visa" onClick={(e) => handleApplyClick(e, '/applications/visitor-visa')} className="group">
               <div className="bg-white rounded-2xl p-6 border border-slate-200 
                               hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
-                  <span className="text-2xl">✈️</span>
-                </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">访客签证</h3>
                 <p className="text-slate-600 text-sm mb-4">Visitor Visa (IMM 5257)</p>
                 <ul className="text-sm text-slate-500 space-y-1">
@@ -586,9 +570,6 @@ export default function Home() {
             <a href="/applications/work-permit" onClick={(e) => handleApplyClick(e, '/applications/work-permit')} className="group">
               <div className="bg-white rounded-2xl p-6 border border-slate-200 
                               hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
-                  <span className="text-2xl">💼</span>
-                </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">工作签证</h3>
                 <p className="text-slate-600 text-sm mb-4">Work Permit (IMM 1295)</p>
                 <ul className="text-sm text-slate-500 space-y-1">
@@ -606,9 +587,6 @@ export default function Home() {
             <a href="/applications/express-entry" onClick={(e) => handleApplyClick(e, '/applications/express-entry')} className="group">
               <div className="bg-white rounded-2xl p-6 border border-slate-200 
                               hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
-                  <span className="text-2xl">🚀</span>
-                </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">EE 技术移民</h3>
                 <p className="text-slate-600 text-sm mb-4">Express Entry (IMM 0008)</p>
                 <ul className="text-sm text-slate-500 space-y-1">
@@ -626,9 +604,6 @@ export default function Home() {
             <a href="/applications/provincial-nominee" onClick={(e) => handleApplyClick(e, '/applications/provincial-nominee')} className="group">
               <div className="bg-white rounded-2xl p-6 border border-slate-200 
                               hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
-                  <span className="text-2xl">🏛️</span>
-                </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">省提名项目</h3>
                 <p className="text-slate-600 text-sm mb-4">PNP (IMM 0008)</p>
                 <ul className="text-sm text-slate-500 space-y-1">
@@ -646,9 +621,6 @@ export default function Home() {
             <a href={consultantLink} className="group">
               <div className="bg-white rounded-2xl p-6 border border-slate-200 
                               hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full flex flex-col items-center justify-center">
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-slate-400 to-gray-500 flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
-                  <span className="text-2xl">📋</span>
-                </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">查看全部</h3>
                 <p className="text-slate-600 text-sm text-center">浏览所有可用的申请类型</p>
                 <div className="mt-4 text-[#C62828] font-medium text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
@@ -667,7 +639,6 @@ export default function Home() {
             {/* 我是用户 */}
             <div className="border-2 border-slate-200 rounded-2xl p-12 hover:border-[#C62828] transition-all duration-300 flex flex-col">
               <div className="flex-1">
-                <div className="text-6xl mb-6 text-center">👤</div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-2 text-center">我是用户</h3>
                 <p className="text-sm text-slate-500 mb-4 text-center">I'm a User</p>
                 <p className="text-slate-600 mb-1 text-center">我想移民/留学/办理签证</p>
@@ -736,7 +707,6 @@ export default function Home() {
             {/* 我是顾问 */}
             <div className="border-2 border-slate-200 rounded-2xl p-12 hover:border-[#1E293B] transition-all duration-300 flex flex-col">
               <div className="flex-1">
-                <div className="text-6xl mb-6 text-center">👨‍💼</div>
                 <h3 className="text-2xl font-bold text-slate-900 mb-2 text-center">我是顾问</h3>
                 <p className="text-sm text-slate-500 mb-4 text-center">I'm a Consultant</p>
                 <p className="text-slate-600 mb-1 text-center">我提供移民/留学/签证服务</p>

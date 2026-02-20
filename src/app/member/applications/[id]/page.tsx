@@ -56,16 +56,16 @@ const statusMap: Record<string, { label: string; color: string; bgColor: string;
 };
 
 const typeIconMap: Record<string, { icon: string; color: string }> = {
-  "study-permit": { icon: "🎓", color: "from-blue-500 to-cyan-500" },
-  study_permit: { icon: "🎓", color: "from-blue-500 to-cyan-500" },
-  "visitor-visa": { icon: "✈️", color: "from-green-500 to-emerald-500" },
-  visitor_visa: { icon: "✈️", color: "from-green-500 to-emerald-500" },
-  "work-permit": { icon: "💼", color: "from-purple-500 to-pink-500" },
-  work_permit: { icon: "💼", color: "from-purple-500 to-pink-500" },
-  "express-entry": { icon: "🚀", color: "from-indigo-500 to-blue-500" },
-  express_entry: { icon: "🚀", color: "from-indigo-500 to-blue-500" },
-  "provincial-nominee": { icon: "🏛️", color: "from-orange-500 to-red-500" },
-  provincial_nominee: { icon: "🏛️", color: "from-orange-500 to-red-500" },
+  "study-permit": { icon: "", color: "from-blue-500 to-cyan-500" },
+  study_permit: { icon: "", color: "from-blue-500 to-cyan-500" },
+  "visitor-visa": { icon: "", color: "from-green-500 to-emerald-500" },
+  visitor_visa: { icon: "", color: "from-green-500 to-emerald-500" },
+  "work-permit": { icon: "", color: "from-purple-500 to-pink-500" },
+  work_permit: { icon: "", color: "from-purple-500 to-pink-500" },
+  "express-entry": { icon: "", color: "from-indigo-500 to-blue-500" },
+  express_entry: { icon: "", color: "from-indigo-500 to-blue-500" },
+  "provincial-nominee": { icon: "", color: "from-orange-500 to-red-500" },
+  provincial_nominee: { icon: "", color: "from-orange-500 to-red-500" },
 };
 
 /** 申请类型在 URL 中为短横线（如 visitor-visa），DB 中为下划线（visitor_visa） */
@@ -150,7 +150,7 @@ export default function ApplicationDetailPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">❌</div>
+          <div className="w-20 h-20 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-4 text-slate-600 font-bold text-xl">无</div>
           <h2 className="text-xl font-semibold text-slate-900 mb-2">申请不存在</h2>
           <a href="/member/applications" className="text-red-600 hover:underline">
             返回申请列表
@@ -160,7 +160,7 @@ export default function ApplicationDetailPage() {
     );
   }
 
-  const typeInfo = typeIconMap[application.type] || { icon: "📄", color: "from-gray-500 to-gray-600" };
+  const typeInfo = typeIconMap[application.type] || { icon: "", color: "from-gray-500 to-gray-600" };
   const statusInfo = statusMap[application.status] || statusMap.draft;
 
   return (
@@ -199,8 +199,8 @@ export default function ApplicationDetailPage() {
         {/* Application Header */}
         <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
           <div className="flex items-start gap-4">
-            <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${typeInfo.color} flex items-center justify-center text-3xl`}>
-              {typeInfo.icon}
+            <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${typeInfo.color} flex items-center justify-center text-white font-bold text-xl`}>
+              {typeInfo.icon || application.typeName?.charAt(0) || "申"}
             </div>
             <div className="flex-1">
               <div className="flex items-start justify-between">
@@ -221,7 +221,7 @@ export default function ApplicationDetailPage() {
         {application.rcicComment && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 mb-6">
             <div className="flex items-start gap-3">
-              <div className="text-2xl">👨‍⚖️</div>
+              <div className="w-10 h-10 rounded-lg bg-yellow-200 flex items-center justify-center text-yellow-800 font-bold text-sm">顾</div>
               <div>
                 <h3 className="font-semibold text-yellow-800">
                   顾问反馈 {application.rcicName && `- ${application.rcicName}`}
@@ -302,7 +302,7 @@ export default function ApplicationDetailPage() {
                     href={`/applications/${applicationTypeToPath(application.type)}?id=${application.id}&from=member`}
                     className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50"
                   >
-                    <span className="text-xl">✏️</span>
+                    <span className="text-slate-600 font-bold">改</span>
                     <span>{application.status === "draft" ? "继续填写申请" : "修改申请内容"}</span>
                   </a>
                 )}
@@ -310,14 +310,14 @@ export default function ApplicationDetailPage() {
                   href={`/member/messages?applicationId=${application.id}`}
                   className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50"
                 >
-                  <span className="text-xl">💬</span>
+                  <span className="text-slate-600 font-bold">聊</span>
                   <span>与顾问沟通</span>
                 </a>
                 <button
                   onClick={() => window.print()}
                   className="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:bg-slate-50 w-full text-left"
                 >
-                  <span className="text-xl">🖨️</span>
+                  <span className="text-slate-600 font-bold">印</span>
                   <span>打印申请</span>
                 </button>
               </div>

@@ -322,7 +322,7 @@ export default function ConsultantsPage() {
                             key={index}
                             className="px-2 py-1 bg-green-50 text-green-600 rounded-lg text-xs"
                           >
-                            📍 {region}
+                            {region}
                           </span>
                         ))}
                         {consultant.serviceRegions.length > 2 && (

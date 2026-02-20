@@ -14,10 +14,10 @@ interface Notification {
 }
 
 const typeIconMap: Record<string, { icon: string; color: string; bgColor: string }> = {
-  status_change: { icon: "📋", color: "text-blue-600", bgColor: "bg-blue-100" },
-  message: { icon: "💬", color: "text-green-600", bgColor: "bg-green-100" },
-  reminder: { icon: "⏰", color: "text-yellow-600", bgColor: "bg-yellow-100" },
-  system: { icon: "🔔", color: "text-gray-600", bgColor: "bg-gray-100" },
+  status_change: { icon: "", color: "text-blue-600", bgColor: "bg-blue-100" },
+  message: { icon: "", color: "text-green-600", bgColor: "bg-green-100" },
+  reminder: { icon: "", color: "text-yellow-600", bgColor: "bg-yellow-100" },
+  system: { icon: "", color: "text-gray-600", bgColor: "bg-gray-100" },
 };
 
 export default function NotificationsPage() {
@@ -187,7 +187,7 @@ export default function NotificationsPage() {
           </div>
         ) : notifications.length === 0 ? (
           <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
-            <div className="text-6xl mb-4">🔔</div>
+            <div className="w-16 h-16 rounded-full bg-slate-200 flex items-center justify-center mx-auto mb-4 text-slate-500 text-2xl font-bold">通</div>
             <h2 className="text-xl font-semibold text-slate-900 mb-2">暂无通知</h2>
             <p className="text-slate-500">
               {filter === "unread" ? "没有未读通知" : "您还没有收到任何通知"}

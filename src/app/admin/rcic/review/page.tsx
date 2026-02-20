@@ -298,7 +298,7 @@ export default function AdminReviewPage() {
                   <div>
                     <div className="text-sm text-gray-600">邮箱验证</div>
                     <div className="text-base font-medium">
-                      {selectedConsultant.emailVerified ? "✅ 已验证" : "❌ 未验证"}
+                      {selectedConsultant.emailVerified ? "已验证" : "未验证"}
                     </div>
                   </div>
                   <div>

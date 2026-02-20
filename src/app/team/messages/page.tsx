@@ -318,7 +318,7 @@ function TeamMessagesContent() {
             </a>
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                <span className="text-xl">💬</span>
+                <span className="text-white font-bold">聊</span>
               </div>
               <div>
                 <h1 className="font-semibold text-white">消息中心</h1>
@@ -360,7 +360,7 @@ function TeamMessagesContent() {
           <div className="flex-1 overflow-y-auto">
             {contacts.length === 0 ? (
               <div className="p-8 text-center">
-                <div className="text-4xl mb-2">💬</div>
+                <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center mx-auto mb-2 text-slate-400 font-bold">聊</div>
                 <p className="text-slate-400 text-sm">暂无联系人</p>
               </div>
             ) : (
@@ -470,7 +470,7 @@ function TeamMessagesContent() {
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 underline"
                           >
-                            <span>📄</span>
+                            <span>PDF</span>
                             <span>{(firstAtt as { fileName?: string; name?: string }).fileName ?? (firstAtt as { fileName?: string; name?: string }).name ?? "文件"}</span>
                           </a>
                         )
@@ -494,14 +494,14 @@ function TeamMessagesContent() {
                     className="p-3 rounded-xl bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white disabled:opacity-50 transition-colors"
                     title="视频通话"
                   >
-                    📹 视频
+                    视频
                   </button>
                   <button
                     onClick={() => setCallModal({ type: "voice" })}
                     className="p-3 rounded-xl bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white disabled:opacity-50 transition-colors"
                     title="语音通话"
                   >
-                    🎤 语音
+                    语音
                   </button>
                   {/* 文件上传按钮 */}
                   <div className="relative">
@@ -511,7 +511,7 @@ function TeamMessagesContent() {
                       className="p-3 rounded-xl bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white disabled:opacity-50 transition-colors"
                       title="上传文件"
                     >
-                      {uploading ? "⏳" : "📎"}
+                      {uploading ? "..." : "附"}
                     </button>
 
                     {showUploadMenu && (
@@ -520,14 +520,14 @@ function TeamMessagesContent() {
                           onClick={() => imageInputRef.current?.click()}
                           className="flex items-center gap-3 px-4 py-3 hover:bg-slate-600 w-full text-left text-white"
                         >
-                          <span className="text-lg">🖼️</span>
+                          <span className="text-sm font-bold">图</span>
                           <span className="text-sm">发送图片</span>
                         </button>
                         <button
                           onClick={() => fileInputRef.current?.click()}
                           className="flex items-center gap-3 px-4 py-3 hover:bg-slate-600 w-full text-left text-white"
                         >
-                          <span className="text-lg">📎</span>
+                          <span className="text-sm font-bold">附</span>
                           <span className="text-sm">发送文件</span>
                         </button>
                       </div>
@@ -595,7 +595,7 @@ function TeamMessagesContent() {
           {!selectedContactId || !selectedContact ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
-                <div className="text-6xl mb-4">💬</div>
+                <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center mx-auto mb-4 text-slate-400 font-bold text-xl">聊</div>
                 <p className="text-slate-400">选择左侧会员开始聊天</p>
               </div>
             </div>

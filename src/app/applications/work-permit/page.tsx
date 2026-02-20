@@ -1343,7 +1343,7 @@ function WorkPermitApplicationPageContent() {
               }}
               className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
             >
-              💾 保存草稿
+              保存草稿
             </button>
 
             {currentStep < totalSteps ? (

@@ -314,7 +314,7 @@ function RCICMessagesContent() {
         className="flex items-center gap-2 mt-2 p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
       >
         <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-          {attachment.mimeType.includes("pdf") ? "📄" : "📎"}
+          {attachment.mimeType.includes("pdf") ? "PDF" : "附"}
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium truncate">{attachment.fileName}</div>
@@ -338,7 +338,7 @@ function RCICMessagesContent() {
             </a>
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
-                <span className="text-xl">🏛️</span>
+                <span className="text-white font-bold text-sm">RCIC</span>
               </div>
               <div>
                 <h1 className="font-semibold text-white">RCIC 顾问后台</h1>
@@ -418,7 +418,7 @@ function RCICMessagesContent() {
           <div className="flex-1 bg-slate-800/50 rounded-xl border border-slate-700 flex flex-col">
             {!selectedContactId ? (
               <div className="flex-1 flex flex-col items-center justify-center text-slate-500">
-                <div className="text-4xl mb-4">💬</div>
+                <div className="w-14 h-14 rounded-full bg-slate-700 flex items-center justify-center mx-auto mb-4 text-slate-400 font-bold text-xl">聊</div>
                 <p>选择左侧会员开始沟通</p>
               </div>
             ) : (
@@ -473,7 +473,7 @@ function RCICMessagesContent() {
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   {messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-slate-500">
-                      <div className="text-4xl mb-4">💬</div>
+                      <div className="w-14 h-14 rounded-full bg-slate-700 flex items-center justify-center mx-auto mb-4 text-slate-400 font-bold text-xl">聊</div>
                       <p>暂无消息</p>
                     </div>
                   ) : (
@@ -525,14 +525,14 @@ function RCICMessagesContent() {
                       className="p-3 rounded-xl border border-slate-600 hover:bg-slate-700 transition-colors"
                       title="视频通话"
                     >
-                      <span className="text-slate-400 text-sm">📹 视频</span>
+                      <span className="text-slate-400 text-sm">视频</span>
                     </button>
                     <button
                       onClick={() => setCallModal({ type: "voice" })}
                       className="p-3 rounded-xl border border-slate-600 hover:bg-slate-700 transition-colors"
                       title="语音通话"
                     >
-                      <span className="text-slate-400 text-sm">🎤 语音</span>
+                      <span className="text-slate-400 text-sm">语音</span>
                     </button>
                     {/* Upload Button */}
                     <div className="relative">
@@ -556,14 +556,14 @@ function RCICMessagesContent() {
                             onClick={() => imageInputRef.current?.click()}
                             className="flex items-center gap-3 px-4 py-3 hover:bg-slate-600 w-full text-left text-white"
                           >
-                            <span className="text-lg">🖼️</span>
+                            <span className="text-sm font-bold">图</span>
                             <span className="text-sm">发送图片</span>
                           </button>
                           <button
                             onClick={() => fileInputRef.current?.click()}
                             className="flex items-center gap-3 px-4 py-3 hover:bg-slate-600 w-full text-left text-white"
                           >
-                            <span className="text-lg">📎</span>
+                            <span className="text-sm font-bold">附</span>
                             <span className="text-sm">发送文件</span>
                           </button>
                         </div>

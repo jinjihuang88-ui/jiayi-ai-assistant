@@ -106,11 +106,11 @@ export default function TeamCasesPage() {
   };
 
   const typeIconMap: Record<string, string> = {
-    "study-permit": "🎓",
-    "visitor-visa": "✈️",
-    "work-permit": "💼",
-    "express-entry": "🚀",
-    "provincial-nominee": "🏛️",
+    "study-permit": "",
+    "visitor-visa": "",
+    "work-permit": "",
+    "express-entry": "",
+    "provincial-nominee": "",
   };
 
   const filters = [
@@ -141,7 +141,7 @@ export default function TeamCasesPage() {
             </a>
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                <span className="text-xl">👥</span>
+                <span className="text-white font-bold">团</span>
               </div>
               <div>
                 <h1 className="font-semibold text-white">团队成员后台</h1>
@@ -209,7 +209,7 @@ export default function TeamCasesPage() {
           </div>
         ) : applications.length === 0 ? (
           <div className="bg-slate-800/50 rounded-xl border border-slate-700 p-12 text-center">
-            <div className="text-4xl mb-4">📭</div>
+            <div className="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center mx-auto mb-4 text-slate-500 font-bold text-xl">无</div>
             <p className="text-slate-400">暂无案件</p>
           </div>
         ) : (
@@ -222,7 +222,7 @@ export default function TeamCasesPage() {
                   className="flex items-center gap-4 p-4 hover:bg-slate-700/30 transition-colors"
                 >
                   <div className="w-12 h-12 rounded-xl bg-slate-700 flex items-center justify-center text-2xl">
-                    {typeIconMap[app.type] || "📄"}
+                    {typeIconMap[app.type] || app.typeName?.charAt(0) || "申"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">

@@ -47,7 +47,7 @@ function StudyPermitReviewPageContent() {
 
       {status === "approved" && (
         <div className="p-4 rounded-lg bg-green-50 text-green-700 text-sm">
-          🎉 RCIC 已审核通过，可进入下一步正式递交阶段。
+          RCIC 已审核通过，可进入下一步正式递交阶段。
         </div>
       )}
 

@@ -50,7 +50,7 @@ export default function TeamLoginPage() {
             返回首页
           </a>
           <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-            <span className="text-3xl">👥</span>
+            <span className="text-white font-bold text-2xl">团</span>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">团队成员登录</h1>
           <p className="text-slate-400">登录您的团队成员账户</p>
