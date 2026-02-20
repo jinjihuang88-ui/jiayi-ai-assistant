@@ -80,13 +80,24 @@ export default function Home() {
     description: "加拿大移民、留学、学签、工签、访客签证、Express Entry、省提名专业评估与持牌移民顾问(RCIC)服务。",
   };
 
+  /** 风险指南针：结构化数据供搜索引擎/富媒体摘要与 AI 调用 */
+  const riskCompassToolJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "风险指南针 Risk Compass",
+    applicationCategory: "WebApplication",
+    url: "https://www.jiayi.co/risk-compass",
+    description: "此工具可提供实时的移民评估服务。选择学签、工签、访客签证、Express Entry 或省提名等目标，输入年龄、预算、雅思等条件，获取五维风险概览与可行性参考。",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "CAD" },
+  };
+
   return (
     <main className="bg-white text-slate-900">
       <script
         type="application/ld+json"
         // 仅供搜索引擎使用，不影响前端布局
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([organizationJsonLd, websiteJsonLd]),
+          __html: JSON.stringify([organizationJsonLd, websiteJsonLd, riskCompassToolJsonLd]),
         }}
       />
       {/* Top Nav - 专业导航栏 */}

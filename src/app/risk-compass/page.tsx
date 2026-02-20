@@ -334,8 +334,19 @@ export default function RiskCompassPage() {
     compassSectionRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const riskCompassJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "风险指南针 Risk Compass",
+    applicationCategory: "WebApplication",
+    url: "https://www.jiayi.co/risk-compass",
+    description: "此工具可提供实时的移民评估服务。选择学签、工签、访客签证、Express Entry 或省提名等目标，输入年龄、预算、雅思等条件，获取五维风险概览与可行性参考。",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "CAD" },
+  };
+
   return (
     <main className="min-h-screen bg-black text-white font-mono">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(riskCompassJsonLd) }} />
       <PromoChatFab />
       <header className="border-b border-white/10 bg-black/90 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">

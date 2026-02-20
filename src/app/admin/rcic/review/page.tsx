@@ -147,25 +147,10 @@ export default function AdminReviewPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">RCIC 顾问审核</h1>
-            <div className="flex gap-3">
-              <button
-                onClick={() => router.push("/admin/members")}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                会员信息
-              </button>
-              <button
-                onClick={() => router.push("/admin/page-stats")}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                页面点击率
-              </button>
-              <button
-                onClick={() => router.push("/")}
-                className="text-gray-600 hover:text-gray-900"
-              >
-                返回首页
-              </button>
+            <div className="flex gap-3 flex-wrap">
+              <button onClick={() => router.push("/admin/members")} className="text-gray-600 hover:text-gray-900">会员信息</button>
+              <button onClick={() => router.push("/admin/page-stats")} className="text-gray-600 hover:text-gray-900">页面点击率</button>
+              <button onClick={() => router.push("/")} className="text-gray-600 hover:text-gray-900">返回首页</button>
             </div>
           </div>
         </div>
