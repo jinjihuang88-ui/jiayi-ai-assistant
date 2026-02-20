@@ -149,6 +149,12 @@ export default function AdminReviewPage() {
             <h1 className="text-2xl font-bold text-gray-900">RCIC 顾问审核</h1>
             <div className="flex gap-3">
               <button
+                onClick={() => router.push("/admin/members")}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                会员信息
+              </button>
+              <button
                 onClick={() => router.push("/admin/page-stats")}
                 className="text-gray-600 hover:text-gray-900"
               >
