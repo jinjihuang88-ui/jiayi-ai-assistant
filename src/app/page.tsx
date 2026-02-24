@@ -190,80 +190,98 @@ export default function Home() {
         )}
       </header>
 
-      {/* Hero - 左功能右图片：AI 咨询主视觉，描述问题 + 开始对话 */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
-        <div className="max-w-6xl mx-auto px-6 py-16 md:py-24">
+      {/* Hero - 图片居中，内容覆盖在图片之上（仿律师站布局） */}
+      <section className="relative overflow-hidden bg-slate-950">
+        {/* 背景图片居中铺满 */}
+        <div className="absolute inset-0">
+          <img
+            src="/home-right.png"
+            alt="加移 AI 移民顾问在线咨询示意图"
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-black/85" />
+        </div>
+
+        {/* 覆盖层内容 */}
+        <div className="relative max-w-6xl mx-auto px-6 py-16 md:py-24">
           <div className={`transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
-            <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
-              <div className="grid md:grid-cols-2 gap-0 items-stretch">
-                {/* 左侧：文案与功能 */}
-                <div className="px-6 py-8 md:px-10 md:py-10 flex flex-col">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-xs font-medium text-slate-600 mb-4 w-fit">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    与 AI 移民顾问对话 · 免费开始
-                  </div>
-
-                  <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
-                    与 AI 移民顾问对话，在线咨询
-                  </h1>
-                  <p className="text-base md:text-lg text-slate-600 mb-2">
-                    Talk to an AI immigration consultant online now
-                  </p>
-                  <p className="text-sm text-slate-500 mb-6">
-                    描述您的问题，与 AI 对话获取学签、工签、移民路径的初步建议 · 持牌顾问(RCIC)平台。
-                  </p>
-
-                  {/* 主入口卡片：描述问题 + 开始对话 */}
-                  <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5 md:p-6 mb-5">
-                    <p className="text-slate-600 text-sm mb-3">
-                      与 AI 一对一对话，直到您满意。学签、工签、访客签证、Express Entry、省提名等均可咨询。
-                    </p>
-                    <p className="text-slate-500 text-xs mb-4">
-                      Chat with AI for path overview. No retainers. Then connect with a licensed consultant when you’re ready.
-                    </p>
-                    <a
-                      href="/chat"
-                      className="block w-full py-4 px-6 rounded-xl bg-[#C62828] text-white font-semibold text-center text-lg hover:bg-[#B71C1C] transition-colors shadow-lg"
-                    >
-                      开始对话 Start chat
-                    </a>
-                    <p className="text-xs text-slate-400 mt-3 text-center">
-                      点击后进入 AI 顾问对话页 · 平台不提供移民或法律服务，仅供参考
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap justify-start gap-3 text-xs md:text-sm text-slate-600 mb-4">
-                    <span className="inline-flex items-center gap-1">
-                      <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-                      不承诺 100% 成功
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-                      不强推方案
-                    </span>
-                    <span className="inline-flex items-center gap-1">
-                      <svg className="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-                      顾问均经平台审核
-                    </span>
-                  </div>
-
-                  <p className="text-xs md:text-sm text-slate-500">
-                    想找真人顾问？
-                    <a href={consultantLink} className="text-[#C62828] font-medium hover:underline ml-1">
-                      去 找顾问 →
-                    </a>
-                  </p>
+            <div className="grid md:grid-cols-[minmax(0,1.6fr)_minmax(0,1.4fr)] gap-8 items-stretch">
+              {/* 左侧：主标题、说明、卖点 + 找顾问，全部覆盖在图片上 */}
+              <div className="flex flex-col justify-center">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-medium text-white/80 mb-4 w-fit border border-white/20">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  在线与 AI 移民顾问交流 · 先了解再决策
                 </div>
 
-                {/* 右侧：首页展示图片 */}
-                <div className="relative min-h-[220px] md:min-h-[320px] bg-slate-900">
-                  <img
-                    src="/home-right.png"
-                    alt="加移 AI 移民顾问在线咨询示意图"
-                    className="absolute inset-0 w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-l from-slate-900/40 via-slate-900/10 to-transparent" />
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+                  与 AI 移民顾问对话，在线咨询
+                </h1>
+                <p className="text-base md:text-lg text-white/80 mb-2">
+                  Talk to an AI immigration consultant online now
+                </p>
+                <p className="text-sm text-white/70 mb-6 max-w-xl">
+                  描述您的问题，与 AI 对话获取学签、工签、移民路径的初步建议；需要时再对接加拿大持牌移民顾问 (RCIC)。
+                </p>
+
+                <ul className="text-sm text-white/80 space-y-2 mb-6">
+                  <li className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                    不承诺 100% 成功，不画大饼，只帮你看清利弊
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                    不强推方案，你可以随时停止或更换顾问
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-emerald-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                    顾问均经平台审核，信息透明可查
+                  </li>
+                </ul>
+
+                <p className="text-xs md:text-sm text-white/70">
+                  想直接找真人顾问？
+                  <a href={consultantLink} className="text-[#FFB4B4] font-medium hover:underline ml-1">
+                    去 找顾问 →
+                  </a>
+                </p>
+              </div>
+
+              {/* 右侧：AI 顾问功能卡片（仿右侧聊天面板） */}
+              <div className="flex items-stretch">
+                <div className="w-full max-w-md ml-auto bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+                  <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-semibold">AI 移民顾问在线</p>
+                      <p className="text-[11px] text-white/70">先用 AI 整理思路，再决定是否找顾问</p>
+                    </div>
+                    <span className="inline-flex items-center gap-1 text-[11px] text-emerald-300">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      Online
+                    </span>
+                  </div>
+                  <div className="px-4 py-3 border-b border-slate-100 text-xs text-slate-500">
+                    提示：点击右下角 AI 图标，或访问 `/chat` 页面，可以和 AI 顾问持续对话。
+                  </div>
+                  <div className="px-4 py-4 bg-slate-50 text-xs text-slate-600 space-y-2">
+                    <div className="flex gap-2">
+                      <div className="h-6 w-6 rounded-full bg-slate-200 flex items-center justify-center text-[11px] text-slate-700 font-semibold">
+                        AI
+                      </div>
+                      <div className="bg-white border border-slate-200 rounded-2xl px-3 py-2 max-w-[260px]">
+                        <p className="text-[11px] text-slate-700">
+                          欢迎，你可以输入：<br />
+                          · 想走学签 / 工签 / EE / 省提名，帮我评估可行性<br />
+                          · 我现在的年龄、专业、预算，值得继续吗？
+                        </p>
+                      </div>
+                    </div>
+                    <div className="bg-white border border-dashed border-slate-200 rounded-xl px-3 py-2 text-[11px]">
+                      <p className="text-slate-500">
+                        本工具仅做信息整理与风险提示，不构成移民或法律意见。
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
