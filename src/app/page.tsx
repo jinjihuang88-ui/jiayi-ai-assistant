@@ -255,9 +255,9 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 固定在页面右下角的 AI 咨询框（桌面端） */}
+      {/* 固定在页面右侧、接近原始位置的 AI 咨询框（桌面端） */}
       <div className="hidden lg:block">
-        <div className="fixed z-40 right-6 bottom-6 w-full max-w-md">
+        <div className="fixed z-40 right-20 top-32 w-full max-w-md">
           <ChatBox className="h-[520px]" />
         </div>
       </div>
