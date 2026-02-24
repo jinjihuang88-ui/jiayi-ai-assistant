@@ -325,7 +325,6 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             {/* 透明 */}
             <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-16 h-16 rounded-xl bg-[#C62828] flex items-center justify-center mb-6 text-white text-2xl font-bold">1</div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">透明</h3>
               <p className="text-sm text-slate-500 mb-4">Transparent</p>
               <ul className="text-slate-600 space-y-2 text-sm">
@@ -337,7 +336,6 @@ export default function Home() {
 
             {/* 安全 */}
             <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-16 h-16 rounded-xl bg-[#1E293B] flex items-center justify-center mb-6 text-white text-2xl font-bold">2</div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">安全</h3>
               <p className="text-sm text-slate-500 mb-4">Secure</p>
               <ul className="text-slate-600 space-y-2 text-sm">
@@ -350,7 +348,6 @@ export default function Home() {
 
             {/* 智能 */}
             <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200 hover:shadow-xl transition-all duration-300">
-              <div className="w-16 h-16 rounded-xl bg-[#C62828] flex items-center justify-center mb-6 text-white text-2xl font-bold">3</div>
               <h3 className="text-xl font-bold text-slate-900 mb-1">智能</h3>
               <p className="text-sm text-slate-500 mb-4">Intelligent</p>
               <ul className="text-slate-600 space-y-2 text-sm">
@@ -421,9 +418,6 @@ export default function Home() {
               },
             ].map((item, i) => (
               <div key={i} className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300">
-                <div className="w-12 h-12 rounded-full bg-[#C62828] text-white font-bold flex items-center justify-center mb-4 text-lg">
-                  {item.step}
-                </div>
                 {item.icon ? <div className="text-3xl mb-3">{item.icon}</div> : null}
                 <h3 className="text-lg font-bold text-slate-900 mb-1">{item.title}</h3>
                 <p className="text-xs text-slate-500 mb-2">{item.titleEn}</p>
