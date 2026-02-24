@@ -190,59 +190,74 @@ export default function Home() {
         )}
       </header>
 
-      {/* Hero - 仿 JustAnswer/律师站：AI 咨询主视觉，描述问题 + 开始对话 */}
+      {/* Hero - 左功能右图片：AI 咨询主视觉，描述问题 + 开始对话 */}
       <section className="relative overflow-hidden bg-gradient-to-b from-slate-50 to-white">
-        <div className="max-w-3xl mx-auto px-6 py-16 md:py-24">
+        <div className="max-w-6xl mx-auto px-6 py-16 md:py-24">
           <div className={`transition-all duration-1000 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3 text-center">
-              与 AI 移民顾问对话，在线咨询
-            </h1>
-            <p className="text-lg md:text-xl text-slate-600 mb-1 text-center">
-              Talk to an AI immigration consultant online now
-            </p>
-            <p className="text-sm text-slate-500 mb-6 text-center">
-              描述您的问题，与 AI 对话获取学签、工签、移民路径的初步建议 · 持牌顾问(RCIC)平台
-            </p>
+            <div className="grid md:grid-cols-2 gap-10 items-center">
+              {/* 左侧：文案与功能 */}
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-3">
+                  与 AI 移民顾问对话，在线咨询
+                </h1>
+                <p className="text-lg md:text-xl text-slate-600 mb-1">
+                  Talk to an AI immigration consultant online now
+                </p>
+                <p className="text-sm text-slate-500 mb-6">
+                  描述您的问题，与 AI 对话获取学签、工签、移民路径的初步建议 · 持牌顾问(RCIC)平台
+                </p>
 
-            {/* 主入口卡片：描述问题 + 开始对话 */}
-            <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl p-6 md:p-8 mb-6">
-              <p className="text-slate-600 text-sm mb-4">
-                与 AI 一对一对话，直到您满意。学签、工签、访客签证、Express Entry、省提名等均可咨询。
-              </p>
-              <p className="text-slate-500 text-xs mb-4">
-                Chat with AI for path overview. No retainers. Then connect with a licensed consultant when you’re ready.
-              </p>
-              <a
-                href="/chat"
-                className="block w-full py-4 px-6 rounded-xl bg-[#C62828] text-white font-semibold text-center text-lg hover:bg-[#B71C1C] transition-colors shadow-lg"
-              >
-                开始对话 Start chat
-              </a>
-              <p className="text-xs text-slate-400 mt-3 text-center">
-                点击后进入 AI 顾问对话页 · 平台不提供移民或法律服务，仅供参考
-              </p>
+                {/* 主入口卡片：描述问题 + 开始对话 */}
+                <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-xl p-6 md:p-8 mb-6">
+                  <p className="text-slate-600 text-sm mb-4">
+                    与 AI 一对一对话，直到您满意。学签、工签、访客签证、Express Entry、省提名等均可咨询。
+                  </p>
+                  <p className="text-slate-500 text-xs mb-4">
+                    Chat with AI for path overview. No retainers. Then connect with a licensed consultant when you’re ready.
+                  </p>
+                  <a
+                    href="/chat"
+                    className="block w-full py-4 px-6 rounded-xl bg-[#C62828] text-white font-semibold text-center text-lg hover:bg-[#B71C1C] transition-colors shadow-lg"
+                  >
+                    开始对话 Start chat
+                  </a>
+                  <p className="text-xs text-slate-400 mt-3 text-center">
+                    点击后进入 AI 顾问对话页 · 平台不提供移民或法律服务，仅供参考
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-slate-600 mb-6">
+                  <span className="flex items-center gap-1">
+                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                    不承诺100%成功
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                    不强推方案
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
+                    顾问均经平台审核
+                  </span>
+                </div>
+
+                <p className="text-center md:text-left">
+                  <a href={consultantLink} className="text-[#C62828] font-medium hover:underline">
+                    需要真人持牌顾问？去 找顾问 →
+                  </a>
+                </p>
+              </div>
+
+              {/* 右侧：首页展示图片 */}
+              <div className="mt-10 md:mt-0 flex justify-center">
+                <img
+                  src="/home-right.png"
+                  alt="加移 AI 移民顾问在线咨询示意图"
+                  className="w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 object-cover"
+                  loading="lazy"
+                />
+              </div>
             </div>
-
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-slate-600 mb-6">
-              <span className="flex items-center gap-1">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-                不承诺100%成功
-              </span>
-              <span className="flex items-center gap-1">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-                不强推方案
-              </span>
-              <span className="flex items-center gap-1">
-                <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
-                顾问均经平台审核
-              </span>
-            </div>
-
-            <p className="text-center">
-              <a href={consultantLink} className="text-[#C62828] font-medium hover:underline">
-                需要真人持牌顾问？去 找顾问 →
-              </a>
-            </p>
           </div>
         </div>
       </section>
