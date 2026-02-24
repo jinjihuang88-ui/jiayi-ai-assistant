@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ChatBox from "@/components/ChatBox";
 
 interface User {
   id: string;
@@ -247,42 +248,9 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* 右侧：AI 顾问功能卡片（仿右侧聊天面板） */}
+              {/* 右侧：真正可用的 AI 咨询聊天框 */}
               <div className="flex items-stretch">
-                <div className="w-full max-w-md ml-auto bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-                  <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
-                    <div>
-                      <p className="text-xs font-semibold">AI 移民顾问在线</p>
-                      <p className="text-[11px] text-white/70">先用 AI 整理思路，再决定是否找顾问</p>
-                    </div>
-                    <span className="inline-flex items-center gap-1 text-[11px] text-emerald-300">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      Online
-                    </span>
-                  </div>
-                  <div className="px-4 py-3 border-b border-slate-100 text-xs text-slate-500">
-                    提示：点击右下角 AI 图标，或访问 `/chat` 页面，可以和 AI 顾问持续对话。
-                  </div>
-                  <div className="px-4 py-4 bg-slate-50 text-xs text-slate-600 space-y-2">
-                    <div className="flex gap-2">
-                      <div className="h-6 w-6 rounded-full bg-slate-200 flex items-center justify-center text-[11px] text-slate-700 font-semibold">
-                        AI
-                      </div>
-                      <div className="bg-white border border-slate-200 rounded-2xl px-3 py-2 max-w-[260px]">
-                        <p className="text-[11px] text-slate-700">
-                          欢迎，你可以输入：<br />
-                          · 想走学签 / 工签 / EE / 省提名，帮我评估可行性<br />
-                          · 我现在的年龄、专业、预算，值得继续吗？
-                        </p>
-                      </div>
-                    </div>
-                    <div className="bg-white border border-dashed border-slate-200 rounded-xl px-3 py-2 text-[11px]">
-                      <p className="text-slate-500">
-                        本工具仅做信息整理与风险提示，不构成移民或法律意见。
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <ChatBox className="w-full max-w-md ml-auto h-[520px]" />
               </div>
             </div>
           </div>

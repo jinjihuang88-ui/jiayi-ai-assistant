@@ -23,7 +23,7 @@ function genSessionUserId(): string {
   return "web_" + Math.random().toString(36).slice(2) + "_" + Date.now();
 }
 
-export default function ChatBox() {
+export default function ChatBox({ className }: { className?: string } = {}) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -155,7 +155,7 @@ export default function ChatBox() {
   ];
 
   return (
-    <div className="flex flex-col h-[700px] bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden">
+    <div className={`flex flex-col bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden ${className || "h-[700px]"}`}>
       {/* Header */}
       <div className="flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-red-600 to-orange-500 text-white flex-shrink-0">
         <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
@@ -183,8 +183,8 @@ export default function ChatBox() {
       >
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center px-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center text-3xl mb-4 shadow-lg">
-              🍁
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-600 to-orange-500 flex items-center justify-center text-sm font-semibold text-white mb-4 shadow-lg">
+              AI
             </div>
             <h4 className="text-lg font-semibold text-slate-800 mb-2">
               欢迎使用 AI 移民顾问
