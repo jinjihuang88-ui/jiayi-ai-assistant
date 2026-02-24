@@ -248,14 +248,19 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* 右侧：真正可用的 AI 咨询聊天框（滚动时保持在视窗内） */}
-              <div className="flex items-stretch md:sticky md:top-24">
-                <ChatBox className="w-full max-w-md ml-auto h-[520px]" />
-              </div>
+              {/* 右侧：预留空间，让背景图更完整（桌面端占位） */}
+              <div className="hidden md:block" />
             </div>
           </div>
         </div>
       </section>
+
+      {/* 固定在页面右下角的 AI 咨询框（桌面端） */}
+      <div className="hidden lg:block">
+        <div className="fixed z-40 right-6 bottom-6 w-full max-w-md">
+          <ChatBox className="h-[520px]" />
+        </div>
+      </div>
 
       {/* What you get - 仿律师站 */}
       <section className="py-12 md:py-16 bg-white border-t border-slate-100">
