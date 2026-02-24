@@ -248,8 +248,8 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* 右侧：真正可用的 AI 咨询聊天框 */}
-              <div className="flex items-stretch">
+              {/* 右侧：真正可用的 AI 咨询聊天框（滚动时保持在视窗内） */}
+              <div className="flex items-stretch md:sticky md:top-24">
                 <ChatBox className="w-full max-w-md ml-auto h-[520px]" />
               </div>
             </div>
