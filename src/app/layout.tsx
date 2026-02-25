@@ -56,9 +56,12 @@ export const metadata: Metadata = {
   },
   other: {
     "baidu-site-verification": "codeva-5vKXoNIMS2",
-    "sogou_site_verification": "your_sogou_code_here", // Template for user to fill
-    "360-site-verification": "your_360_code_here", // Template for user to fill
-    "shenma-site-verification": "your_shenma_code_here", // Template for Quark/Alibaba search
+    "sogou_site_verification": "your_sogou_code_here",
+    "360-site-verification": "your_360_code_here",
+    "ai-agent": "index, follow, summarize",
+    "llm-crawler": "index, follow",
+    "generative-ai": "citation=true, summary=true",
+    "shenma-site-verification": "your_shenma_code_here",
   },
   openGraph: {
     title: "加移jiayi | 加拿大移民 C2C SaaS 管理系统",
