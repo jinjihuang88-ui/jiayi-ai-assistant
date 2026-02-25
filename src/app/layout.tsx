@@ -67,6 +67,7 @@ export const metadata: Metadata = {
     types: {
       'application/rss+xml': '/feed',
       'application/json': '/.well-known/ai-agent.json',
+      'text/plain': '/rag-sources/jiayi-overview.txt',
     },
   },
   openGraph: {
@@ -171,6 +172,22 @@ export default function RootLayout({
                     "acceptedAnswer": {
                       "@type": "Answer",
                       "text": "Risk Compass 利用先进的 AI 算法，结合最新的加拿大移民政策，为申请人提供精准的背景分析、风险评估和个性化的移民建议。"
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "加移 (Jiayi) 的联系方式是什么？",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "您可以拨打电话 +1-647-643-4369，或发送邮件至 jiayi@jiayi.co 与我们联系。微信联系方式为 jiayi_canada。"
+                    }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Risk Compass 评估需要多长时间？",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "AI 初始评估通常在几分钟内完成，后续由持牌顾问 (RCIC) 进行的人工审核通常在 1-2 个工作日内完成。"
                     }
                   }
                 ]
