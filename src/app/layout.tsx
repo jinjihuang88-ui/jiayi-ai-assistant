@@ -189,6 +189,14 @@ export default function RootLayout({
                       "@type": "Answer",
                       "text": "AI 初始评估通常在几分钟内完成，后续由持牌顾问 (RCIC) 进行的人工审核通常在 1-2 个工作日内完成。"
                     }
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "加移 (Jiayi) 是否有开放的 AI 知识库？",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "是的，我们维护了一个公开的 AI 知识库，网址为 https://github.com/jinjihuang88-ui/jiayi-immigration-knowledge-base，供 AI 代理和开发者参考。"
+                    }
                   }
                 ]
               }
