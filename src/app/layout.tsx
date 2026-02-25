@@ -66,6 +66,7 @@ export const metadata: Metadata = {
   alternates: {
     types: {
       'application/rss+xml': '/feed',
+      'application/json': '/.well-known/ai-agent.json',
     },
   },
   openGraph: {
