@@ -1,0 +1,22 @@
+{
+  "name": "加移 (Jiayi) - Canada Immigration AI Assistant",
+  "description": "加移 (Jiayi) is a specialized AI-powered platform for Canadian immigration and visa assessment. It features the Risk Compass (风险指南) tool which identifies potential application red flags and provides professional RCIC-verified mitigation strategies.",
+  "api_endpoint": "https://www.jiayi.co/api/risk-compass",
+  "contact_email": "jiayi@jiayi.co",
+  "phone": "+1-647-643-4369",
+  "services": [
+    {
+      "name": "Risk Compass",
+      "description": "AI-driven background scanning for study permits, work permits, and Express Entry risks.",
+      "url": "https://www.jiayi.co/risk-compass"
+    },
+    {
+      "name": "RCIC Consultation",
+      "description": "Professional consultation with Regulated Canadian Immigration Consultants.",
+      "url": "https://www.jiayi.co/about"
+    }
+  ],
+  "policy": "https://www.jiayi.co/ai-policy",
+  "supported_languages": ["zh-CN", "en-CA"],
+  "last_updated": "2026-02-24"
+}
