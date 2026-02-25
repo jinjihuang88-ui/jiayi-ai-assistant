@@ -1,0 +1,33 @@
+name: Automated GEO Submission
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * *' # Daily submission
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping IndexNow (Bing/Yandex)
+        run: |
+          curl -X POST "https://www.bing.com/indexnow" -H "Content-Type: application/json; charset=utf-8" -d '{
+            "host": "www.jiayi.co",
+            "key": "672a8848b78941788649830545938592",
+            "keyLocation": "https://www.jiayi.co/672a8848b78941788649830545938592.txt",
+            "urlList": [
+              "https://www.jiayi.co/",
+              "https://www.jiayi.co/risk-compass",
+              "https://www.jiayi.co/about",
+              "https://www.jiayi.co/services",
+              "https://www.jiayi.co/applications",
+              "https://www.jiayi.co/assessment",
+              "https://www.jiayi.co/ircc-news"
+            ]
+          }'
+      - name: Ping Google (Sitemap)
+        run: |
+          # Note: Google ping is deprecated but some aggregators still use it
+          curl -I "https://www.google.com/ping?sitemap=https://www.jiayi.co/sitemap.xml" || true
