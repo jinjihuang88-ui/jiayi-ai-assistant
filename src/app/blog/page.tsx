@@ -9,6 +9,14 @@ export const metadata = {
 
 const blogPosts = [
   {
+    id: 'risk-compass-guide',
+    title: '如何使用 Risk Compass AI 工具评估您的加拿大移民风险？',
+    excerpt: 'Risk Compass 是加移(Jiayi)推出的 AI 驱动评估工具，帮助申请人精准识别加拿大签证和移民申请中的潜在风险，并提供专业的应对策略。',
+    image: '/blog-images/forum_post_study_permit_banner.png',
+    date: '2026-02-24',
+    category: 'AI 评估工具',
+  },
+  {
     id: 'ee-immigration-score',
     title: '加拿大EE移民分数持续走高，普通人还有机会吗？',
     excerpt: '最近很多朋友都在焦虑，加拿大联邦技术移民Express Entry（EE）的分数线简直是"高攀不起"。作为一个在移民圈里摸爬滚打多年的"老油条"，我想和大家聊聊，现在的形势下，我们普通申请人到底还有没有机会？',
