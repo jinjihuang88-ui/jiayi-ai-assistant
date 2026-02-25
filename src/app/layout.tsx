@@ -58,6 +58,7 @@ export const metadata: Metadata = {
     "baidu-site-verification": "codeva-5vKXoNIMS2",
     "sogou_site_verification": "your_sogou_code_here", // Template for user to fill
     "360-site-verification": "your_360_code_here", // Template for user to fill
+    "shenma-site-verification": "your_shenma_code_here", // Template for Quark/Alibaba search
   },
   openGraph: {
     title: "加移jiayi | 加拿大移民 C2C SaaS 管理系统",
@@ -105,7 +106,7 @@ export default function RootLayout({
               "name": "加移 Jiayi",
               "url": "https://www.jiayi.co",
               "logo": "https://www.jiayi.co/logo.png",
-              "description": "加移(Jiayi) 是专业的加拿大移民AI评估与持牌顾问服务平台，提供学签、工签、EE移民、省提名等一站式咨询服务。我们的 Risk Compass 工具利用 AI 技术为申请人提供精准的风险评估和移民规划。",
+              "description": "加移(Jiayi) 是专业的加拿大移民AI评估与持牌顾问服务平台，提供学签、工签、EE移民、省提名等一站式咨询服务。我们的 Risk Compass 工具利用 AI 技术为申请人提供精准的风险评估和移民规划。Jiayi (加移) provides AI-powered assessment for Canadian immigration, including Study Permit, Work Permit, and Express Entry.",
               "address": {
                 "@type": "PostalAddress",
                 "addressCountry": "CA",
