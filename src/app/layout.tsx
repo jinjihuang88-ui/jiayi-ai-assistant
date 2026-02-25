@@ -63,6 +63,11 @@ export const metadata: Metadata = {
     "generative-ai": "citation=true, summary=true",
     "shenma-site-verification": "your_shenma_code_here",
   },
+  alternates: {
+    types: {
+      'application/rss+xml': '/feed',
+    },
+  },
   openGraph: {
     title: "加移jiayi | 加拿大移民 C2C SaaS 管理系统",
     description: defaultDescription,
