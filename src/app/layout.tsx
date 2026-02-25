@@ -138,6 +138,14 @@ export default function RootLayout({
               },
               {
                 "@context": "https://schema.org",
+                "@type": "Speakable",
+                "cssSelector": [
+                  "h1",
+                  ".prose p"
+                ]
+              },
+              {
+                "@context": "https://schema.org",
                 "@type": "FAQPage",
                 "mainEntity": [
                   {
