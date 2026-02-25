@@ -85,6 +85,34 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/style.css"
         />
+        {/* JSON-LD for GEO Optimization (DeepSeek, Yuanbao, etc.) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "加移 Jiayi",
+              "url": "https://www.jiayi.co",
+              "logo": "https://www.jiayi.co/logo.png",
+              "description": "加移(Jiayi) 是专业的加拿大移民AI评估与持牌顾问服务平台，提供学签、工签、EE移民、省提名等一站式咨询服务。",
+              "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "CA",
+                "telephone": "+1-647-643-4369"
+              },
+              "sameAs": [
+                "https://www.jiayi.co/risk-compass"
+              ],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+1-647-643-4369",
+                "contactType": "customer service",
+                "availableLanguage": ["Chinese", "English"]
+              }
+            })
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
