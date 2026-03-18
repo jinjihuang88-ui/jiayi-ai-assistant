@@ -1,0 +1,115 @@
+services:
+  # 1. 核心中枢 (FastAPI) — 本项目入口为 api_server.py，非 api_server_db
+  api:
+    build: .
+    command: uvicorn api_server:app --host 0.0.0.0 --port 8000
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # 将当前目录挂载到容器 /app，intent_net.db 持久化在宿主机
+      - ./:/app
+    env_file:
+      - .env
+    restart: always
+
+  # 2. 极客控制台 (Streamlit)
+  web:
+    build: .
+    command: streamlit run ui_dashboard.py --server.port 8501 --server.address 0.0.0.0 --server.headless true
+    depends_on:
+      - api
+    environment:
+      # Docker 内通过 nginx 反代，API_BASE 指向同源
+      - API_BASE=http://api:8000
+    volumes:
+      - ./:/app
+    restart: always
+
+  # 4. SearXNG 私有搜索引擎 — 端口 8080
+  searxng:
+    image: searxng/searxng:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=http://43.98.245.147:8080/
+    restart: always
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+
+  # 5. Telegram Bot — 买卖家通过 Telegram 提交供需
+  telegram:
+    build:
+      context: .
+      dockerfile: Dockerfile.telegram
+    volumes:
+      - ./telegram_bot.py:/app/telegram_bot.py:ro
+    environment:
+      - API_BASE=http://api:8000
+    env_file:
+      - .env
+    depends_on:
+      - api
+    restart: always
+
+  # 6. 供应商爬虫 v5 — 每4h搜索北美批发商/进口商/中国出口商，存SUPPLY意图
+  crawler:
+    build:
+      context: .
+      dockerfile: Dockerfile.crawler
+    command: python crawler_worker.py
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    environment:
+      - API_BASE=http://api:8000
+      - DB_FILE=/app/intent_net.db
+      - SEARXNG_URL=http://searxng:8080
+    depends_on:
+      - api
+      - searxng
+    restart: always
+
+  # 7. 需求侧三合一爬虫 — 替代 Manus 三个 Skill，每6h一轮
+  #    A: Shopify/独立站买家 (DEMAND)
+  #    B: 为未匹配供应商定向找买家 (DEMAND)
+  #    C: 亚洲中小供应商 (SUPPLY)
+  demand_crawler:
+    build:
+      context: .
+      dockerfile: Dockerfile.crawler
+    command: python -u demand_crawler.py
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+      - API_BASE=http://api:8000
+      - DB_FILE=/app/intent_net.db
+      - SEARXNG_URL=http://searxng:8080
+    depends_on:
+      - api
+      - searxng
+    restart: always
+
+  # 3. Nginx 反向代理 — / → static landing page, /app → Streamlit, /api/ → FastAPI
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./static:/usr/share/nginx/html:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    depends_on:
+      - api
+      - web
+    restart: always

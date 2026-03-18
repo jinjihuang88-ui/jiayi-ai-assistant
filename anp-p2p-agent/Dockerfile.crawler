@@ -1,0 +1,5 @@
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install --no-cache-dir requests beautifulsoup4 lxml openai
+# 不在此处 COPY 文件 — docker-compose 用 volume 挂载整个目录
+CMD ["python", "crawler_worker.py"]
