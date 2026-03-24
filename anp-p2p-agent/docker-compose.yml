@@ -57,26 +57,7 @@ services:
       - api
     restart: always
 
-  # 6. 供应商爬虫 v5 — 每4h搜索北美批发商/进口商/中国出口商，存SUPPLY意图
-  crawler:
-    build:
-      context: .
-      dockerfile: Dockerfile.crawler
-    command: python crawler_worker.py
-    volumes:
-      - ./:/app
-    env_file:
-      - .env
-    environment:
-      - API_BASE=http://api:8000
-      - DB_FILE=/app/intent_net.db
-      - SEARXNG_URL=http://searxng:8080
-    depends_on:
-      - api
-      - searxng
-    restart: always
-
-  # 7. 需求侧三合一爬虫 — 替代 Manus 三个 Skill，每6h一轮
+  # 6. 三合一爬虫 — 每6h一轮
   #    A: Shopify/独立站买家 (DEMAND)
   #    B: 为未匹配供应商定向找买家 (DEMAND)
   #    C: 亚洲中小供应商 (SUPPLY)
