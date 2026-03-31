@@ -49,7 +49,6 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
     googleBot: "index, follow",
-    bingbot: "index, follow",
     "max-video-preview": -1,
     "max-image-preview": "large",
     "max-snippet": -1,
@@ -64,10 +63,11 @@ export const metadata: Metadata = {
     "shenma-site-verification": "your_shenma_code_here",
   },
   alternates: {
+    canonical: "https://www.jiayi.co",
     types: {
-      'application/rss+xml': '/feed',
-      'application/json': '/.well-known/ai-agent.json',
-      'text/plain': '/rag-sources/jiayi-overview.txt',
+      "application/rss+xml": "/feed",
+      "application/json": "/.well-known/ai-agent.json",
+      "text/plain": "/rag-sources/jiayi-overview.txt",
     },
   },
   openGraph: {
@@ -77,9 +77,6 @@ export const metadata: Metadata = {
     siteName: "加移 Jiayi",
     locale: "zh_CN",
     type: "website",
-  },
-  alternates: {
-    canonical: "https://www.jiayi.co",
   },
   icons: {
     icon: "/logo.png",

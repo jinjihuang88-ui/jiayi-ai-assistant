@@ -2,7 +2,6 @@ import type { MetadataRoute } from "next";
 
 const BASE_URL = "https://www.jiayi.co";
 
-/** 静态页面配置：path, changeFrequency, priority */
 const staticPages: [string, MetadataRoute.Sitemap[0]["changeFrequency"], number][] = [
   ["/", "weekly", 1],
   ["/about", "monthly", 0.9],
@@ -22,15 +21,29 @@ const staticPages: [string, MetadataRoute.Sitemap[0]["changeFrequency"], number]
   ["/privacy", "yearly", 0.5],
   ["/terms", "yearly", 0.5],
   ["/report", "monthly", 0.6],
-  ["/auth/login", "yearly", 0.5],
-  ["/auth/register", "yearly", 0.5],
-  ["/auth/verify", "yearly", 0.4],
-  ["/auth/resend-verification", "yearly", 0.4],
-  ["/auth/rcic/register", "yearly", 0.5],
-  ["/member/consultants", "weekly", 0.7],
-  ["/member/applications", "weekly", 0.6],
-  ["/rcic/login", "yearly", 0.4],
-  ["/rcic/register", "yearly", 0.5],
+  ["/ai-policy", "monthly", 0.7],
+  ["/m-ai", "monthly", 0.7],
+  ["/blog", "weekly", 0.9],
+  ["/blog/risk-compass-guide", "monthly", 0.8],
+  ["/blog/study-permit-2026", "monthly", 0.8],
+  ["/blog/ee-immigration-score", "monthly", 0.8],
+  ["/blog/pnp-immigration", "monthly", 0.8],
+  ["/blog/immigration-mistakes", "monthly", 0.8],
+  ["/blog/lmia-work-permit", "monthly", 0.8],
+  ["/docs/risk-compass", "monthly", 0.8],
+  ["/docs/case-studies", "monthly", 0.7],
+  ["/docs/api", "monthly", 0.7],
+  ["/docs/data-schemas", "monthly", 0.7],
+  ["/docs/methodology", "monthly", 0.7],
+  ["/docs/whitepaper", "monthly", 0.8],
+  ["/.well-known/ai-agent.json", "monthly", 0.3],
+  ["/rag-sources/jiayi-overview.txt", "monthly", 0.3],
+  ["/llms.txt", "monthly", 0.3],
+  ["/llms-zh.txt", "monthly", 0.3],
+  ["/llms-full.txt", "monthly", 0.3],
+  ["/jia-na-da-xue-qian-shen-qing-wenda", "monthly", 0.8],
+  ["/jia-na-da-gong-qian-shen-qing-wenda", "monthly", 0.8],
+  ["/jia-na-da-yi-min-risk-compass-wenda", "monthly", 0.8],
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -4,13 +4,23 @@ const urls = [
   'https://www.jiayi.co/',
   'https://www.jiayi.co/risk-compass',
   'https://www.jiayi.co/about',
+  'https://www.jiayi.co/services',
+  'https://www.jiayi.co/ai-policy',
   'https://www.jiayi.co/blog',
   'https://www.jiayi.co/blog/risk-compass-guide',
   'https://www.jiayi.co/blog/study-permit-2026',
   'https://www.jiayi.co/blog/ee-immigration-score',
   'https://www.jiayi.co/blog/pnp-immigration',
   'https://www.jiayi.co/blog/immigration-mistakes',
-  'https://www.jiayi.co/blog/lmia-work-permit'
+  'https://www.jiayi.co/blog/lmia-work-permit',
+  'https://www.jiayi.co/jia-na-da-xue-qian-shen-qing-wenda',
+  'https://www.jiayi.co/jia-na-da-gong-qian-shen-qing-wenda',
+  'https://www.jiayi.co/jia-na-da-yi-min-risk-compass-wenda',
+  'https://www.jiayi.co/.well-known/ai-agent.json',
+  'https://www.jiayi.co/rag-sources/jiayi-overview.txt',
+  'https://www.jiayi.co/llms.txt',
+  'https://www.jiayi.co/llms-zh.txt',
+  'https://www.jiayi.co/llms-full.txt'
 ];
 
 // Bing IndexNow

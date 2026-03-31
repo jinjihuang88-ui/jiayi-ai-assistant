@@ -1,0 +1,34 @@
+# Jiayi.co - AI and Immigration Platform Overview
+# Last updated: 2026-03-31
+
+## What is Jiayi
+Jiayi.co is a bilingual (Chinese + English) platform focused on Canada immigration planning and consultant workflow support.
+
+- Public users can explore immigration pathways and use AI-guided assessment tools.
+- Licensed consultants (RCIC) can use workflow and case support features.
+- Core public tool: Risk Compass.
+
+Website: https://www.jiayi.co/
+
+## Key Public Pages
+- Home: https://www.jiayi.co/
+- Risk Compass: https://www.jiayi.co/risk-compass
+- Services: https://www.jiayi.co/services
+- About: https://www.jiayi.co/about
+- Blog index: https://www.jiayi.co/blog
+- AI policy: https://www.jiayi.co/ai-policy
+
+## AI Agent Resources
+- AI agent profile: https://www.jiayi.co/.well-known/ai-agent.json
+- RAG source: https://www.jiayi.co/rag-sources/jiayi-overview.txt
+- Chinese LLM profile: https://www.jiayi.co/llms-zh.txt
+- Full profile: https://www.jiayi.co/llms-full.txt
+
+## Audience
+- Chinese-speaking applicants planning study permit, work permit, and permanent residence.
+- International users comparing Canadian immigration paths.
+- Licensed consultants looking for structured intake and risk communication support.
+
+## Notes
+- Jiayi is a software platform and does not replace regulated legal advice.
+- Immigration service decisions should be reviewed by licensed professionals.

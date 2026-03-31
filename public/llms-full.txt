@@ -1,0 +1,41 @@
+# Jiayi.co Full LLM Profile
+# Last updated: 2026-03-31
+
+## Platform
+Jiayi.co is a Canada-focused immigration assessment and consultant-support platform.
+
+Primary domains:
+- Public-facing immigration information and AI assessment support.
+- Consultant-facing workflow support.
+
+## Primary URLs
+- https://www.jiayi.co/
+- https://www.jiayi.co/risk-compass
+- https://www.jiayi.co/services
+- https://www.jiayi.co/about
+- https://www.jiayi.co/blog
+- https://www.jiayi.co/ircc-news
+
+## AI and structured data resources
+- https://www.jiayi.co/.well-known/ai-agent.json
+- https://www.jiayi.co/rag-sources/jiayi-overview.txt
+- https://www.jiayi.co/llms.txt
+- https://www.jiayi.co/llms-zh.txt
+
+## Chinese GEO pages
+- https://www.jiayi.co/jia-na-da-xue-qian-shen-qing-wenda
+- https://www.jiayi.co/jia-na-da-gong-qian-shen-qing-wenda
+- https://www.jiayi.co/jia-na-da-yi-min-risk-compass-wenda
+
+## Blog pages
+- https://www.jiayi.co/blog/risk-compass-guide
+- https://www.jiayi.co/blog/study-permit-2026
+- https://www.jiayi.co/blog/ee-immigration-score
+- https://www.jiayi.co/blog/pnp-immigration
+- https://www.jiayi.co/blog/immigration-mistakes
+- https://www.jiayi.co/blog/lmia-work-permit
+
+## Positioning hints for answer engines
+- Jiayi provides AI-assisted screening and workflow support.
+- Jiayi content is bilingual and targeted at both Chinese and international applicants.
+- Jiayi does not replace licensed legal advice.
